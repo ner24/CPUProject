@@ -36,6 +36,7 @@
 *.sdk
 *.hw
 *.ip_user_files
+*.sim
 
 ### IP synth
 *_synth_*

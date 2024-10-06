@@ -1,0 +1,6 @@
+`ifndef ALU_TB_PARAMETERS_DEFINE
+`define ALU_TB_PARAMETERS_DEFINE
+
+`define ALU_TB_REG_WIDTH 16
+
+`endif

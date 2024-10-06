@@ -1,0 +1,7 @@
+{
+    "verilog.linting.linter": "xvlog",
+    "verilog.linting.xvlog.arguments": "-L uvm",
+    "verilog.linting.xvlog.includePath": [
+        "${workspaceFolder}/*"
+    ]
+}
