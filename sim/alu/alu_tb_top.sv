@@ -10,6 +10,7 @@ module alu_tb import uvm_pkg::*; (
 );
 
   localparam REG_WIDTH = `ALU_TB_REG_WIDTH;
+  localparam USE_PIPELINED_ALU = `ALU_TB_USE_PIPELINED_ALU;
 
 `ifdef ALU_TB_TOP
   logic clk;
@@ -30,11 +31,14 @@ module alu_tb import uvm_pkg::*; (
 
   initial begin
     uvm_config_db #( virtual alu_dut_intf #(.REG_WIDTH(REG_WIDTH)) )::set(null, "*", "intf_alu", alu_intf);
+    uvm_config_db #( virtual alu_dut_intf #(.REG_WIDTH(REG_WIDTH)) .DRIVER_SIDE )::set(null, "*", "intf_alu_driver_side", alu_intf);
   end
 
   alu #(
-    .REG_WIDTH(REG_WIDTH)
+    .REG_WIDTH(REG_WIDTH),
+    .USE_PIPELINED_ALU(USE_PIPELINED_ALU)
   ) dut (
+    .clk      (clk),
     .reset_n  (alu_intf.reset_n),
     .instr_i  (alu_intf.instr_i),
     .a_i      (alu_intf.a_i),
@@ -44,10 +48,20 @@ module alu_tb import uvm_pkg::*; (
     .cout_o   (alu_intf.cout_o)
   );
 
-`ifdef ALU_TB_TOP
-  //does some strange uvm thing which apparently registers the parameterised test
-  //typedef test_operations#( .REG_WIDTH(REG_WIDTH) ) test_type;
+  //SVAs
+  sva_alu_op #(
+    .REG_WIDTH(REG_WIDTH),
+    .USE_PIPELINED_ALU(USE_PIPELINED_ALU)
+  ) u_sva_alu_op (
+    .alu_clk    (clk),
+    .alu_resetn (alu_intf.reset_n),
+    .alu_cir    (alu_intf.instr_i),
+    .in_a       (alu_intf.a_i),
+    .in_b       (alu_intf.b_i),
+    .out        (alu_intf.out_o)
+  );
 
+`ifdef ALU_TB_TOP
   initial begin
     run_test("test_operations");
   end

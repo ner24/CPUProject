@@ -1,8 +1,8 @@
-
 module cpu #(
   parameter REG_WIDTH = 16
 ) (
-  input  logic clk
+  input  logic clk,
+  input  logic reset_n
 );
 
   logic [REG_WIDTH-1:0] r1;
@@ -13,6 +13,9 @@ module cpu #(
   alu #(
     .REG_WIDTH(REG_WIDTH)
   ) u_alu (
+    .clk(clk),
+    .reset_n(reset_n),
+
     .instr_i  (f1[2 +: 4]),
     .a_i      (r1),
     .b_i      (r2),

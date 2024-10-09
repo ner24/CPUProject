@@ -17,5 +17,25 @@ interface alu_dut_intf #(
   initial begin
     reset_n <= 1'b0;
   end
+
+  modport DRIVER_SIDE (
+    input clk,
+    output reset_n,
+    input out_o, cout_o,
+    output a_i, b_i, instr_i, cin_i
+  );
+
+  modport DUT_SIDE (
+    input clk,
+    input reset_n,
+    input a_i, b_i, instr_i, cin_i,
+    output out_o, cout_o
+  );
+
+  modport VERIF_SIDE (
+    input clk,
+    input reset_n,
+    input a_i, b_i, instr_i, cin_i, out_o, cout_o
+  );
     
 endinterface

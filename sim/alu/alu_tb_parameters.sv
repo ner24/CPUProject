@@ -2,5 +2,6 @@
 `define ALU_TB_PARAMETERS_DEFINE
 
 `define ALU_TB_REG_WIDTH 16
+`define ALU_TB_USE_PIPELINED_ALU 0
 
 `endif

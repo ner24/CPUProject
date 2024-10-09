@@ -1,28 +1,29 @@
 module alu #(
-  parameter REG_WIDTH = 8
+  parameter REG_WIDTH = 8,
+  parameter USE_PIPELINED_ALU = 0
 ) (
-  //input  wire                   clk,
+  input  wire                   clk,
   input  wire                   reset_n,
 
   input  logic            [3:0] instr_i,
   input  wire   [REG_WIDTH-1:0] a_i,
   input  wire   [REG_WIDTH-1:0] b_i,
   input  wire                   cin_i,
-  output wire   [REG_WIDTH-1:0] acc_o, //accumulator
+  output wire   [REG_WIDTH-1:0] acc_o,
   output wire                   cout_o
 );
 
-  logic [REG_WIDTH-1:0] reg_acc;
+  //logic [REG_WIDTH-1:0] reg_acc;
   wire  [REG_WIDTH-1:0] out_wire;
-  assign acc_o = reg_acc;
-
-  always_comb begin: rst
+  //assign acc_o = reg_acc;
+  assign acc_o = out_wire;
+  /*always_comb begin: rst
     if(~reset_n) begin
       reg_acc <= '0;
     end else begin
       reg_acc <= out_wire;
     end
-  end
+  end*/
 
   // ----------------------
   // Instruction decoding
@@ -51,15 +52,32 @@ module alu #(
     endcase
   end
 
-  alu_comb #(
-    .REG_WIDTH(REG_WIDTH)
-  ) u_alu_comb (
-    .a(a_i),
-    .b(b_i),
-    .out(out_wire),
-    .ctrl(cir_decoded[8:1]),
-    .cin(cin_i),
-    .cout(cout_o)
-  );
+  generate if (USE_PIPELINED_ALU) begin: g_alu_comb_piped
+    alu_comb_piped #(
+      .REG_WIDTH(REG_WIDTH)
+    ) u_alu_comb (
+      .clk(clk),
+      .reset_n(reset_n),
+      .pipe_active(1'b1),
+
+      .a(a_i),
+      .b(b_i),
+      .out(out_wire),
+      .ctrl(cir_decoded[8:1]),
+      .cin(cin_i),
+      .cout(cout_o)
+    );
+  end else begin: g_alu_comb_n_piped
+    alu_comb #(
+      .REG_WIDTH(REG_WIDTH)
+    ) u_alu_comb (
+      .a(a_i),
+      .b(b_i),
+      .out(out_wire),
+      .ctrl(cir_decoded[8:1]),
+      .cin(cin_i),
+      .cout(cout_o)
+    );
+  end endgenerate
 
 endmodule
