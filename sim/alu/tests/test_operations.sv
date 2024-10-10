@@ -1,7 +1,7 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 
-`include "../alu_tb_parameters.sv"
+`include "../../../config/alu_parameters.sv"
 
 `include "../testbench/agent/alu_tb_sequence_item.sv"
 `include "../testbench/alu_tb_env.sv"
@@ -41,7 +41,7 @@ class test_operations extends uvm_test;
   `uvm_component_utils(test_operations)
   //`uvm_component_registry(test_operations#( .REG_WIDTH(REG_WIDTH) ), "test_operations")
 
-  localparam REG_WIDTH = `ALU_TB_REG_WIDTH;
+  localparam REG_WIDTH = `ALU_REG_WIDTH;
 
   alu_tb_env #(
     .REG_WIDTH(REG_WIDTH)

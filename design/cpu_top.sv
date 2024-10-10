@@ -11,7 +11,7 @@ module cpu #(
   logic [REG_WIDTH-1:0] f1;
 
   alu #(
-    .REG_WIDTH(REG_WIDTH)
+    //.REG_WIDTH(REG_WIDTH)
   ) u_alu (
     .clk(clk),
     .reset_n(reset_n),

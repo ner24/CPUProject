@@ -1,0 +1,7 @@
+`ifndef ALU_PARAMETERS_DEFINE
+`define ALU_PARAMETERS_DEFINE
+
+`define ALU_REG_WIDTH 4
+`define ALU_USE_PIPELINED_ALU 1
+
+`endif

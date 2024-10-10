@@ -1,6 +1,8 @@
+`include "../../config/alu_parameters.sv"
+
 module alu #(
-  parameter REG_WIDTH = 8,
-  parameter USE_PIPELINED_ALU = 0
+  parameter REG_WIDTH = `ALU_REG_WIDTH,
+  parameter USE_PIPELINED_ALU = `ALU_USE_PIPELINED_ALU
 ) (
   input  wire                   clk,
   input  wire                   reset_n,

@@ -1,6 +1,6 @@
 `define ALU_TB_TOP
 
-`include "alu_tb_parameters.sv"
+`include "../../config/alu_parameters.sv"
 `include "tests/test_operations.sv"
 
 module alu_tb import uvm_pkg::*; (
@@ -9,8 +9,8 @@ module alu_tb import uvm_pkg::*; (
 `endif
 );
 
-  localparam REG_WIDTH = `ALU_TB_REG_WIDTH;
-  localparam USE_PIPELINED_ALU = `ALU_TB_USE_PIPELINED_ALU;
+  localparam REG_WIDTH = `ALU_REG_WIDTH;
+  localparam USE_PIPELINED_ALU = `ALU_USE_PIPELINED_ALU;
 
 `ifdef ALU_TB_TOP
   logic clk;
