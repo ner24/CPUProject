@@ -14,15 +14,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="1,238.415 ns"></ZoomStartTime>
-      <ZoomEndTime time="1,281.624 ns"></ZoomEndTime>
-      <Cursor1Time time="1,790.000 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="31.451 ns"></ZoomEndTime>
+      <Cursor1Time time="0.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="137"></NameColumnWidth>
+      <NameColumnWidth column_width="127"></NameColumnWidth>
       <ValueColumnWidth column_width="72"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="11" />
+   <WVObjectSize size="15" />
    <wvobject fp_name="/alu_tb/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -70,5 +70,21 @@
    <wvobject fp_name="/alu_tb/alu_intf/cout_o" type="logic">
       <obj_property name="ElementShortName">cout_o</obj_property>
       <obj_property name="ObjectShortName">cout_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/alu_tb/u_sva_alu_op/alu_cir" type="array">
+      <obj_property name="ElementShortName">alu_cir[3:0]</obj_property>
+      <obj_property name="ObjectShortName">alu_cir[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/alu_tb/u_sva_alu_op/alu_cir_q2" type="array">
+      <obj_property name="ElementShortName">alu_cir_q2[3:0]</obj_property>
+      <obj_property name="ObjectShortName">alu_cir_q2[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/alu_tb/u_sva_alu_op/sva_prop_alu_cir" type="logic">
+      <obj_property name="ElementShortName">sva_prop_alu_cir</obj_property>
+      <obj_property name="ObjectShortName">sva_prop_alu_cir</obj_property>
+   </wvobject>
+   <wvobject fp_name="/alu_tb/u_sva_alu_op/alu_resetn" type="logic">
+      <obj_property name="ElementShortName">alu_resetn</obj_property>
+      <obj_property name="ObjectShortName">alu_resetn</obj_property>
    </wvobject>
 </wave_config>

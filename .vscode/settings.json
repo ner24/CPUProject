@@ -3,5 +3,9 @@
     "verilog.linting.xvlog.arguments": "-L uvm",
     "verilog.linting.xvlog.includePath": [
         "${workspaceFolder}/*"
-    ]
+    ],
+
+    "files.watcherExclude": {
+        "${workspaceFolder}/CPUDesign*/**": true
+    }
 }

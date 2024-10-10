@@ -44,10 +44,10 @@ class alu_tb_monitor #(
     forever begin
       @(posedge vintf.clk);
 
-      sequence_item.a     <= vintf.a_i;
-      sequence_item.b     <= vintf.b_i;
-      sequence_item.instr <= vintf.instr_i;
-      sequence_item.out   <= vintf.out_o;
+      sequence_item.a     = vintf.a_i;
+      sequence_item.b     = vintf.b_i;
+      sequence_item.instr = vintf.instr_i;
+      sequence_item.out   = vintf.out_o;
       
       analysis_port.write(sequence_item);
       
