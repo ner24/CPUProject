@@ -43,8 +43,5 @@ class alu_tb_driver #(
     vintf.b_i     <= seq_item.b;
     vintf.instr_i <= seq_item.instr;
     vintf.cin_i   <= '0;
-
-    vintf.out_o   <= seq_item.out[REG_WIDTH-1:0];
-    vintf.cout_o  <= seq_item.out[REG_WIDTH];
   endtask
 endclass
