@@ -77,8 +77,8 @@ for line in assembly:
                 G.add_edge(regTracker[firstSrc], n)
             if secondSrc in regTracker:
                 G.add_edge(regTracker[secondSrc], n)
-            regTracker[operands[0]] = n
-            
+            if operands[0] in regTracker:
+                G.add_edge(regTracker[operands[0]], n)
         case "stmia":
             memBaseIdxReg: str = operands[0].replace('!','')
             if memBaseIdxReg in regTracker:
@@ -90,8 +90,13 @@ for line in assembly:
         #ld instructions will allocate to reg in new file so ignore dependencies (for now)
         #assumes each ld access a different memory address (for now)
         case "ldr":
-            regTracker[operands[0]] = n
-            
+            firstSrc: str = operands[1].replace('[','').replace(',','')
+            secondSrc: str = operands[2].replace(']','')
+            if firstSrc in regTracker:
+                G.add_edge(regTracker[firstSrc], n)
+            if secondSrc in regTracker:
+                G.add_edge(regTracker[secondSrc], n)
+            regTracker[operands[0]] = n          
         case "ldmia":
             memBaseIdxReg: str = operands[0].replace('!','')
             if memBaseIdxReg in regTracker:
@@ -107,6 +112,9 @@ for line in assembly:
             for i in range(1, len(operands)):
                 if operands[i] in regTracker:
                     G.add_edge(regTracker[operands[i]], n)
+            if len(operands) < 3:
+                if operands[0] in regTracker:
+                    G.add_edge(regTracker[operands[0]], n)
             #update resource tracker to track destination reg of this instruction
             regTracker[operands[0]] = n
             
