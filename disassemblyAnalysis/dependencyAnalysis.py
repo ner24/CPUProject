@@ -32,7 +32,7 @@ def getTokens(line) -> List[str]:
     return tokens
 
 
-G: pgv.AGraph = pgv.AGraph()
+G: pgv.AGraph = pgv.AGraph(directed=True)
 regTracker: dict[str, tuple, pgv.Node] = {} #where the int in tuple is somewhat analogous to reg file index
 #memTracker: dict[str, pgv.Node] = {}
 for line in assembly:

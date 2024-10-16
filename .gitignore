@@ -37,6 +37,7 @@
 *.hw
 *.ip_user_files
 *.sim
+*.runs
 
 ### IP synth
 *_synth_*
