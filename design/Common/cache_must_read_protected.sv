@@ -6,7 +6,8 @@ module cache_MRP # ( //must read protected cache
   parameter IDX_BITS = 2,
 
   parameter DATA_WIDTH = 16,
-  parameter ADDR_WIDTH = 8
+  parameter ADDR_WIDTH = 8,
+  parameter USE_BRAM_IP = 0
 ) (
   input  wire                   clk,
   input  wire                   reset_n,
@@ -33,7 +34,7 @@ module cache_MRP # ( //must read protected cache
 
   logic       has_been_read [(2**IDX_BITS)-1:0];
   //(* ram_style = "block" *) cache_entry ram [(2**IDX_BITS)-1:0];
-  (* ram_style = "block" *) logic [(DATA_WIDTH+TAG_ADDRESS_WITDH)-1:0] ram [(2**IDX_BITS)-1:0];
+  logic [(DATA_WIDTH+TAG_ADDRESS_WITDH)-1:0] ram [(2**IDX_BITS)-1:0];
 
   wire [IDX_BITS-1:0] idx;
   assign idx = addr_i[IDX_BITS-1:0];

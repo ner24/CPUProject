@@ -1,40 +1,28 @@
-`define ALU_TB_TOP
+import uvm_pkg::*;
+`include "uvm_macros.svh"
 
-`include "../../config/alu_parameters.sv"
-`include "tests/test_operations.sv"
+`include "projectConfig/alu_parameters.sv"
+`include "projectConfig/simulation_parameters.sv"
 
-module alu_tb import uvm_pkg::*; (
-`ifndef ALU_TB_TOP
+`define MODULE_NAME alu_alpu_`VERIF_MODULE_SUFFIX_CONST
+module `MODULE_NAME import uvm_pkg::*; (
   input  wire clk
-`endif
 );
-
   localparam REG_WIDTH = `ALU_REG_WIDTH;
   localparam USE_PIPELINED_ALU = `ALU_USE_PIPELINED_ALU;
 
-`ifdef ALU_TB_TOP
-  logic clk;
-
-  initial begin
-    clk = 0;
-    forever begin
-      #10 clk = ~clk;
-    end
-  end
-`endif
-
-  alu_dut_intf #(
+  intf_alpu #(
     .REG_WIDTH(REG_WIDTH)
   ) alu_intf (
     .clk(clk)
   );
 
   initial begin
-    uvm_config_db #( virtual alu_dut_intf #(.REG_WIDTH(REG_WIDTH)) )::set(null, "*", "intf_alu", alu_intf);
-    uvm_config_db #( virtual alu_dut_intf #(.REG_WIDTH(REG_WIDTH)) .DRIVER_SIDE )::set(null, "*", "intf_alu_driver_side", alu_intf);
+    uvm_config_db #( virtual intf_alpu #(.REG_WIDTH(REG_WIDTH)) )::set(null, "*", "intf_alu", alu_intf);
+    uvm_config_db #( virtual intf_alpu #(.REG_WIDTH(REG_WIDTH)) .DRIVER_SIDE )::set(null, "*", "intf_alu_driver_side", alu_intf);
   end
 
-  alu #(
+  alu_alpu #(
     .REG_WIDTH(REG_WIDTH),
     .USE_PIPELINED_ALU(USE_PIPELINED_ALU)
   ) dut (
@@ -48,7 +36,9 @@ module alu_tb import uvm_pkg::*; (
     .cout_o   (alu_intf.cout_o)
   );
 
-  //SVAs
+  // --------------------
+  // Assertions
+  // --------------------
   sva_alu_op #(
     .REG_WIDTH(REG_WIDTH),
     .USE_PIPELINED_ALU(USE_PIPELINED_ALU)
@@ -60,12 +50,6 @@ module alu_tb import uvm_pkg::*; (
     .in_b       (alu_intf.b_i),
     .out        (alu_intf.out_o)
   );
-
-`ifdef ALU_TB_TOP
-  initial begin
-    run_test("test_operations");
-  end
-`endif
 
 endmodule
 

@@ -1,4 +1,4 @@
-`include "../../config/alu_parameters.sv"
+`include "projectConfig/alu_parameters.sv"
 
 module alu #(
   parameter REG_WIDTH = `ALU_REG_WIDTH,
@@ -15,17 +15,8 @@ module alu #(
   output wire                   cout_o
 );
 
-  //logic [REG_WIDTH-1:0] reg_acc;
   wire  [REG_WIDTH-1:0] out_wire;
-  //assign acc_o = reg_acc;
   assign acc_o = out_wire;
-  /*always_comb begin: rst
-    if(~reset_n) begin
-      reg_acc <= '0;
-    end else begin
-      reg_acc <= out_wire;
-    end
-  end*/
 
   // ----------------------
   // Instruction decoding
@@ -81,5 +72,22 @@ module alu #(
       .cout(cout_o)
     );
   end endgenerate
+
+  // --------------------------------------
+  // Virtual Interface
+  // used for verif to probe this module
+  // --------------------------------------
+  intf_alpu_in #(
+    .REG_WIDTH(REG_WIDTH)
+  ) verif_intf (
+    .clk(clk)
+  );
+  assign verif_intf.reset_n = reset_n;
+  assign verif_intf.a_i = a_i;
+  assign verif_intf.b_i = b_i;
+  assign verif_intf.instr_i = instr_i;
+  assign verif_intf.cin_i = cin_i;
+  assign verif_intf.out_o = acc_o;
+  assign verif_intf.cout_o = cout_o;
 
 endmodule
