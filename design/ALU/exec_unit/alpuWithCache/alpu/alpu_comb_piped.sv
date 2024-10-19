@@ -1,5 +1,5 @@
 //alu combinational logic only
-module alu_comb_piped #(
+module alpu_comb_piped #(
   parameter REG_WIDTH = 16
 ) (
   input  wire                  clk,
@@ -26,7 +26,7 @@ module alu_comb_piped #(
 
   //twos complement inverter
   wire[REG_WIDTH-1:0] invA;
-  alu_inverter #(
+  alpu_inverter #(
     .REG_WIDTH(REG_WIDTH)
   ) inv0 (
     .a(a),
@@ -71,7 +71,7 @@ module alu_comb_piped #(
   wire  [REG_WIDTH-1:0] cla_lh_oX;
   wire  [REG_WIDTH-1:0] cla_lh_cgen_out;
   wire  [REG_WIDTH-1:0] cla_lh_cgen;
-  alu_add_cla_lh #(
+  alpu_add_cla_lh #(
     .REG_WIDTH(REG_WIDTH)
   ) cla_lh_0 (
     .a(invA_s0),
@@ -112,7 +112,7 @@ module alu_comb_piped #(
   //top half
   wire  [REG_WIDTH-1:0] cla_s;
   wire                  cout_internal;
-  alu_add_cla_uh #(
+  alpu_add_cla_uh #(
     .REG_WIDTH(REG_WIDTH)
   ) cla_uh_0 (
     .oX(cla_lh_oX_s1),

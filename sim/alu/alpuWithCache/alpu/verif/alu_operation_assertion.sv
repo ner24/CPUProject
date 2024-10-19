@@ -3,7 +3,7 @@ import uvm_pkg::*;
 
 module sva_alu_op #(
   parameter REG_WIDTH = 16,
-  parameter USE_PIPELINED_ALU = 1
+  parameter USE_PIPELINED_ALPU = 1
 ) (
   input wire alu_clk,
   input wire alu_resetn,
@@ -36,7 +36,7 @@ module sva_alu_op #(
   logic           [3:0] alu_cir_q,
                         alu_cir_q2,
                         alu_cir_sync;
-  generate if (USE_PIPELINED_ALU) begin
+  generate if (USE_PIPELINED_ALPU) begin
     always_ff @(posedge alu_clk) begin : ff_prop_input
       if (~alu_resetn) begin
         in_a_q    <= '0;

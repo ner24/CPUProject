@@ -1,5 +1,5 @@
-interface alu_dut_intf #(
-    parameter REG_WIDTH = 4
+interface intf_alpu #(
+  parameter REG_WIDTH = 4
 ) (
   input wire clk
 );
@@ -18,7 +18,7 @@ interface alu_dut_intf #(
     reset_n <= 1'b0;
   end
 
-  modport DRIVER_SIDE (
+  /*modport DRIVER_SIDE (
     input clk,
     output reset_n,
     input out_o, cout_o,
@@ -36,6 +36,6 @@ interface alu_dut_intf #(
     input clk,
     input reset_n,
     input a_i, b_i, instr_i, cin_i, out_o, cout_o
-  );
+  );*/
     
 endinterface

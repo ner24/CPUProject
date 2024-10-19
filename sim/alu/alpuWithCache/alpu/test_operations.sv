@@ -1,3 +1,6 @@
+`ifndef ALPU_TEST_OPERATIONS_INCLUDE
+`define ALPU_TEST_OPERATIONS_INCLUDE
+
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 
@@ -5,24 +8,24 @@ import uvm_pkg::*;
 
 `include "agent_alpu.sv"
 
-class alu_tb_env #(
+class alpu_env #(
   parameter REG_WIDTH = 4
 ) extends uvm_env;
-  `uvm_component_utils(alu_tb_env #(.REG_WIDTH(REG_WIDTH)) )
+  `uvm_component_utils(alpu_env #(.REG_WIDTH(REG_WIDTH)) )
 
-  alu_tb_agent #(
+  alpu_agent #(
     .REG_WIDTH(REG_WIDTH)
   ) agent;
-  //test_design_cov alu_tb_coverage; //WIP
+  //test_design_cov alpu_coverage; //WIP
 
-  function new (string name = "alu_tb_env", uvm_component parent = null);
+  function new (string name = "alpu_env", uvm_component parent = null);
     super.new(name, parent);
   endfunction
 
   virtual function void build_phase(uvm_phase phase);
     super.build_phase(phase);
     `uvm_info(get_full_name(), "Building...", UVM_LOW)
-    agent = alu_alpu_agent #(.REG_WIDTH(REG_WIDTH)) ::type_id::create("agent", this);
+    agent = alpu_agent #(.REG_WIDTH(REG_WIDTH)) ::type_id::create("agent", this);
   endfunction
 
   virtual function void connect_phase(uvm_phase phase);
@@ -32,7 +35,7 @@ endclass
 
 class test_operations_sequence #(
   parameter REG_WIDTH = 4
-) extends uvm_sequence#(alu_tb_sequence_item #( .REG_WIDTH(REG_WIDTH) ));
+) extends uvm_sequence#(alpu_sequence_item #( .REG_WIDTH(REG_WIDTH) ));
 
   `uvm_object_param_utils(test_operations_sequence#( .REG_WIDTH(REG_WIDTH) ))
 
@@ -41,7 +44,7 @@ class test_operations_sequence #(
   endfunction
 
   virtual task body();
-    alu_tb_sequence_item #(
+    alpu_sequence_item #(
       .REG_WIDTH(REG_WIDTH)
     ) sequence_item;
 
@@ -50,7 +53,7 @@ class test_operations_sequence #(
     for (logic[3:0] i = 0; i <= 4'd8; i++) begin
       for (int j = 0; j < 10; j++) begin
       //repeat(10) begin
-        sequence_item = alu_alpu_sequence_item#( .REG_WIDTH(REG_WIDTH) )::type_id::create("sequence_item");
+        sequence_item = alpu_sequence_item#( .REG_WIDTH(REG_WIDTH) )::type_id::create("sequence_item");
         start_item(sequence_item);
         sequence_item.instr = i;
         assert (sequence_item.randomize());
@@ -67,7 +70,7 @@ class test_operations extends uvm_test;
 
   localparam REG_WIDTH = `ALU_REG_WIDTH;
 
-  alu_tb_env #(
+  alpu_env #(
     .REG_WIDTH(REG_WIDTH)
   ) env;
 
@@ -80,7 +83,7 @@ class test_operations extends uvm_test;
   endfunction
 
   virtual function void build_phase(uvm_phase phase);
-    env = alu_tb_env #( .REG_WIDTH(REG_WIDTH) )::type_id::create("env", this);
+    env = alpu_env #( .REG_WIDTH(REG_WIDTH) )::type_id::create("env", this);
   endfunction
 
   virtual task run_phase(uvm_phase phase);
@@ -94,3 +97,5 @@ class test_operations extends uvm_test;
     phase.drop_objection(this);
   endtask
 endclass
+
+`endif //include guard

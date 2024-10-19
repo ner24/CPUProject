@@ -1,4 +1,4 @@
-module alu_inverter #(
+module alpu_inverter #(
     parameter REG_WIDTH
 )(
     input logic[REG_WIDTH - 1:0] a,
@@ -21,7 +21,7 @@ module alu_inverter #(
 
 endmodule
 
-module alu_add_cla_lh #( //lower half of carry look ahead adder (i.e. just the and and xor)
+module alpu_add_cla_lh #( //lower half of carry look ahead adder (i.e. just the and and xor)
     parameter REG_WIDTH
 )(
     input  wire[REG_WIDTH-1:0] a,
@@ -39,7 +39,7 @@ module alu_add_cla_lh #( //lower half of carry look ahead adder (i.e. just the a
 
 endmodule
 
-module alu_add_cla_uh #( //upper half of carry look ahead adder (i.e. carry chain and sum xor)
+module alpu_add_cla_uh #( //upper half of carry look ahead adder (i.e. carry chain and sum xor)
     parameter REG_WIDTH
 ) (
     input wire[REG_WIDTH - 1:0] oX,

@@ -1,8 +1,8 @@
 `include "projectConfig/alu_parameters.sv"
 
-module alu #(
+module alpu #(
   parameter REG_WIDTH = `ALU_REG_WIDTH,
-  parameter USE_PIPELINED_ALU = `ALU_USE_PIPELINED_ALU
+  parameter USE_PIPELINED_ALPU = `ALU_USE_PIPELINED_ALPU
 ) (
   input  wire                   clk,
   input  wire                   reset_n,
@@ -11,12 +11,12 @@ module alu #(
   input  wire   [REG_WIDTH-1:0] a_i,
   input  wire   [REG_WIDTH-1:0] b_i,
   input  wire                   cin_i,
-  output wire   [REG_WIDTH-1:0] acc_o,
+  output wire   [REG_WIDTH-1:0] out_o,
   output wire                   cout_o
 );
 
-  wire  [REG_WIDTH-1:0] out_wire;
-  assign acc_o = out_wire;
+  /*wire  [REG_WIDTH-1:0] out_wire;
+  assign out_o = out_wire;*/
 
   // ----------------------
   // Instruction decoding
@@ -45,49 +45,32 @@ module alu #(
     endcase
   end
 
-  generate if (USE_PIPELINED_ALU) begin: g_alu_comb_piped
-    alu_comb_piped #(
+  generate if (USE_PIPELINED_ALPU) begin: g_alpu_comb_piped
+    alpu_comb_piped #(
       .REG_WIDTH(REG_WIDTH)
-    ) u_alu_comb (
+    ) u_alpu_comb (
       .clk(clk),
       .reset_n(reset_n),
       .pipe_active(1'b1),
 
       .a(a_i),
       .b(b_i),
-      .out(out_wire),
+      .out(out_o),
       .ctrl(cir_decoded[8:1]),
       .cin(cin_i),
       .cout(cout_o)
     );
-  end else begin: g_alu_comb_n_piped
-    alu_comb #(
+  end else begin: g_alpu_comb_n_piped
+    alpu_comb #(
       .REG_WIDTH(REG_WIDTH)
-    ) u_alu_comb (
+    ) u_alpu_comb (
       .a(a_i),
       .b(b_i),
-      .out(out_wire),
+      .out(out_o),
       .ctrl(cir_decoded[8:1]),
       .cin(cin_i),
       .cout(cout_o)
     );
   end endgenerate
-
-  // --------------------------------------
-  // Virtual Interface
-  // used for verif to probe this module
-  // --------------------------------------
-  intf_alpu_in #(
-    .REG_WIDTH(REG_WIDTH)
-  ) verif_intf (
-    .clk(clk)
-  );
-  assign verif_intf.reset_n = reset_n;
-  assign verif_intf.a_i = a_i;
-  assign verif_intf.b_i = b_i;
-  assign verif_intf.instr_i = instr_i;
-  assign verif_intf.cin_i = cin_i;
-  assign verif_intf.out_o = acc_o;
-  assign verif_intf.cout_o = cout_o;
 
 endmodule
