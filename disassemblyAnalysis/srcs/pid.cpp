@@ -1,6 +1,5 @@
 
-
-int main() {
+void pid() {
 
 #define VAR float
     
@@ -24,5 +23,5 @@ int main() {
         y[i] = (P * x[i]) + (I * sum_x) + (D * diff_x);
     }
 
-    return 0;
+    //return 0;
 }

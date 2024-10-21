@@ -29,7 +29,7 @@ module alpu_with_cache #( //WIP
     .cout_o(cout_o)
   );
 
-  /*alpu_cache`VERIF_MODULE_SUFFIX #(
+  /*`SIM_TB_MODULE(alpu_cache) #(
 
   ) cache (
 

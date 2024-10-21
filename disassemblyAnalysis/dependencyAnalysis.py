@@ -1,13 +1,14 @@
 import sys, pathlib, os
 from typing import List
 if sys.platform == 'win32':
-    path = pathlib.Path(r'C:\Program Files\Graphviz\bin')
+    path = pathlib.Path(r'C:\\Program Files\\Graphviz\\bin')
     if path.is_dir() and str(path) not in os.environ['PATH']:
         os.environ['PATH'] += f';{path}'
 import pygraphviz as pgv
 
 
-assembly = open("common_equations_int_dis.txt", "r")
+#assembly = open("common_equations_int_dis.txt", "r")
+assembly = open("travelling_salesman_dis.txt", "r")
 
 def getTokens(line) -> List[str]:
     tokens: List[str] = list()
@@ -31,17 +32,27 @@ def getTokens(line) -> List[str]:
 
     return tokens
 
-
-G: pgv.AGraph = pgv.AGraph(directed=True)
-regTracker: dict[str, tuple, pgv.Node] = {} #where the int in tuple is somewhat analogous to reg file index
-#memTracker: dict[str, pgv.Node] = {}
+lines: List[str] = []
 for line in assembly:
+    lines.append(line)
+
+GList: List[pgv.AGraph] = []
+G: pgv.AGraph #= pgv.AGraph(directed=True)
+#GList.append(G)
+
+regTracker: dict[str, pgv.Node] = {}
+#memTracker: dict[str, pgv.Node] = {}
+for ptr in range(0, len(lines)):
+    line = lines[ptr]
+
     tokens: List[str] = getTokens(line)
     
     print(*tokens, sep=', ')
 
     #get code to ignore lines that are not instructions
-    if len(tokens) < 2 or tokens[2] == ".word":
+    if len(tokens) < 3:
+        continue
+    if tokens[2] == ".word":
         continue
 
     #get instruction name (ignoring any operand width suffixes)
@@ -64,11 +75,26 @@ for line in assembly:
     for i in range(0, len(operands)):
         operands[i] = operands[i].replace(',','')
     
-    G.add_node(line)
-    n: pgv.Node = G.get_node(line)
-    print(type(n))
+    #resolve push/pop
+    #evauate each function independently (for now)
+    #i.e. reset regTracker on each push or pop and also start new graph
+    #in the case of bx, there is no pop but instead a ldr.w followed by bx for some functions
+    n: pgv.Node
     match instruction:
-        case "push":
+        case "push" | "vpush":
+            G = pgv.AGraph(directed=True)
+            GList.append(G)
+            G.add_node(line)
+            n = G.get_node(line)
+        case "pop" | "vpop" | "bx":
+            regTracker = {}
+        case _:
+            G.add_node(line)
+            n: pgv.Node = G.get_node(line)
+    print(type(n))
+
+    match instruction:
+        case "nop":
             continue
         case "str":
             firstSrc: str = operands[1].replace('[','').replace(',','')
@@ -118,6 +144,9 @@ for line in assembly:
             #update resource tracker to track destination reg of this instruction
             regTracker[operands[0]] = n
             
-
-G.layout()
-filename = G.draw(path="./g.dot", format='dot')
+i: int = 0
+for g in GList:
+    g.layout()
+    print("Drawing g" + str(i))
+    filename = g.draw(path="./graphs/g" + str(i) + ".dot", format='dot')
+    i = i + 1

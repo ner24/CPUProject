@@ -2,14 +2,17 @@ CC=arm-linux-gnueabihf-gcc
 CXX=arm-linux-gnueabihf-g++
 OBJDUMP=arm-linux-gnueabihf-objdump
 
-FILENAME=common_equations
+FILENAME=travelling_salesman
 
 obj:
-	$(CXX) -c $(FILENAME).cpp -o $(FILENAME).o
+	$(CXX) -c srcs/$(FILENAME).cpp -o $(FILENAME).o
 $(FILENAME).o: obj
 
 dmp: $(FILENAME).o
 	$(OBJDUMP) -marm -d $(FILENAME).o > $(FILENAME)_dis.txt
+
+dmp_sig: $(FILENAME).o
+	$(OBJDUMP) -marm -t $(FILENAME).o
 
 #sanity check that source code can run without error
 test:
