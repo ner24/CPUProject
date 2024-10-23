@@ -2,7 +2,7 @@ CC=arm-linux-gnueabihf-gcc
 CXX=arm-linux-gnueabihf-g++
 OBJDUMP=arm-linux-gnueabihf-objdump
 
-FILENAME=travelling_salesman
+FILENAME=md5
 
 obj:
 	$(CXX) -c srcs/$(FILENAME).cpp -o $(FILENAME).o
@@ -24,7 +24,7 @@ test:
 dg:
 	python3 ./dependencyAnalysis.py
 	dot -Tpng g.dot > g.png
-	explorer.exe g.png
+#	explorer.exe g.png
 
 #NOTE: using ubuntu 22.04 in WSL
 install:

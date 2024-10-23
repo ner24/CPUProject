@@ -6,9 +6,9 @@ if sys.platform == 'win32':
         os.environ['PATH'] += f';{path}'
 import pygraphviz as pgv
 
-
-#assembly = open("common_equations_int_dis.txt", "r")
-assembly = open("travelling_salesman_dis.txt", "r")
+#name = "travelling_salesman_dis"
+assembly = open("md5Dis/md5_dis.txt", "r")
+#assembly = open(name + ".txt", "r")
 
 def getTokens(line) -> List[str]:
     tokens: List[str] = list()
@@ -37,8 +37,9 @@ for line in assembly:
     lines.append(line)
 
 GList: List[pgv.AGraph] = []
-G: pgv.AGraph #= pgv.AGraph(directed=True)
-#GList.append(G)
+G: pgv.AGraph
+
+instructionCounts: dict[str, int] = {}
 
 regTracker: dict[str, pgv.Node] = {}
 #memTracker: dict[str, pgv.Node] = {}
@@ -47,7 +48,14 @@ for ptr in range(0, len(lines)):
 
     tokens: List[str] = getTokens(line)
     
-    print(*tokens, sep=', ')
+    #print(*tokens, sep=', ')
+
+    #create new graph for each function
+    if(line.find(">:") != -1): #char sequence only found in function declarations
+        print(line)
+        G = pgv.AGraph(directed=True)
+        GList.append(G)
+        regTracker = {}
 
     #get code to ignore lines that are not instructions
     if len(tokens) < 3:
@@ -58,7 +66,14 @@ for ptr in range(0, len(lines)):
     #get instruction name (ignoring any operand width suffixes)
     instruction: str = tokens[2].split(".")[0]
 
+    #count instructions
+    if instruction in instructionCounts:
+        instructionCounts[instruction] = instructionCounts[instruction] + 1
+    else:
+        instructionCounts[instruction] = 1
+
     #ignore effects of branching on instruction order and therefore dependency order (for now)
+    #effectively assumes all false
     if instruction[0] == 'b':
         continue
 
@@ -74,29 +89,36 @@ for ptr in range(0, len(lines)):
         operands: List[str] = tokens[3:]
     for i in range(0, len(operands)):
         operands[i] = operands[i].replace(',','')
-    
+
+    G.add_node(line)
+    n = G.get_node(line)
+
     #resolve push/pop
     #evauate each function independently (for now)
     #i.e. reset regTracker on each push or pop and also start new graph
     #in the case of bx, there is no pop but instead a ldr.w followed by bx for some functions
+    #TODO: setup stack tracker
     n: pgv.Node
     match instruction:
         case "push" | "vpush":
-            G = pgv.AGraph(directed=True)
-            GList.append(G)
-            G.add_node(line)
-            n = G.get_node(line)
-        case "pop" | "vpop" | "bx":
-            regTracker = {}
+            op: str = operands[i].replace('{','').replace('}','')
+            #if op in regTracker:
+            #    regTracker[op] = n
+        case "pop" | "vpop":
+            op: str = operands[i].replace('{','').replace('}','')
+            #if op in regTracker:
+            #    regTracker[op] = n
+        case "bx":
+            continue
         case _:
             G.add_node(line)
             n: pgv.Node = G.get_node(line)
-    print(type(n))
+    #print(type(n))
 
     match instruction:
         case "nop":
             continue
-        case "str":
+        case "str" | "strb":
             firstSrc: str = operands[1].replace('[','').replace(',','')
             secondSrc: str = operands[2].replace(']','')
             if firstSrc in regTracker:
@@ -115,7 +137,7 @@ for ptr in range(0, len(lines)):
                     G.add_edge(regTracker[op], n)
         #ld instructions will allocate to reg in new file so ignore dependencies (for now)
         #assumes each ld access a different memory address (for now)
-        case "ldr":
+        case "ldr" | "ldrb":
             firstSrc: str = operands[1].replace('[','').replace(',','')
             secondSrc: str = operands[2].replace(']','')
             if firstSrc in regTracker:
@@ -150,3 +172,8 @@ for g in GList:
     print("Drawing g" + str(i))
     filename = g.draw(path="./graphs/g" + str(i) + ".dot", format='dot')
     i = i + 1
+
+print("Instructions counts:")
+print(type(instructionCounts))
+for k, v in instructionCounts.items():
+    print(k + ": " + str(v))
