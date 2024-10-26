@@ -24,8 +24,12 @@ sim_alpu_old: env_setup
 	cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/initProject.tcl
 
 CMD_ALPU_BASE:= cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/prj.tcl -tclargs module_top alpu sim_module_top alpu_tb_top $(TCL_ARGS_EXTRA)
+open_alpu:
+	$(CMD_ALPU_BASE) job_type nothing
 sim_alpu: env_setup
 	$(CMD_ALPU_BASE) job_type sim
+simlint_alpu: env_setup
+	$(CMD_ALPU_BASE) job_type simlint
 elab_alpu: env_setup
 	$(CMD_ALPU_BASE) job_type elab
 lint_alpu: env_setup

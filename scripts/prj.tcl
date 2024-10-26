@@ -4,7 +4,9 @@ dict with argv {
 
   #get script path. Assumes batch command passes absolute path to script in -source arg
   set script_path [ file dirname [ file normalize [ info script ] ] ]
-  set root_dir $script_path/..
+  set root_dir [file dirname $script_path]
+  puts "Script path: $script_path"
+  puts "Root directory: $root_dir"
 
   set part_name xczu7ev-ffvc1156-2-e
 
@@ -22,20 +24,29 @@ dict with argv {
   if {($resetproj == 1) || (![file exists $xpr])} {
     puts "Creating/Recreating project"
     create_project proj_cpu $xpr_dir -part $part_name -force
-    set_property source_mgmt_mode None [current_project]
+    #set_property source_mgmt_mode None [current_project]
     
     #add design files
-    add_files $root_dir/design -verbose
+    puts "Adding design files"
     add_files $root_dir/interfaces -verbose
-    #set_property top alpu [get_fileset sources_1]
+    add_files $root_dir/design -verbose
+
+    set project_headers [glob -directory "$root_dir/projectHeaders" -- *.sv]
+    add_files $root_dir/projectHeaders -verbose
+    foreach i $project_headers {
+      puts "Adding Header: $i"
+      set_property file_type "Verilog Header" [get_files $i]
+      set_property is_global_include true [get_files $i]
+    }
 
     #add sim files
+    puts "Creating simset: $simset_name"
     create_fileset -simset $simset_name -verbose
     current_fileset -simset [get_filesets $simset_name] -verbose
     add_files -fileset $simset_name $root_dir/sim -verbose
 
     #set properties
-    set_property -name {xsim.compile.xvlog.more_options} -value "-L uvm -d MODE_SIMULATION -i $root_dir" -objects [get_fileset $simset_name] -verbose
+    set_property -name {xsim.compile.xvlog.more_options} -value "-L uvm -d MODE_SIMULATION -i $root_dir/projectHeaders" -objects [get_fileset $simset_name] -verbose
     set_property -name {xsim.simulate.custom_tcl} -value "$script_path/runSim.tcl" -objects [get_fileset $simset_name] -verbose
     set_property -name {xsim.simulate.runtime} -value "10000ns" -objects [get_fileset $simset_name] -verbose
   } else {
@@ -73,7 +84,7 @@ dict with argv {
 
       puts "Running sim lint"
       update_compile_order -fileset $simset_name
-      synth_design -top $sim_module_top -include_dirs "$root_dir" -lint
+      synth_design -top $sim_module_top -include_dirs "$root_dir/projectHeaders" -lint
     }
 
     sim {
@@ -93,13 +104,18 @@ dict with argv {
     lint {
       puts "Running design lint"
       update_compile_order -fileset sources_1
-      synth_design -top $module_top -include_dirs "$root_dir" -lint
+      synth_design -top $module_top -include_dirs "$root_dir/projectHeaders" -lint
     }
 
     elab {
       puts "Running design elab"
       update_compile_order -fileset sources_1
-      synth_design -top $module_top -include_dirs "$root_dir" -rtl
+      synth_design -top $module_top -include_dirs "$root_dir/projectHeaders" -rtl
+    }
+
+    nothing {
+      #for if just want to open gui or reconfigure project etc.
+      puts "Running nothing"
     }
 
     default {
