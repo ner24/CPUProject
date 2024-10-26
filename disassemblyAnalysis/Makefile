@@ -2,7 +2,7 @@ CC=arm-linux-gnueabihf-gcc
 CXX=arm-linux-gnueabihf-g++
 OBJDUMP=arm-linux-gnueabihf-objdump
 
-FILENAME=md5
+FILENAME=fft
 
 obj:
 	$(CXX) -c srcs/$(FILENAME).cpp -o $(FILENAME).o
