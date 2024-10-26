@@ -2,6 +2,6 @@
 `define ALU_PARAMETERS_DEFINE
 
 `define ALU_REG_WIDTH 4
-`define ALU_USE_PIPELINED_ALPU 1
+`define ALU_USE_PIPELINED_ALPU 0
 
 `endif
