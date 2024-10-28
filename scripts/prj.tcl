@@ -8,7 +8,8 @@ dict with argv {
   puts "Script path: $script_path"
   puts "Root directory: $root_dir"
 
-  set part_name xczu7ev-ffvc1156-2-e
+  #set part name to digilent zybo Z7-10 (assumes board files have been manually installed for vivado)
+  set part_name xc7z010clg400-1
 
   set xpr_dir $script_path/vivado/run
   set xpr_name proj_cpu.xpr
@@ -30,6 +31,7 @@ dict with argv {
     puts "Adding design files"
     add_files $root_dir/interfaces -verbose
     add_files $root_dir/design -verbose
+    add_files $root_dir/testExps -verbose
 
     set project_headers [glob -directory "$root_dir/projectHeaders" -- *.sv]
     add_files $root_dir/projectHeaders -verbose
@@ -38,6 +40,11 @@ dict with argv {
       set_property file_type "Verilog Header" [get_files $i]
       set_property is_global_include true [get_files $i]
     }
+
+    #add constraints
+    puts "Adding constraint files"
+    add_files -fileset constrs_1 $root_dir/xdcs -verbose
+    #NOTE: to set target xdc use: set_property target_constrs_file $root_dir/z710alpu_test.xdc [current_fileset -constrset]
 
     #add sim files
     puts "Creating simset: $simset_name"
@@ -55,11 +62,14 @@ dict with argv {
     open_project $xpr
   }
 
+  #setup auto inference detection for XPM modules
+  auto_detect_xpm
+
   #set design top module
   puts "Evalutaing module_top param"
   if {[info exists module_top]} {
     puts "Setting design top module to $module_top"
-    #set_property top $module_top [get_fileset sources_1]
+    set_property top $module_top [get_fileset sources_1]
   } else {
     echo "No design top module specified"
     exit
@@ -128,6 +138,7 @@ dict with argv {
 
   #gui and auto closing
   if {[info exists open_gui]} {
+    puts "Starting GUI"
     start_gui
   #if open_gui exists, do not auto close even if it is specified
   } elseif {[info exists auto_close]} {

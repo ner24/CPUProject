@@ -1,4 +1,8 @@
-module cache_MRP # ( //must read protected cache
+module cache_MRP_DP # ( //must read protected cache
+  //Xilinx supports inference of dual port ram blocks. Obviously comes with an area
+  //impact compared to single port but this ram module is not tailored for large storage capacity
+  //so area penalty can be accepted
+  //https://docs.amd.com/r/2022.1-English/ug1483-model-composer-sys-gen-user-guide/Dual-Port-RAM
 
   //NUM_ENTRIES will equal 2**IDX_BITS
   //avoids having to have extra logic for out of
@@ -7,7 +11,7 @@ module cache_MRP # ( //must read protected cache
 
   parameter DATA_WIDTH = 16,
   parameter ADDR_WIDTH = 8,
-  parameter USE_BRAM_IP = 0
+  parameter INFER_BLK_RAM = 0 //for synthesis
 ) (
   input  wire                   clk,
   input  wire                   reset_n,

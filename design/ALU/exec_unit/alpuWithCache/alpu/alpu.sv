@@ -1,4 +1,4 @@
-`include "projectConfig/alu_parameters.sv"
+`include "alu_parameters.sv"
 
 module alpu #(
   parameter REG_WIDTH = `ALU_REG_WIDTH,
