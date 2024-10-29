@@ -41,7 +41,7 @@ module alpu_comb_piped #(
     assign b_with_en[i] = b[i] & ~ctrl[6];
   end endgenerate
 
-  always_ff @(posedge clk or negedge reset_n) begin : ff_s0
+  always_ff @(posedge clk /*or negedge reset_n*/) begin : ff_s0
     if(~reset_n) begin
       invA_s0      <= '0;
       b_with_en_s0 <= '0;
@@ -86,7 +86,7 @@ module alpu_comb_piped #(
     assign cla_lh_cgen[i] = (cla_lh_oX[i] & ctrl_s0[4]) | cla_lh_cgen_out[i];
   end endgenerate
 
-  always_ff @(posedge clk or negedge reset_n) begin : ff_s1
+  always_ff @(posedge clk /*or negedge reset_n*/) begin : ff_s1
     if(~reset_n) begin
       cla_lh_oX_s1       <= '0;
       cla_lh_cgen_s1     <= '0;
@@ -131,7 +131,7 @@ module alpu_comb_piped #(
     assign out_internal[i] = out_nI[i] ^ ctrl_s1[0];
   end endgenerate
 
-  always_ff @(posedge clk or negedge reset_n) begin : ff_s2
+  always_ff @(posedge clk /*or negedge reset_n*/) begin : ff_s2
     if(~reset_n) begin
       out_s2       <= '0;
       cout_s2      <= '0;
