@@ -15,9 +15,6 @@ module alpu #(
   output wire                   cout_o
 );
 
-  /*wire  [REG_WIDTH-1:0] out_wire;
-  assign out_o = out_wire;*/
-
   // ----------------------
   // Instruction decoding
   // ----------------------

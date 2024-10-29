@@ -20,9 +20,6 @@ env_setup:
 	mkdir -p $(VIVADO_DIR)
 
 #ALPU
-sim_alpu_old: env_setup
-	cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/initProject.tcl
-
 CMD_ALPU_BASE:= cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/prj.tcl -tclargs module_top alpu sim_module_top alpu_tb_top $(TCL_ARGS_EXTRA)
 open_alpu:
 	$(CMD_ALPU_BASE) job_type nothing
@@ -34,3 +31,21 @@ elab_alpu: env_setup
 	$(CMD_ALPU_BASE) job_type elab
 lint_alpu: env_setup
 	$(CMD_ALPU_BASE) job_type lint
+sim_alpu_old: env_setup
+	cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/initProject.tcl
+
+#ALPU CACHE
+CMD_ALPU_CACHE_BASE:= cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/prj.tcl -tclargs module_top alpu_cache $(TCL_ARGS_EXTRA)
+lint_alpu_cache: env_setup
+	$(CMD_ALPU_CACHE_BASE) job_type lint
+
+elab_alpu_cache: env_setup
+	$(CMD_ALPU_CACHE_BASE) job_type elab
+
+#cache DP
+CMD_CACHE_DP_BASE:= cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/prj.tcl -tclargs module_top cache_MRP_DP $(TCL_ARGS_EXTRA)
+lint_cache_MRPDP: env_setup
+	$(CMD_CACHE_DP_BASE) job_type lint
+
+elab_cache_MRPDP: env_setup
+	$(CMD_CACHE_DP_BASE) job_type elab
