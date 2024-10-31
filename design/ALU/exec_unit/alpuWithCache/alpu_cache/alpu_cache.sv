@@ -1,4 +1,4 @@
-module alpu_cache import exec_unit_dtypes::*; #(
+module alpu_cache_bad import exec_unit_dtypes::*; #(
   //IDX used to work out if operand is local or foreign
   parameter eu_idx = 0
 ) (

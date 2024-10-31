@@ -63,7 +63,7 @@ dict with argv {
   }
 
   #disable constraint files by default to stop missing port warnings
-  set project_constraints [glob -directory "$root_dir/xdcs" -- *.sv]
+  set project_constraints [glob -directory "$root_dir/xdcs" -- *.xdc]
   foreach i $project_constraints {
     set_property is_enabled false [get_files $i]
   }
