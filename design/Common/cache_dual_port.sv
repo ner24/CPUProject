@@ -31,8 +31,6 @@ module cache_DP # ( //must read protected cache
   //if tag address does not match on read, then read is invalid
   output logic                  rhita_o,
   output logic                  rhitb_o
-  //if address writing to has not already been read, then write has not been acknowledged
-  //output logic                  wack_o
 );
 
   localparam TAG_ADDRESS_WITDH = ADDR_WIDTH - IDX_BITS;
@@ -83,8 +81,8 @@ module cache_DP # ( //must read protected cache
    xpm_memory_dpdistram_inst (
       .douta(rdataa),   // READ_DATA_WIDTH_A-bit output: Data output for port A read operations.
       .doutb(rdatab),   // READ_DATA_WIDTH_B-bit output: Data output for port B read operations.
-      .addra(addra_i),   // ADDR_WIDTH_A-bit input: Address for port A write and read operations.
-      .addrb(addrb_i),   // ADDR_WIDTH_B-bit input: Address for port B write and read operations.
+      .addra(addra_i[IDX_BITS-1:0]),   // ADDR_WIDTH_A-bit input: Address for port A write and read operations.
+      .addrb(addrb_i[IDX_BITS-1:0]),   // ADDR_WIDTH_B-bit input: Address for port B write and read operations.
       .clka(clk),     // 1-bit input: Clock signal for port A. Also clocks port B when parameter CLOCKING_MODE
                        // is "common_clock".
 

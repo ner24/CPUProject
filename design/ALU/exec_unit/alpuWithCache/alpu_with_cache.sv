@@ -23,7 +23,7 @@ module alpu_with_cache #( //WIP
   output wire  [OPERAND_WIDTH-1:0] op1
 );
 
-  wire [1:0] flags;
+  /*wire [1:0] flags;
   `SIM_TB_MODULE(alpu) #(
     .REG_WIDTH(REG_WIDTH)
   ) alpu (
@@ -50,6 +50,6 @@ module alpu_with_cache #( //WIP
     .rdata_o  (rdata_o),
     .rvalid_o (rvalid_o),
     .wack_o   (wack_o)
-  );
+  );*/
 
 endmodule

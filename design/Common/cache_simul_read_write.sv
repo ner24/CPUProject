@@ -5,7 +5,6 @@ module cache_SRW # ( //simultaneous read write
   //Xilinx supports dual port ram blocks. Obviously comes with an area
   //impact compared to single port but this ram module is not tailored for large storage capacity
   //so area penalty can be accepted
-  //https://docs.amd.com/r/2022.1-English/ug1483-model-composer-sys-gen-user-guide/Dual-Port-RAM
 
   //NUM_ENTRIES will equal 2**IDX_BITS
   //avoids having to have extra logic for out of
@@ -76,8 +75,8 @@ module cache_SRW # ( //simultaneous read write
    xpm_memory_dpdistram_inst (
       .douta(),   // READ_DATA_WIDTH_A-bit output: Data output for port A read operations.
       .doutb(rdata),   // READ_DATA_WIDTH_B-bit output: Data output for port B read operations.
-      .addra(waddr_i),   // ADDR_WIDTH_A-bit input: Address for port A write and read operations.
-      .addrb(raddr_i),   // ADDR_WIDTH_B-bit input: Address for port B write and read operations.
+      .addra(waddr_i[IDX_BITS-1:0]),   // ADDR_WIDTH_A-bit input: Address for port A write and read operations.
+      .addrb(raddr_i[IDX_BITS-1:0]),   // ADDR_WIDTH_B-bit input: Address for port B write and read operations.
       .clka(clk),     // 1-bit input: Clock signal for port A. Also clocks port B when parameter CLOCKING_MODE
                        // is "common_clock".
 
