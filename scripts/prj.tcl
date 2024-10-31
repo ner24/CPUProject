@@ -62,6 +62,12 @@ dict with argv {
     open_project $xpr
   }
 
+  #disable constraint files by default to stop missing port warnings
+  set project_constraints [glob -directory "$root_dir/xdcs" -- *.sv]
+  foreach i $project_constraints {
+    set_property is_enabled false [get_files $i]
+  }
+
   #setup auto inference detection for XPM modules
   auto_detect_xpm
 
