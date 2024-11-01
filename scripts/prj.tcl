@@ -53,7 +53,7 @@ dict with argv {
     add_files -fileset $simset_name $root_dir/sim -verbose
 
     #set properties
-    set_property -name {xsim.compile.xvlog.more_options} -value "-L uvm -d MODE_SIMULATION -i $root_dir/projectHeaders" -objects [get_fileset $simset_name] -verbose
+    set_property -name {xsim.compile.xvlog.more_options} -value "-L uvm -d MODE_SIMULATION -i $root_dir/projectHeaders -i $root_dir/sim/seqItems" -objects [get_fileset $simset_name] -verbose
     set_property -name {xsim.simulate.custom_tcl} -value "$script_path/runSim.tcl" -objects [get_fileset $simset_name] -verbose
     set_property -name {xsim.simulate.runtime} -value "10000ns" -objects [get_fileset $simset_name] -verbose
   } else {

@@ -1,8 +1,8 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 
-`include "projectConfig/alu_parameters.sv"
-`include "projectConfig/simulation_parameters.sv"
+`include "alu_parameters.sv"
+`include "simulation_parameters.sv"
 
 `include "seqItem_alpu.sv"
 

@@ -4,7 +4,7 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 
-`include "projectConfig/alu_parameters.sv"
+`include "alu_parameters.sv"
 
 `include "agent_alpu.sv"
 

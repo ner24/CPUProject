@@ -1,7 +1,8 @@
 `include "uvm_macros.svh"
-`include "projectConfig/alu_parameters.sv"
-`include "projectConfig/simulation_parameters.sv"
-`include "test_operations.sv"
+`include "alu_parameters.sv"
+`include "simulation_parameters.sv"
+
+`include "test_operations.sv" //to trigger compile
 
 module alpu_tb_top import uvm_pkg::*; (
 );
