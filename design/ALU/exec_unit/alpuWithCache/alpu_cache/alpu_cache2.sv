@@ -15,9 +15,9 @@ module alpu_cache import exec_unit_dtypes::*; #(
 
   // Interconnect interface
   // 3 channels: operands write, operand read
-  input  wire type_icon_channel    icon_w0,
+  input  wire type_icon_channel    icon_w0, //for op0
   output wire type_icon_rx_channel icon_w0_rx,
-  input  wire type_icon_channel    icon_w1,
+  input  wire type_icon_channel    icon_w1, //for op1
   output wire type_icon_rx_channel icon_w1_rx,
   
   //not using type_icon_channel since attributes go in different directions
@@ -32,6 +32,8 @@ module alpu_cache import exec_unit_dtypes::*; #(
   // if address is invalid, then ireq contained immediate for operand
   input  wire type_iqueue_entry ireq_curr_instr
 );
+  localparam YBUF_IDX_BITS = $bits(type_alpu_local_addr) > 2 ? 2 : $bits(type_alpu_local_addr);
+  localparam XBUF_IDX_BITS = $bits(type_exec_unit_addr) > 2 ? 2 : $bits(type_exec_unit_addr);
 
   //calc if operands are to/from local or foreign
   wire op0_yorx;
@@ -134,7 +136,7 @@ module alpu_cache import exec_unit_dtypes::*; #(
   wire             [1:0] [1:0] yx_rhitx;
   generate for (genvar i = 0; i < 2; i++) begin: g_yx
     cache_DP #(
-      .IDX_BITS(2),
+      .IDX_BITS(YBUF_IDX_BITS),
       .DATA_WIDTH($bits(type_ycache_data)),
       .ADDR_WIDTH($bits(type_alpu_local_addr))
     ) ybuf (
@@ -155,22 +157,22 @@ module alpu_cache import exec_unit_dtypes::*; #(
 
   //resolve op0, op1 and operand valids (also yx_wready)
   //see yx_assigns block for description
-  type_exec_unit_data [1:0] opx_data;
-  logic               [1:0] opx_valid;
+  type_exec_unit_data [1:0] y_opxData;
+  logic               [1:0] y_opxValid;
   always_comb begin: route_alpu_ops
     if (mode_rr) begin: mode_rr
       //if hit on bank 0, use that, else assign to bank 1 (even if invalid, in which case valid bits will be low)
-      opx_data[0]  <= yx_rhitx[0][0] ? yx_rdatax[0][0] : yx_rdatax[1][0];
-      opx_data[1]  <= yx_rhitx[0][1] ? yx_rdatax[0][1] : yx_rdatax[1][1];
-      opx_valid[0] <= yx_rhitx[0][0] | yx_rhitx[1][0]; //TODO: assert that yx_rhitx is one hot per operand (i.e no duplicates)
-      opx_valid[1] <= yx_rhitx[0][1] | yx_rhitx[1][1];
+      y_opxData[0]  <= yx_rhitx[0][0] ? yx_rdatax[0][0] : yx_rdatax[1][0];
+      y_opxData[1]  <= yx_rhitx[0][1] ? yx_rdatax[0][1] : yx_rdatax[1][1];
+      y_opxValid[0] <= yx_rhitx[0][0] | yx_rhitx[1][0]; //TODO: assert that yx_rhitx is one hot per operand (i.e no duplicates)
+      y_opxValid[1] <= yx_rhitx[0][1] | yx_rhitx[1][1];
 
       yx_wready <= 1'b0;
     end else begin: mode_rw
-      opx_data[0]  <= yx_rw[0] ? yx_rdatax[1][1] : yx_rdatax[0][1];
-      opx_data[1]  <= yx_rw[0] ? yx_rdatax[0][0] : yx_rdatax[1][0];
-      opx_valid[0] <= yx_rw[0] ? yx_rhitx[1][1]  : yx_rhitx[0][1];
-      opx_valid[1] <= yx_rw[0] ? yx_rhitx[0][0]  : yx_rhitx[1][0];
+      y_opxData[0]  <= yx_rw[0] ? yx_rdatax[1][1] : yx_rdatax[0][1];
+      y_opxData[1]  <= yx_rw[0] ? yx_rdatax[0][0] : yx_rdatax[1][0];
+      y_opxValid[0] <= yx_rw[0] ? yx_rhitx[1][1]  : yx_rhitx[0][1];
+      y_opxValid[1] <= yx_rw[0] ? yx_rhitx[0][0]  : yx_rhitx[1][0];
 
       yx_wready <= yx_rw[0] ? yx_rdatax[0][1].has_been_read : yx_rdatax[1][1].has_been_read;
     end
@@ -179,5 +181,67 @@ module alpu_cache import exec_unit_dtypes::*; #(
   // -----------------------------------------------------
   // Foreign (X) buffers
   // -----------------------------------------------------
+
+  type_exec_unit_data [1:0] xrx_rdata;
+  wire                [1:0] xrx_rvalid;
+  wire                [1:0] xrx_wready;
+
+  assign icon_w0_rx.ready = xrx_wready[0];
+  assign icon_w1_rx.ready = xrx_wready[1];
+
+  //RX buffers
+  type_icon_channel [1:0] icon_wx;
+  assign icon_wx[0] = icon_w0;
+  assign icon_wx[1] = icon_w1;
+  type_exec_unit_addr [1:0] xrx_raddr;
+  assign xrx_raddr[0] = ireq_curr_instr.op0.as_addr;
+  assign xrx_raddr[1] = ireq_curr_instr.op1.as_addr;
+  wire [1:0] xrx_raddr_valid;
+  assign xrx_raddr_valid[0] = ireq_curr_instr.op0m & ~op0_yorx;
+  assign xrx_raddr_valid[1] = ireq_curr_instr.op1m & ~op1_yorx;
+
+  generate for (genvar i = 0; i < 2; i++) begin: g_xrx
+    alpu_cache_xbuf #(
+      .IDX_BITS(XBUF_IDX_BITS)
+    ) xbuf (
+      .clk(clk),
+      .reset_n(reset_n),
+      .waddr_i(icon_wx[i].addr),
+      .raddr_i(xrx_raddr[i]),
+      .wvalid_i(icon_wx[i].valid),
+      .rvalid_i(xrx_raddr_valid[i]),
+      .wdata_i(icon_wx[i].data),
+      .rdata_o(xrx_rdata[i]),
+      .rhit_o(xrx_rvalid[i]),
+      .wready_o(xrx_wready[i])
+    );
+  end endgenerate
+
+  //TX buffer
+  wire xtx_wready;
+  alpu_cache_xbuf #(
+    .IDX_BITS(XBUF_IDX_BITS)
+  ) xtx_buf (
+    .clk(clk),
+    .reset_n(reset_n),
+    .waddr_i(alpu_tx.opd_addr),
+    .raddr_i(icon_r0addr),
+    .wvalid_i(alpu_tx.opd_valid & ~opd_yorx),
+    .rvalid_i(icon_r0ready),
+    .wdata_i(alpu_tx.opd_data),
+    .rdata_o(icon_r0data),
+    .rhit_o(icon_r0valid),
+    .wready_o(xtx_wready)
+  );
+
+  // --------------------------------
+  // wire X and Y to alpu intf
+  // --------------------------------
+  assign alpu_rx.op0_data  = ireq_curr_instr.op0m ? (op0_yorx ? y_opxData[0]  : xrx_rdata[0])  : ireq_curr_instr.op0.as_immediate.data;
+  assign alpu_rx.op1_data  = ireq_curr_instr.op1m ? (op1_yorx ? y_opxData[1]  : xrx_rdata[1])  : ireq_curr_instr.op1.as_immediate.data;
+  assign alpu_rx.op0_valid = ireq_curr_instr.op0m ? (op0_yorx ? y_opxValid[0] : xrx_rvalid[0]) : 1'b1;
+  assign alpu_rx.op1_valid = ireq_curr_instr.op1m ? (op1_yorx ? y_opxValid[1] : xrx_rvalid[1]) : 1'b1;
+  assign alpu_rx.opd_addr  = ireq_curr_instr.opd;
+  assign alpu_rx.opd_ready = opd_yorx ? 1'b0 : xtx_wready;
 
 endmodule

@@ -1,28 +1,28 @@
 module alpu_cache_xbuf import exec_unit_dtypes::*; #( //simultaneous read write
   parameter IDX_BITS = 2
 ) (
-  input  wire                   clk,
-  input  wire                   reset_n,
+  input  wire                     clk,
+  input  wire                     reset_n,
 
   input  wire type_exec_unit_addr waddr_i,
   input  wire type_exec_unit_addr raddr_i,
 
-  input  wire                   wvalid_i,
-  input  wire                   rvalid_i,
+  input  wire                     wvalid_i,
+  input  wire                     rvalid_i,
 
-  input  wire  [DATA_WIDTH-1:0] wdata_i,
-  output wire  [DATA_WIDTH-1:0] rdata_o,
+  input  wire type_exec_unit_data wdata_i,
+  output wire type_exec_unit_data rdata_o,
 
   //if tag address does not match on read, then read is invalid
-  output wire                   rhit_o,
-  output logic                  wready_o
+  output wire                     rhit_o,
+  output wire                     wready_o
 );
 
-  type_xcache_data wdata;
+  type_exec_unit_data wdata;
   assign wdata.data          = wdata_i;
-  assign wdata.has_been_read = 1'b0;
+  //assign wdata.has_been_read = 1'b0;
 
-  type_xcache_data rdata; //NOTE: used to get data width; has_been_read field is unconnected here
+  type_exec_unit_data rdata; //NOTE: used to get data width; has_been_read field is unconnected here
   assign rdata_o = rdata.data;
 
   //check for collision. If there is, cancel write and use bypass
@@ -67,8 +67,8 @@ module alpu_cache_xbuf import exec_unit_dtypes::*; #( //simultaneous read write
 
   cache_SRW #(
     .IDX_BITS(2),
-    .DATA_WIDTH($bits(rdata.data)), //i.e. type_xcache_data.data
-    .ADDR_WIDTH(LOG2_NUM_REG)
+    .DATA_WIDTH($bits(type_exec_unit_data)),
+    .ADDR_WIDTH($bits(type_exec_unit_addr))
   ) xbuf (
     .clk(clk),
     .reset_n(reset_n),
@@ -76,8 +76,8 @@ module alpu_cache_xbuf import exec_unit_dtypes::*; #( //simultaneous read write
     .raddr_i(raddr_i),
     .ce_i(xbuf_ce),
     .we_i(xbuf_we),
-    .rdata_o(rdata.data),
-    .wdata_i(wdata.data),
+    .rdata_o(rdata),
+    .wdata_i(wdata),
     .rhit_o(xbuf_rhit)
   );
 

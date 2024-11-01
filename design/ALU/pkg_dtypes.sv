@@ -30,6 +30,7 @@ package exec_unit_dtypes;
   } type_icon_addr;*/
 
   typedef struct packed {
+    //logic                  addr_opx; //WIP
     type_exec_unit_addr    addr;
     type_exec_unit_data    data;
     logic                  valid;
@@ -46,6 +47,7 @@ package exec_unit_dtypes;
     type_exec_unit_data    op1_data;
     logic                  op1_valid;
 
+    type_exec_unit_addr    opd_addr;
     logic                  opd_ready; //ready to write to address opd (which means cache index has_been_read is high)
   } type_alpu_channel_rx; //rx on alpu side
 
