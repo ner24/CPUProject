@@ -35,6 +35,7 @@ package exec_unit_dtypes;
     type_exec_unit_data    data;
     logic                  valid;
   } type_icon_channel;
+  typedef type_icon_tx_channel type_icon_channel;
 
   typedef struct packed {
     logic                  ready;
@@ -92,6 +93,11 @@ package exec_unit_dtypes;
     type_exec_unit_data    data;
     logic                  has_been_read;
   } type_ycache_data;
+
+  typedef struct packed {
+    logic               opx; //see type_alpu_channel_tx for description
+    type_exec_unit_addr addr;
+  } type_icon_TXQentry;
 
 endpackage
 

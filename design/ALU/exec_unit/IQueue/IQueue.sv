@@ -1,4 +1,4 @@
-module IQueue #( //WIP
+module IQueue #( //WIP (TODO: rewrite with RAM queue module)
   parameter QUEUE_SIZE_BIN = 4,
   parameter DATA_WIDTH = 16
 ) (

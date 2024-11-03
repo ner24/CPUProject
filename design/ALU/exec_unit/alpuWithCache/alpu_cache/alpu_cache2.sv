@@ -3,7 +3,7 @@
 
 module alpu_cache import exec_unit_dtypes::*; #(
   //IDX used to work out if operand is local or foreign
-  parameter eu_idx = 0
+  parameter ALPU_IDX = 0
 ) (
   input  wire                   clk,
   input  wire                   reset_n,
@@ -39,9 +39,9 @@ module alpu_cache import exec_unit_dtypes::*; #(
   wire op0_yorx;
   wire op1_yorx;
   wire opd_yorx;
-  assign op0_yorx = eu_idx == ireq_curr_instr.op0.as_addr.eu_idx; //1 = local (y), 0 = foreign (x)
-  assign op1_yorx = eu_idx == ireq_curr_instr.op1.as_addr.eu_idx;
-  assign opd_yorx = eu_idx == alpu_tx.opd_addr.eu_idx;
+  assign op0_yorx = ALPU_IDX == ireq_curr_instr.op0.as_addr.eu_idx; //1 = local (y), 0 = foreign (x)
+  assign op1_yorx = ALPU_IDX == ireq_curr_instr.op1.as_addr.eu_idx;
+  assign opd_yorx = ALPU_IDX == alpu_tx.opd_addr.eu_idx;
 
   // -----------------------------------------------------
   // Local (Y) buffers
