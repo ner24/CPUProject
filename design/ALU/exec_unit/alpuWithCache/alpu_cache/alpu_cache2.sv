@@ -15,12 +15,12 @@ module alpu_cache import exec_unit_dtypes::*; #(
 
   // Interconnect interface
   // 3 channels: operands write, operand read
-  input  wire type_icon_channel    icon_w0, //for op0
+  input  wire type_icon_tx_channel    icon_w0, //for op0
   output wire type_icon_rx_channel icon_w0_rx,
-  input  wire type_icon_channel    icon_w1, //for op1
+  input  wire type_icon_tx_channel    icon_w1, //for op1
   output wire type_icon_rx_channel icon_w1_rx,
   
-  //not using type_icon_channel since attributes go in different directions
+  //not using type_icon_tx_channel since attributes go in different directions
   output wire type_exec_unit_data  icon_r0data,
   input  wire type_exec_unit_addr  icon_r0addr,
   output wire                      icon_r0valid,
@@ -190,7 +190,7 @@ module alpu_cache import exec_unit_dtypes::*; #(
   assign icon_w1_rx.ready = xrx_wready[1];
 
   //RX buffers
-  type_icon_channel [1:0] icon_wx;
+  type_icon_tx_channel [1:0] icon_wx;
   assign icon_wx[0] = icon_w0;
   assign icon_wx[1] = icon_w1;
   type_exec_unit_addr [1:0] xrx_raddr;

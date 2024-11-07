@@ -34,12 +34,17 @@ package exec_unit_dtypes;
     type_exec_unit_addr    addr;
     type_exec_unit_data    data;
     logic                  valid;
-  } type_icon_channel;
-  typedef type_icon_tx_channel type_icon_channel;
+  } type_icon_tx_channel;
+  //typedef type_icon_tx_channel type_icon_channel;
 
   typedef struct packed {
     logic                  ready;
   } type_icon_rx_channel;
+
+  typedef struct packed {
+    type_icon_tx_channel   tx;
+    type_icon_rx_channel   rx;
+  } type_icon_channel;
 
   typedef struct packed {
     type_exec_unit_data    op0_data;
