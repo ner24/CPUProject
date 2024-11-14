@@ -30,7 +30,7 @@ package exec_unit_dtypes;
   } type_icon_addr;*/
 
   typedef struct packed {
-    //logic                  addr_opx; //WIP
+    //logic                  addr_opx;
     type_exec_unit_addr    addr;
     type_exec_unit_data    data;
     logic                  valid;
@@ -42,6 +42,7 @@ package exec_unit_dtypes;
   } type_icon_rx_channel;
 
   typedef struct packed {
+    logic                  opx;
     type_icon_tx_channel   tx;
     type_icon_rx_channel   rx;
   } type_icon_channel;

@@ -1,4 +1,4 @@
-module ram_queue # (
+module ram_queue # ( //TODO: replace pointers with JK flip flop counters for smaller power and area
   parameter DATA_WIDTH = 4,
   parameter LOG2_SIZE = 2
 ) (
@@ -61,10 +61,10 @@ module ram_queue # (
   end
 
   //empty when both ptrs are equal
-  assign empty = ptr_head == ptr_tail;
+  assign empty = ptr_tail == (ptr_head - 1'b1);
   assign empty_o = empty;
   //full when head = tail - 1
-  assign full = ptr_head == (ptr_tail - 1'b1);
+  assign full = ptr_head == ptr_tail;
   assign full_o = full;
 
   ram_SRW # (

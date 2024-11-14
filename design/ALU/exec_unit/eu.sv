@@ -1,4 +1,4 @@
-module exec_block #(
+module execution_unit #(
 
 ) (
 

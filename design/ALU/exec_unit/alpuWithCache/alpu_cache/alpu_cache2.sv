@@ -17,7 +17,7 @@ module alpu_cache import exec_unit_dtypes::*; #(
   // 3 channels: operands write, operand read
   input  wire type_icon_tx_channel    icon_w0, //for op0
   output wire type_icon_rx_channel icon_w0_rx,
-  input  wire type_icon_tx_channel    icon_w1, //for op1
+  input  wire type_icon_tx_channel    icon_w1, //for op
   output wire type_icon_rx_channel icon_w1_rx,
   
   //not using type_icon_tx_channel since attributes go in different directions
@@ -77,7 +77,7 @@ module alpu_cache import exec_unit_dtypes::*; #(
       ys.data  <= 'x;
       ys.addr  <= 'x; //add x to simplify reset logic
       ys.valid <= 1'b0;
-    end else if (alpu_tx.opd_valid & opd_yorx & yx_wready) begin //TODO: assign yx_wready
+    end else if (alpu_tx.opd_valid & opd_yorx & yx_wready) begin
       ys.data  <= alpu_tx.opd_data;
       ys.addr  <= alpu_tx.opd_addr;
       ys.valid <= 1'b1;
