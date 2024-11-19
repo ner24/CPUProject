@@ -1,0 +1,9 @@
+buff = [add r2,r1,#1
+        sub r0,r1,#10
+        add r0,r0,r2]
+
+//each register will be mapped to an address
+//- e.g. dxr2 -> address dxx1x2 where x1 is ALU idx and x2 is cache idx and dx is dependency graph (reg file) idx
+//the dispatch unit will need to track the queue sizes
+//
+
