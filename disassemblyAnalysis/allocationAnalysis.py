@@ -1,13 +1,15 @@
 from typing import List
-from allocators.allocator12 import allocate as allocate1
+from allocators.allocator13 import allocate as allocate1
 
-assembly = open("./allocators/testAsm.txt", "r")
+assembly = open("./allocators/testAsm3.txt", "r")
 
 lines: List[str] = []
 for line in assembly:
   lines.append(line)
 
 renamedInstructions: List[dict] = allocate1(lines)
+#for i in renamedInstructions:
+#  print(i)
 
 def reg_dict_to_addr(obj) -> str:
   #print(obj)

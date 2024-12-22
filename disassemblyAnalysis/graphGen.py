@@ -83,6 +83,7 @@ def decompInstruction(line) -> tuple[bool, str, str, List[str]]:
             for i in range(len(operands)):
                 operands[i]["value"] = operands[i]["value"].replace('[','').replace(',','').replace(']','')
             destReg: str = operands[0]
+            operands = operands[1:]
             return True, instruction, destReg, operands
         #case "ldmia":
         #    memBaseIdxReg: str = operands[0].replace('!','')
@@ -92,6 +93,9 @@ def decompInstruction(line) -> tuple[bool, str, str, List[str]]:
         case _:
             destReg = operands[0]
             srcReg = operands[1:]
+            if len(srcReg) == 1: #if true, this is an accumulative op (where one reg is dest and src (e.g. add r2, r3))
+                srcReg.append(destReg)
+                srcReg.reverse()
             return True, instruction, destReg, srcReg
 
 def genGraph(lines: List[str]) -> List[pgv.AGraph]:

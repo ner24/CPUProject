@@ -1,0 +1,12 @@
+aa:	443b      	add	r3, r7
+ac:	f853 3c54 	ldr.w	r3, [r3, #-84]
+b0:	693a      	ldr	r2, [r7, #16]
+b2:	fb03 f202 	mul.w	r2, r3, r2
+ba:	fb01 f303 	mul.w	r3, r1, r3
+be:	441a      	add	r2, r3
+c4:	fb01 f303 	mul.w	r3, r1, r3
+c8:	441a      	add	r2, r3
+cc:	009b      	lsls	r3, r3, #2
+ce:	3370      	adds	r3, #112	; 0x70
+d0:	443b      	add	r3, r7
+d2:	f843 2c2c 	str.w	r2, [r3, #-44]
