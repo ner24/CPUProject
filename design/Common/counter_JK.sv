@@ -1,4 +1,4 @@
-module counter_JK #(
+module counter_JK #( //TODO: add sim wrapper module for testing
   parameter WIDTH = 3,
   parameter INC_OR_DEC = 0 //0 for increment, 1 for decrement
 ) (

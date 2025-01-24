@@ -1,5 +1,5 @@
 from typing import List
-from allocators.allocator13 import allocate as allocate1
+from allocators.allocator14 import allocate as allocate1
 
 assembly = open("./allocators/testAsm3.txt", "r")
 

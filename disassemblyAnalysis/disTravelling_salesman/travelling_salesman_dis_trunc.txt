@@ -1,0 +1,494 @@
+
+travelling_salesman.o:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+00000000 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>:
+   0:	b580      	push	{r7, lr}
+   2:	ed2d 8b02 	vpush	{d8}
+   6:	b082      	sub	sp, #8
+   8:	af00      	add	r7, sp, #0
+   a:	6078      	str	r0, [r7, #4]
+   c:	6039      	str	r1, [r7, #0]
+   e:	687b      	ldr	r3, [r7, #4]
+  10:	681a      	ldr	r2, [r3, #0]
+  12:	683b      	ldr	r3, [r7, #0]
+  14:	681b      	ldr	r3, [r3, #0]
+  16:	1ad3      	subs	r3, r2, r3
+  18:	2102      	movs	r1, #2
+  1a:	4618      	mov	r0, r3
+  1c:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+  20:	eeb0 8b40 	vmov.f64	d8, d0
+  24:	687b      	ldr	r3, [r7, #4]
+  26:	685a      	ldr	r2, [r3, #4]
+  28:	683b      	ldr	r3, [r7, #0]
+  2a:	685b      	ldr	r3, [r3, #4]
+  2c:	1ad3      	subs	r3, r2, r3
+  2e:	2102      	movs	r1, #2
+  30:	4618      	mov	r0, r3
+  32:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+  36:	eeb0 7b40 	vmov.f64	d7, d0
+  3a:	ee38 7b07 	vadd.f64	d7, d8, d7
+  3e:	eeb0 0b47 	vmov.f64	d0, d7
+  42:	f7ff fffe 	bl	0 <sqrt>
+  46:	eeb0 7b40 	vmov.f64	d7, d0
+  4a:	eeb0 0b47 	vmov.f64	d0, d7
+  4e:	3708      	adds	r7, #8
+  50:	46bd      	mov	sp, r7
+  52:	ecbd 8b02 	vpop	{d8}
+  56:	bd80      	pop	{r7, pc}
+
+00000058 <_ZN19travelling_salesman22calculateTotalDistanceERKSt6vectorINS_4CityESaIS1_EERKS0_IiSaIiEE>:
+  58:	b5b0      	push	{r4, r5, r7, lr}
+  5a:	b086      	sub	sp, #24
+  5c:	af00      	add	r7, sp, #0
+  5e:	6078      	str	r0, [r7, #4]
+  60:	6039      	str	r1, [r7, #0]
+  62:	f04f 0200 	mov.w	r2, #0
+  66:	f04f 0300 	mov.w	r3, #0
+  6a:	e9c7 2304 	strd	r2, r3, [r7, #16]
+  6e:	2300      	movs	r3, #0
+  70:	60fb      	str	r3, [r7, #12]
+  72:	e02f      	b.n	d4 <_ZN19travelling_salesman22calculateTotalDistanceERKSt6vectorINS_4CityESaIS1_EERKS0_IiSaIiEE+0x7c>
+  74:	68f9      	ldr	r1, [r7, #12]
+  76:	6838      	ldr	r0, [r7, #0]
+  78:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+  7c:	4603      	mov	r3, r0
+  7e:	681b      	ldr	r3, [r3, #0]
+  80:	4619      	mov	r1, r3
+  82:	6878      	ldr	r0, [r7, #4]
+  84:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+  88:	4605      	mov	r5, r0
+  8a:	68fb      	ldr	r3, [r7, #12]
+  8c:	1c5c      	adds	r4, r3, #1
+  8e:	6838      	ldr	r0, [r7, #0]
+  90:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+  94:	4603      	mov	r3, r0
+  96:	4619      	mov	r1, r3
+  98:	4620      	mov	r0, r4
+  9a:	f7ff fffe 	bl	0 <__aeabi_uidivmod>
+  9e:	460b      	mov	r3, r1
+  a0:	4619      	mov	r1, r3
+  a2:	6838      	ldr	r0, [r7, #0]
+  a4:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+  a8:	4603      	mov	r3, r0
+  aa:	681b      	ldr	r3, [r3, #0]
+  ac:	4619      	mov	r1, r3
+  ae:	6878      	ldr	r0, [r7, #4]
+  b0:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+  b4:	4603      	mov	r3, r0
+  b6:	4619      	mov	r1, r3
+  b8:	4628      	mov	r0, r5
+  ba:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+  be:	eeb0 6b40 	vmov.f64	d6, d0
+  c2:	ed97 7b04 	vldr	d7, [r7, #16]
+  c6:	ee37 7b06 	vadd.f64	d7, d7, d6
+  ca:	ed87 7b04 	vstr	d7, [r7, #16]
+  ce:	68fb      	ldr	r3, [r7, #12]
+  d0:	3301      	adds	r3, #1
+  d2:	60fb      	str	r3, [r7, #12]
+  d4:	6838      	ldr	r0, [r7, #0]
+  d6:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+  da:	4602      	mov	r2, r0
+  dc:	68fb      	ldr	r3, [r7, #12]
+  de:	4293      	cmp	r3, r2
+  e0:	bf34      	ite	cc
+  e2:	2301      	movcc	r3, #1
+  e4:	2300      	movcs	r3, #0
+  e6:	b2db      	uxtb	r3, r3
+  e8:	2b00      	cmp	r3, #0
+  ea:	d1c3      	bne.n	74 <_ZN19travelling_salesman22calculateTotalDistanceERKSt6vectorINS_4CityESaIS1_EERKS0_IiSaIiEE+0x1c>
+  ec:	e9d7 2304 	ldrd	r2, r3, [r7, #16]
+  f0:	ec43 2b17 	vmov	d7, r2, r3
+  f4:	eeb0 0b47 	vmov.f64	d0, d7
+  f8:	3718      	adds	r7, #24
+  fa:	46bd      	mov	sp, r7
+  fc:	bdb0      	pop	{r4, r5, r7, pc}
+
+000000fe <_ZN19travelling_salesman16generateNeighborERKSt6vectorIiSaIiEE>:
+  fe:	b590      	push	{r4, r7, lr}
+ 100:	b085      	sub	sp, #20
+ 102:	af00      	add	r7, sp, #0
+ 104:	6078      	str	r0, [r7, #4]
+ 106:	6039      	str	r1, [r7, #0]
+ 108:	6839      	ldr	r1, [r7, #0]
+ 10a:	6878      	ldr	r0, [r7, #4]
+ 10c:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 110:	f7ff fffe 	bl	0 <rand>
+ 114:	4603      	mov	r3, r0
+ 116:	461c      	mov	r4, r3
+ 118:	6878      	ldr	r0, [r7, #4]
+ 11a:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 11e:	4603      	mov	r3, r0
+ 120:	4619      	mov	r1, r3
+ 122:	4620      	mov	r0, r4
+ 124:	f7ff fffe 	bl	0 <__aeabi_uidivmod>
+ 128:	460b      	mov	r3, r1
+ 12a:	60bb      	str	r3, [r7, #8]
+ 12c:	f7ff fffe 	bl	0 <rand>
+ 130:	4603      	mov	r3, r0
+ 132:	461c      	mov	r4, r3
+ 134:	6878      	ldr	r0, [r7, #4]
+ 136:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 13a:	4603      	mov	r3, r0
+ 13c:	4619      	mov	r1, r3
+ 13e:	4620      	mov	r0, r4
+ 140:	f7ff fffe 	bl	0 <__aeabi_uidivmod>
+ 144:	460b      	mov	r3, r1
+ 146:	60fb      	str	r3, [r7, #12]
+ 148:	68bb      	ldr	r3, [r7, #8]
+ 14a:	4619      	mov	r1, r3
+ 14c:	6878      	ldr	r0, [r7, #4]
+ 14e:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 152:	4604      	mov	r4, r0
+ 154:	68fb      	ldr	r3, [r7, #12]
+ 156:	4619      	mov	r1, r3
+ 158:	6878      	ldr	r0, [r7, #4]
+ 15a:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 15e:	4603      	mov	r3, r0
+ 160:	4619      	mov	r1, r3
+ 162:	4620      	mov	r0, r4
+ 164:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 168:	bf00      	nop
+ 16a:	6878      	ldr	r0, [r7, #4]
+ 16c:	3714      	adds	r7, #20
+ 16e:	46bd      	mov	sp, r7
+ 170:	bd90      	pop	{r4, r7, pc}
+
+00000172 <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd>:
+ 172:	b5b0      	push	{r4, r5, r7, lr}
+ 174:	ed2d 8b02 	vpush	{d8}
+ 178:	f5ad 5d9f 	sub.w	sp, sp, #5088	; 0x13e0
+ 17c:	b084      	sub	sp, #16
+ 17e:	af00      	add	r7, sp, #0
+ 180:	f507 737c 	add.w	r3, r7, #1008	; 0x3f0
+ 184:	f5a3 7377 	sub.w	r3, r3, #988	; 0x3dc
+ 188:	6018      	str	r0, [r3, #0]
+ 18a:	f107 0310 	add.w	r3, r7, #16
+ 18e:	ed03 0b02 	vstr	d0, [r3, #-8]
+ 192:	f107 0310 	add.w	r3, r7, #16
+ 196:	3b10      	subs	r3, #16
+ 198:	ed83 1b00 	vstr	d1, [r3]
+ 19c:	f507 519f 	add.w	r1, r7, #5088	; 0x13e0
+ 1a0:	f101 010c 	add.w	r1, r1, #12
+ 1a4:	4af4      	ldr	r2, [pc, #976]	; (578 <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd+0x406>)
+ 1a6:	447a      	add	r2, pc
+ 1a8:	4bf4      	ldr	r3, [pc, #976]	; (57c <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd+0x40a>)
+ 1aa:	58d3      	ldr	r3, [r2, r3]
+ 1ac:	681b      	ldr	r3, [r3, #0]
+ 1ae:	600b      	str	r3, [r1, #0]
+ 1b0:	f04f 0300 	mov.w	r3, #0
+ 1b4:	f507 737c 	add.w	r3, r7, #1008	; 0x3f0
+ 1b8:	f5a3 7377 	sub.w	r3, r3, #988	; 0x3dc
+ 1bc:	6818      	ldr	r0, [r3, #0]
+ 1be:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 1c2:	4602      	mov	r2, r0
+ 1c4:	f507 737c 	add.w	r3, r7, #1008	; 0x3f0
+ 1c8:	f5a3 7375 	sub.w	r3, r3, #980	; 0x3d4
+ 1cc:	601a      	str	r2, [r3, #0]
+ 1ce:	f507 737c 	add.w	r3, r7, #1008	; 0x3f0
+ 1d2:	f5a3 7375 	sub.w	r3, r3, #980	; 0x3d4
+ 1d6:	681c      	ldr	r4, [r3, #0]
+ 1d8:	f107 0370 	add.w	r3, r7, #112	; 0x70
+ 1dc:	3b18      	subs	r3, #24
+ 1de:	4618      	mov	r0, r3
+ 1e0:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 1e4:	f107 0270 	add.w	r2, r7, #112	; 0x70
+ 1e8:	3a18      	subs	r2, #24
+ 1ea:	f107 0350 	add.w	r3, r7, #80	; 0x50
+ 1ee:	3b10      	subs	r3, #16
+ 1f0:	4621      	mov	r1, r4
+ 1f2:	4618      	mov	r0, r3
+ 1f4:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 1f8:	f107 0370 	add.w	r3, r7, #112	; 0x70
+ 1fc:	3b18      	subs	r3, #24
+ 1fe:	4618      	mov	r0, r3
+ 200:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 204:	f507 737c 	add.w	r3, r7, #1008	; 0x3f0
+ 208:	f5a3 7375 	sub.w	r3, r3, #980	; 0x3d4
+ 20c:	681c      	ldr	r4, [r3, #0]
+ 20e:	f107 0370 	add.w	r3, r7, #112	; 0x70
+ 212:	3b18      	subs	r3, #24
+ 214:	4618      	mov	r0, r3
+ 216:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 21a:	f107 0270 	add.w	r2, r7, #112	; 0x70
+ 21e:	3a18      	subs	r2, #24
+ 220:	f107 0350 	add.w	r3, r7, #80	; 0x50
+ 224:	3b04      	subs	r3, #4
+ 226:	4621      	mov	r1, r4
+ 228:	4618      	mov	r0, r3
+ 22a:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 22e:	f107 0370 	add.w	r3, r7, #112	; 0x70
+ 232:	3b18      	subs	r3, #24
+ 234:	4618      	mov	r0, r3
+ 236:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 23a:	f507 737c 	add.w	r3, r7, #1008	; 0x3f0
+ 23e:	f5a3 7376 	sub.w	r3, r3, #984	; 0x3d8
+ 242:	2200      	movs	r2, #0
+ 244:	601a      	str	r2, [r3, #0]
+ 246:	e01d      	b.n	284 <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd+0x112>
+ 248:	f507 737c 	add.w	r3, r7, #1008	; 0x3f0
+ 24c:	f5a3 7376 	sub.w	r3, r3, #984	; 0x3d8
+ 250:	681c      	ldr	r4, [r3, #0]
+ 252:	f507 737c 	add.w	r3, r7, #1008	; 0x3f0
+ 256:	f5a3 7376 	sub.w	r3, r3, #984	; 0x3d8
+ 25a:	681a      	ldr	r2, [r3, #0]
+ 25c:	f107 0350 	add.w	r3, r7, #80	; 0x50
+ 260:	3b10      	subs	r3, #16
+ 262:	4611      	mov	r1, r2
+ 264:	4618      	mov	r0, r3
+ 266:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 26a:	4603      	mov	r3, r0
+ 26c:	601c      	str	r4, [r3, #0]
+ 26e:	f507 737c 	add.w	r3, r7, #1008	; 0x3f0
+ 272:	f5a3 7376 	sub.w	r3, r3, #984	; 0x3d8
+ 276:	f507 727c 	add.w	r2, r7, #1008	; 0x3f0
+ 27a:	f5a2 7276 	sub.w	r2, r2, #984	; 0x3d8
+ 27e:	6812      	ldr	r2, [r2, #0]
+ 280:	3201      	adds	r2, #1
+ 282:	601a      	str	r2, [r3, #0]
+ 284:	f507 737c 	add.w	r3, r7, #1008	; 0x3f0
+ 288:	f5a3 7276 	sub.w	r2, r3, #984	; 0x3d8
+ 28c:	f507 737c 	add.w	r3, r7, #1008	; 0x3f0
+ 290:	f5a3 7375 	sub.w	r3, r3, #980	; 0x3d4
+ 294:	6812      	ldr	r2, [r2, #0]
+ 296:	681b      	ldr	r3, [r3, #0]
+ 298:	429a      	cmp	r2, r3
+ 29a:	dbd5      	blt.n	248 <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd+0xd6>
+ 29c:	f107 0370 	add.w	r3, r7, #112	; 0x70
+ 2a0:	3b0c      	subs	r3, #12
+ 2a2:	4618      	mov	r0, r3
+ 2a4:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 2a8:	f107 0370 	add.w	r3, r7, #112	; 0x70
+ 2ac:	3b0c      	subs	r3, #12
+ 2ae:	4618      	mov	r0, r3
+ 2b0:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 2b4:	4602      	mov	r2, r0
+ 2b6:	f607 2328 	addw	r3, r7, #2600	; 0xa28
+ 2ba:	4611      	mov	r1, r2
+ 2bc:	4618      	mov	r0, r3
+ 2be:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 2c2:	f107 0350 	add.w	r3, r7, #80	; 0x50
+ 2c6:	3b10      	subs	r3, #16
+ 2c8:	4618      	mov	r0, r3
+ 2ca:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 2ce:	4604      	mov	r4, r0
+ 2d0:	f107 0350 	add.w	r3, r7, #80	; 0x50
+ 2d4:	3b10      	subs	r3, #16
+ 2d6:	4618      	mov	r0, r3
+ 2d8:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 2dc:	4601      	mov	r1, r0
+ 2de:	f607 2328 	addw	r3, r7, #2600	; 0xa28
+ 2e2:	461a      	mov	r2, r3
+ 2e4:	4620      	mov	r0, r4
+ 2e6:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 2ea:	f107 0250 	add.w	r2, r7, #80	; 0x50
+ 2ee:	3a10      	subs	r2, #16
+ 2f0:	f107 0350 	add.w	r3, r7, #80	; 0x50
+ 2f4:	3b04      	subs	r3, #4
+ 2f6:	4611      	mov	r1, r2
+ 2f8:	4618      	mov	r0, r3
+ 2fa:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 2fe:	f107 0350 	add.w	r3, r7, #80	; 0x50
+ 302:	3b04      	subs	r3, #4
+ 304:	f507 727c 	add.w	r2, r7, #1008	; 0x3f0
+ 308:	f5a2 7277 	sub.w	r2, r2, #988	; 0x3dc
+ 30c:	4619      	mov	r1, r3
+ 30e:	6810      	ldr	r0, [r2, #0]
+ 310:	f7ff fffe 	bl	58 <_ZN19travelling_salesman22calculateTotalDistanceERKSt6vectorINS_4CityESaIS1_EERKS0_IiSaIiEE>
+ 314:	eeb0 7b40 	vmov.f64	d7, d0
+ 318:	f107 0330 	add.w	r3, r7, #48	; 0x30
+ 31c:	3b10      	subs	r3, #16
+ 31e:	ed83 7b00 	vstr	d7, [r3]
+ 322:	f107 0330 	add.w	r3, r7, #48	; 0x30
+ 326:	4619      	mov	r1, r3
+ 328:	f107 0330 	add.w	r3, r7, #48	; 0x30
+ 32c:	3b10      	subs	r3, #16
+ 32e:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 332:	e941 2302 	strd	r2, r3, [r1, #-8]
+ 336:	f107 0330 	add.w	r3, r7, #48	; 0x30
+ 33a:	4619      	mov	r1, r3
+ 33c:	f107 0310 	add.w	r3, r7, #16
+ 340:	e953 2302 	ldrd	r2, r3, [r3, #-8]
+ 344:	e9c1 2300 	strd	r2, r3, [r1]
+ 348:	e0a5      	b.n	496 <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd+0x324>
+ 34a:	f507 737c 	add.w	r3, r7, #1008	; 0x3f0
+ 34e:	f5a3 7266 	sub.w	r2, r3, #920	; 0x398
+ 352:	f107 0350 	add.w	r3, r7, #80	; 0x50
+ 356:	3b10      	subs	r3, #16
+ 358:	4619      	mov	r1, r3
+ 35a:	4610      	mov	r0, r2
+ 35c:	f7ff fffe 	bl	fe <_ZN19travelling_salesman16generateNeighborERKSt6vectorIiSaIiEE>
+ 360:	f107 0370 	add.w	r3, r7, #112	; 0x70
+ 364:	3b18      	subs	r3, #24
+ 366:	f507 727c 	add.w	r2, r7, #1008	; 0x3f0
+ 36a:	f5a2 7277 	sub.w	r2, r2, #988	; 0x3dc
+ 36e:	4619      	mov	r1, r3
+ 370:	6810      	ldr	r0, [r2, #0]
+ 372:	f7ff fffe 	bl	58 <_ZN19travelling_salesman22calculateTotalDistanceERKSt6vectorINS_4CityESaIS1_EERKS0_IiSaIiEE>
+ 376:	eeb0 7b40 	vmov.f64	d7, d0
+ 37a:	f107 0350 	add.w	r3, r7, #80	; 0x50
+ 37e:	3b10      	subs	r3, #16
+ 380:	ed03 7b02 	vstr	d7, [r3, #-8]
+ 384:	f107 0350 	add.w	r3, r7, #80	; 0x50
+ 388:	3b10      	subs	r3, #16
+ 38a:	461a      	mov	r2, r3
+ 38c:	f107 0330 	add.w	r3, r7, #48	; 0x30
+ 390:	ed12 6b02 	vldr	d6, [r2, #-8]
+ 394:	ed13 7b02 	vldr	d7, [r3, #-8]
+ 398:	eeb4 6bc7 	vcmpe.f64	d6, d7
+ 39c:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 3a0:	d426      	bmi.n	3f0 <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd+0x27e>
+ 3a2:	f107 0330 	add.w	r3, r7, #48	; 0x30
+ 3a6:	461a      	mov	r2, r3
+ 3a8:	f107 0350 	add.w	r3, r7, #80	; 0x50
+ 3ac:	3b10      	subs	r3, #16
+ 3ae:	ed12 6b02 	vldr	d6, [r2, #-8]
+ 3b2:	ed13 7b02 	vldr	d7, [r3, #-8]
+ 3b6:	ee36 6b47 	vsub.f64	d6, d6, d7
+ 3ba:	f107 0330 	add.w	r3, r7, #48	; 0x30
+ 3be:	ed93 7b00 	vldr	d7, [r3]
+ 3c2:	ee86 5b07 	vdiv.f64	d5, d6, d7
+ 3c6:	eeb0 0b45 	vmov.f64	d0, d5
+ 3ca:	f7ff fffe 	bl	0 <exp>
+ 3ce:	eeb0 8b40 	vmov.f64	d8, d0
+ 3d2:	f7ff fffe 	bl	0 <rand>
+ 3d6:	ee07 0a90 	vmov	s15, r0
+ 3da:	eeb8 6be7 	vcvt.f64.s32	d6, s15
+ 3de:	ed9f 5b64 	vldr	d5, [pc, #400]	; 570 <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd+0x3fe>
+ 3e2:	ee86 7b05 	vdiv.f64	d7, d6, d5
+ 3e6:	eeb4 8bc7 	vcmpe.f64	d8, d7
+ 3ea:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 3ee:	dd01      	ble.n	3f4 <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd+0x282>
+ 3f0:	2301      	movs	r3, #1
+ 3f2:	e000      	b.n	3f6 <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd+0x284>
+ 3f4:	2300      	movs	r3, #0
+ 3f6:	2b00      	cmp	r3, #0
+ 3f8:	d036      	beq.n	468 <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd+0x2f6>
+ 3fa:	f107 0270 	add.w	r2, r7, #112	; 0x70
+ 3fe:	3a18      	subs	r2, #24
+ 400:	f107 0350 	add.w	r3, r7, #80	; 0x50
+ 404:	3b10      	subs	r3, #16
+ 406:	4611      	mov	r1, r2
+ 408:	4618      	mov	r0, r3
+ 40a:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 40e:	f107 0330 	add.w	r3, r7, #48	; 0x30
+ 412:	4619      	mov	r1, r3
+ 414:	f107 0350 	add.w	r3, r7, #80	; 0x50
+ 418:	3b10      	subs	r3, #16
+ 41a:	e953 2302 	ldrd	r2, r3, [r3, #-8]
+ 41e:	e941 2302 	strd	r2, r3, [r1, #-8]
+ 422:	f107 0330 	add.w	r3, r7, #48	; 0x30
+ 426:	461a      	mov	r2, r3
+ 428:	f107 0330 	add.w	r3, r7, #48	; 0x30
+ 42c:	3b10      	subs	r3, #16
+ 42e:	ed12 6b02 	vldr	d6, [r2, #-8]
+ 432:	ed93 7b00 	vldr	d7, [r3]
+ 436:	eeb4 6bc7 	vcmpe.f64	d6, d7
+ 43a:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 43e:	d513      	bpl.n	468 <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd+0x2f6>
+ 440:	f107 0330 	add.w	r3, r7, #48	; 0x30
+ 444:	3b10      	subs	r3, #16
+ 446:	4619      	mov	r1, r3
+ 448:	f107 0330 	add.w	r3, r7, #48	; 0x30
+ 44c:	e953 2302 	ldrd	r2, r3, [r3, #-8]
+ 450:	e9c1 2300 	strd	r2, r3, [r1]
+ 454:	f107 0250 	add.w	r2, r7, #80	; 0x50
+ 458:	3a10      	subs	r2, #16
+ 45a:	f107 0350 	add.w	r3, r7, #80	; 0x50
+ 45e:	3b04      	subs	r3, #4
+ 460:	4611      	mov	r1, r2
+ 462:	4618      	mov	r0, r3
+ 464:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 468:	f107 0330 	add.w	r3, r7, #48	; 0x30
+ 46c:	461a      	mov	r2, r3
+ 46e:	f107 0330 	add.w	r3, r7, #48	; 0x30
+ 472:	4619      	mov	r1, r3
+ 474:	f107 0310 	add.w	r3, r7, #16
+ 478:	3b10      	subs	r3, #16
+ 47a:	ed91 6b00 	vldr	d6, [r1]
+ 47e:	ed93 7b00 	vldr	d7, [r3]
+ 482:	ee26 7b07 	vmul.f64	d7, d6, d7
+ 486:	ed82 7b00 	vstr	d7, [r2]
+ 48a:	f107 0370 	add.w	r3, r7, #112	; 0x70
+ 48e:	3b18      	subs	r3, #24
+ 490:	4618      	mov	r0, r3
+ 492:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 496:	f107 0330 	add.w	r3, r7, #48	; 0x30
+ 49a:	ed93 7b00 	vldr	d7, [r3]
+ 49e:	eeb7 6b00 	vmov.f64	d6, #112	; 0x3f800000  1.0
+ 4a2:	eeb4 7bc6 	vcmpe.f64	d7, d6
+ 4a6:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 4aa:	f73f af4e 	bgt.w	34a <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd+0x1d8>
+ 4ae:	f107 0330 	add.w	r3, r7, #48	; 0x30
+ 4b2:	3b10      	subs	r3, #16
+ 4b4:	e9d3 4500 	ldrd	r4, r5, [r3]
+ 4b8:	f107 0370 	add.w	r3, r7, #112	; 0x70
+ 4bc:	3b0c      	subs	r3, #12
+ 4be:	4618      	mov	r0, r3
+ 4c0:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 4c4:	f107 0350 	add.w	r3, r7, #80	; 0x50
+ 4c8:	3b04      	subs	r3, #4
+ 4ca:	4618      	mov	r0, r3
+ 4cc:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 4d0:	f107 0350 	add.w	r3, r7, #80	; 0x50
+ 4d4:	3b10      	subs	r3, #16
+ 4d6:	4618      	mov	r0, r3
+ 4d8:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 4dc:	ec45 4b17 	vmov	d7, r4, r5
+ 4e0:	f507 519f 	add.w	r1, r7, #5088	; 0x13e0
+ 4e4:	f101 010c 	add.w	r1, r1, #12
+ 4e8:	4a25      	ldr	r2, [pc, #148]	; (580 <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd+0x40e>)
+ 4ea:	447a      	add	r2, pc
+ 4ec:	4b23      	ldr	r3, [pc, #140]	; (57c <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd+0x40a>)
+ 4ee:	58d3      	ldr	r3, [r2, r3]
+ 4f0:	681a      	ldr	r2, [r3, #0]
+ 4f2:	680b      	ldr	r3, [r1, #0]
+ 4f4:	405a      	eors	r2, r3
+ 4f6:	f04f 0300 	mov.w	r3, #0
+ 4fa:	d02d      	beq.n	558 <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd+0x3e6>
+ 4fc:	e02a      	b.n	554 <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd+0x3e2>
+ 4fe:	f107 0370 	add.w	r3, r7, #112	; 0x70
+ 502:	3b18      	subs	r3, #24
+ 504:	4618      	mov	r0, r3
+ 506:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 50a:	f7ff fffe 	bl	0 <__cxa_end_cleanup>
+ 50e:	f107 0370 	add.w	r3, r7, #112	; 0x70
+ 512:	3b18      	subs	r3, #24
+ 514:	4618      	mov	r0, r3
+ 516:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 51a:	e013      	b.n	544 <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd+0x3d2>
+ 51c:	f107 0370 	add.w	r3, r7, #112	; 0x70
+ 520:	3b18      	subs	r3, #24
+ 522:	4618      	mov	r0, r3
+ 524:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 528:	e7ff      	b.n	52a <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd+0x3b8>
+ 52a:	f107 0370 	add.w	r3, r7, #112	; 0x70
+ 52e:	3b0c      	subs	r3, #12
+ 530:	4618      	mov	r0, r3
+ 532:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 536:	e7ff      	b.n	538 <_ZN19travelling_salesman18simulatedAnnealingERKSt6vectorINS_4CityESaIS1_EEdd+0x3c6>
+ 538:	f107 0350 	add.w	r3, r7, #80	; 0x50
+ 53c:	3b04      	subs	r3, #4
+ 53e:	4618      	mov	r0, r3
+ 540:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 544:	f107 0350 	add.w	r3, r7, #80	; 0x50
+ 548:	3b10      	subs	r3, #16
+ 54a:	4618      	mov	r0, r3
+ 54c:	f7ff fffe 	bl	0 <_ZN19travelling_salesman17calculateDistanceERKNS_4CityES2_>
+ 550:	f7ff fffe 	bl	0 <__cxa_end_cleanup>
+ 554:	f7ff fffe 	bl	0 <__stack_chk_fail>
+ 558:	eeb0 0b47 	vmov.f64	d0, d7
+ 55c:	f507 579f 	add.w	r7, r7, #5088	; 0x13e0
+ 560:	3710      	adds	r7, #16
+ 562:	46bd      	mov	sp, r7
+ 564:	ecbd 8b02 	vpop	{d8}
+ 568:	bdb0      	pop	{r4, r5, r7, pc}
+ 56a:	bf00      	nop
+ 56c:	f3af 8000 	nop.w
+ 570:	ffc00000 	.word	0xffc00000
+ 574:	41dfffff 	.word	0x41dfffff
+ 578:	000003ce 	.word	0x000003ce
+ 57c:	00000000 	.word	0x00000000
+ 580:	00000092 	.word	0x00000092

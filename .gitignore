@@ -106,3 +106,6 @@
 */*/*/bd/*/ip/*/*.tcl
 hw_handoff
 ipshared
+
+#python cache
+*.pyc

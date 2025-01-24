@@ -19,7 +19,7 @@ def get_next_alu_cache_idx(alu_cache_idx_counter: dict, alu_idx: int) -> dict:
     alu_cache_idx_counter[alu_idx] = 0
   return alu_cache_idx_counter
 
-def allocate(instructions: List[str], max_instr_batch_size: int = 10, num_alus: int = 10, alu_alloc_lookback_size: int = 3) -> List[dict]:
+def allocate(instructions: List[str], max_instr_batch_size: int = 10, num_alus: int = 10, alu_alloc_lookback_size: int = 1) -> List[dict]:
   
   #Will be implemented as memory cells unlike the batch tracker which is effectively an
   #iterative logic network
@@ -70,6 +70,7 @@ def allocate(instructions: List[str], max_instr_batch_size: int = 10, num_alus: 
       #alu alloc only applies to instructions that get dispatched
       #and are not resolved internally by the front end
       if instr["instr"] == "str" or instr["instr"] == "ldr":
+        alu_alloc_arr.append(-2)
         continue
       
       #rules:
@@ -95,14 +96,15 @@ def allocate(instructions: List[str], max_instr_batch_size: int = 10, num_alus: 
       #reset batch tracker every alu_alloc_lookback_size instructions
       if ((i-1) % alu_alloc_lookback_size) == 0:
         register_tracker_batch = {}
+      
+      alu_alloc_arr.append(alloc_alu)
 
     # reset batch reg tracker before rename
     register_tracker_batch: dict = {}
 
-    #the icon_mv_instructions_batch store of the mv instructions to be dispatched to the interconnect
-    #before the batch itself is dispatched. These mv instructions align the reg tracker with the reg_tracker_batch
-    #(i.e. it is what the redistribute phase did in previous versions of this allocator)
-    icon_mv_instructions_batch: List[dict] = []
+    # track icon instructions to add additional receivers if multiple parallel instrs using same reg instance
+    reg_icon_instr_tracker: dict = {}
+    print(alu_alloc_arr)
     renamedInstructions_batch: List[dict] = []
     for i in range(instr_batch_size-1, -1, -1):
       instr = instructions_batch[i]
@@ -110,6 +112,8 @@ def allocate(instructions: List[str], max_instr_batch_size: int = 10, num_alus: 
       destReg = instr["destReg"]
       #opcode = instr["instr"]
       print("Evaluating: " + str(instr["instr"]) + " : " + str(instr["destReg"]) + " < " + str(instr["srcs"]))
+
+      alloc_alu = alu_alloc_arr[i]
 
       #TODO: str handling
       if instr["instr"] == "str":
@@ -135,13 +139,13 @@ def allocate(instructions: List[str], max_instr_batch_size: int = 10, num_alus: 
       if instr["instr"] == "ldr":
         #because renamedInstructions starts with 0 elements and is appended every time, it needs a different counter
         c: int = 1
-        for j in range(i+1, instr_batch_size):
+        for j in range(instr_batch_size-1, i, -1):
           print("Ld remap: iter=" + str(c) + ": " + str(instructions_batch[j]["srcs"]))
           print("Ld renamed before: " + str(renamedInstructions_batch[len(renamedInstructions_batch) - c]["srcs"]))
           #go through all instructions after the ld (when not reverse order) and check all source registers
           #if one of the source reg equals the dest reg of the load, remap to memory
           #print(instr["srcs"])
-          for k in range(len(instructions_batch[j]["srcs"])-1, -1, -1):
+          for k in range(len(instructions_batch[j]["srcs"])):
             if instructions_batch[j]["srcs"][k] == instr["destReg"]:
               if len(instr["srcs"]) == 2:
                 renamedInstructions_batch[len(renamedInstructions_batch) - c]["srcs"][k] = {
@@ -164,55 +168,33 @@ def allocate(instructions: List[str], max_instr_batch_size: int = 10, num_alus: 
 
 
       #Source register handling (and alu allocation)
-      alloc_alu: int = -1
       renamedSrcs: List[dict] = []
       for s in instr["srcs"]:
-        print("Src: " + str(s))
-        print("alloc_alu: " + str(alloc_alu))
         if s["type"] == "reg":
-          #if reg not in register_tracker_batch, then default back to register_tracker value.
-          #if srcs are in different alus, then send a redistribute instruction
-          if s["value"] in register_tracker_batch and alloc_alu == -1:
-            #if reg is in batch reg tracker, then it has already been used as a dest reg. If so, the earlier read
-            #instructions (ones which are later as reading backwards) that use this reg as a src
-            #should use that reg from a different file as the later instructions dont use that "reg instance" anymore
-            #from the point of view of the allocator, this should just involve resetting the batch reg tracker for that reg
-            if register_tracker_batch[s["value"]]["dest_state"] == 0:
-              #allocate to alu where the first src is
-              alloc_alu = register_tracker_batch[s["value"]]["alu_idx"]
-
-            
-
-          #allocated alu should be set to wherever one of the sources is (in this case the first one)
-          #if other sources are taken from reg tracker and are in another alu, dispatch a move to the interconnect
-          else:
-            #if no alu allocated via existing entries in caches, do a round robin allocate (for now)
-            if alloc_alu == -1:
-              alloc_alu = alu_idx_counter
-              alu_idx_counter = alu_idx_counter + 1
-              if alu_idx_counter == num_alus:
-                alu_idx_counter = 0
-            
+          #if not in register_tracker_batch, generate new address in allocated eu
+          #if srcs are in different alus, then send a icon instruction
+          if s["value"] not in register_tracker_batch:
             #generate a cache address in the allocated alu for the src
             register_tracker_batch[s["value"]] = {
               "alu_idx": alloc_alu,
-              "alu_cache_idx": alu_cache_idx_counter[alu_idx_counter],
+              "alu_cache_idx": alu_cache_idx_counter[alloc_alu],
               "opx": 0, #TODO: sort out opx
               "dest_state": 0
             }
-            alu_cache_idx_counter = get_next_alu_cache_idx(alu_cache_idx_counter, alu_idx_counter)
+            alu_cache_idx_counter = get_next_alu_cache_idx(alu_cache_idx_counter, alloc_alu)
+          else:
+            #if not equal, then need icon instruction to move it to allocated alu's tx buffer
+            if not register_tracker_batch[s["value"]]["alu_idx"] == alloc_alu:
+              if s["value"] in reg_icon_instr_tracker:
+                reg_icon_instr_tracker[s["value"]] = reg_icon_instr_tracker[s["value"]] | (1 << alloc_alu)
+              else:
+                reg_icon_instr_tracker[s["value"]] = (1 << alloc_alu)
 
           renamedSrcs.append(register_tracker_batch[s["value"]])
         else:
           renamedSrcs.append({
             "immValue": s["value"]
           })
-          #if no alu allocated via existing entries in caches, do a round robin allocate (for now)
-          if alloc_alu == -1:
-            alloc_alu = alu_idx_counter
-            alu_idx_counter = alu_idx_counter + 1
-            if alu_idx_counter == num_alus:
-              alu_idx_counter = 0
       
       #dest reg handling
       #all this needs to do is allocate a cache location if one isnt already allocated
@@ -238,12 +220,35 @@ def allocate(instructions: List[str], max_instr_batch_size: int = 10, num_alus: 
         "srcs": renamedSrcs
       })
 
+      #also reset and dispatch icon for when reg instance is discarded when instr has it a dest reg
+      if destReg["value"] in reg_icon_instr_tracker:
+        renamedInstructions_batch.append({
+          "alu_idx": -1,
+          "instruction": "iconmv",
+          "destReg": {
+            "alu_idx": reg_icon_instr_tracker[destReg["value"]],
+            "alu_cache_idx": "",
+            "opx": ""
+          },
+          "srcs": [ register_tracker_batch[destReg["value"]] ]
+        })
+        del reg_icon_instr_tracker[destReg["value"]]
+
     #redistribute phase
     #This can also be implemented as a carry chain going from first to last (in forward order)
     #the blocking condition is when the register is seen as a dest reg in the cell
+    for key, val in register_tracker_batch.items():
+      if key in register_tracker:
+        renamedInstructions_batch.append({
+          "alu_idx": -1,
+          "instruction": "iconmv",
+          "destReg": val,
+          "srcs": [ register_tracker[key] ]
+        })
+      
+      register_tracker[key] = val
 
     #finalise and append
-    renamedInstructions = renamedInstructions + icon_mv_instructions_batch
     renamedInstructions = renamedInstructions + list(reversed(renamedInstructions_batch))
 
     num_evaluated_instr = num_evaluated_instr + instr_batch_size

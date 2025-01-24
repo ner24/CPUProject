@@ -1,4 +1,5 @@
 module ram_queue # ( //TODO: replace pointers with JK flip flop counters for smaller power and area
+//TODO: do power comparison between this and a shift register
   parameter DATA_WIDTH = 4,
   parameter LOG2_SIZE = 2
 ) (

@@ -8,7 +8,7 @@ import pygraphviz as pgv
 
 #name = "travelling_salesman_dis"
 #assembly = open("md5Dis/md5_dis.txt", "r")
-assembly = open("fft_dis.txt", "r")
+assembly = open("disFFT/fft_dis.txt", "r")
 #assembly = open(name + ".txt", "r")
 
 def getTokens(line) -> List[str]:
