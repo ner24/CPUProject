@@ -87,6 +87,11 @@ def decompInstruction(line) -> tuple[bool, str, str, List[str]]:
             return True, instruction, destReg, operands
         #case "ldmia":
         #    memBaseIdxReg: str = operands[0].replace('!','')
+
+        case "mov":
+            destReg = operands[0]
+            srcReg = operands[1]
+            return True, instruction, destReg, [ srcReg ]
             
         #for most instructions destination is first operand
         #source operands are after

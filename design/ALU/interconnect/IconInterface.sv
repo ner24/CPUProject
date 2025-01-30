@@ -1,6 +1,8 @@
 module eu_iconIntf import exec_unit_dtypes::*; #(
   localparam NUM_PORTS = 3,
-  parameter EU_IDX = 0 //must equal alpu_cache ALU IDX.
+
+  //must equal alpu_cache ALU IDX.
+  parameter EU_IDX = 0
 ) (
   //each interface will have
   inout  wire type_icon_channel channel_port [0:NUM_PORTS-1], //0 = tx, 1 = rx0, 2 = rx1
@@ -31,21 +33,5 @@ module eu_iconIntf import exec_unit_dtypes::*; #(
   assign channel_port[0].rx.ready = 1'bz; //port 0 (TX) ready is disconnected
   assign channel_port[1].rx.ready = x_rxx_idx_hit[0] ? x_rx0_ready_i : 1'bz;
   assign channel_port[2].rx.ready = x_rxx_idx_hit[1] ? x_rx1_ready_i : 1'bz;
-
-  //interconnect TX queue
-  ram_queue #(
-    .DATA_WIDTH($bits(type_icon_TXQentry)),
-    .LOG2_SIZE(2)
-  ) queue (
-    .clk(clk),
-    .reset_n(reset_n),
-    .wvalid_i(),
-    .wdata_i(),
-    .rvalid_i(),
-    .rready_i(),
-    .rdata_o(),
-    .full_o(),
-    .empty_o()
-  );
 
 endmodule

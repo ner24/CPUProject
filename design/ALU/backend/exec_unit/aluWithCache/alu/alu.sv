@@ -1,8 +1,8 @@
-`include "alu_parameters.sv"
+`include "design_parameters.sv"
 
-module alpu #(
-  parameter REG_WIDTH = `ALU_REG_WIDTH,
-  parameter USE_PIPELINED_ALPU = `ALU_USE_PIPELINED_ALPU
+module alu #(
+  parameter REG_WIDTH = `WORD_WIDTH,
+  parameter USE_PIPELINED_ALU = `ALU_USE_PIPELINED_ALU
 ) (
   input  wire                   clk,
   input  wire                   reset_n,
@@ -42,10 +42,10 @@ module alpu #(
     endcase
   end
 
-  generate if (USE_PIPELINED_ALPU) begin: g_alpu_comb_piped
-    alpu_comb_piped #(
+  generate if (USE_PIPELINED_ALU) begin: g_alu_comb_piped
+    alu_comb_piped #(
       .REG_WIDTH(REG_WIDTH)
-    ) u_alpu_comb (
+    ) u_alu_comb (
       .clk(clk),
       .reset_n(reset_n),
       .pipe_active(1'b1),
@@ -57,10 +57,10 @@ module alpu #(
       .cin(cin_i),
       .cout(cout_o)
     );
-  end else begin: g_alpu_comb_n_piped
-    alpu_comb #(
+  end else begin: g_alu_comb_n_piped
+    alu_comb #(
       .REG_WIDTH(REG_WIDTH)
-    ) u_alpu_comb (
+    ) u_alu_comb (
       .a(a_i),
       .b(b_i),
       .out(out_o),

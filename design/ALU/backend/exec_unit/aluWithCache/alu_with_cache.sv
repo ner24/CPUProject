@@ -34,7 +34,7 @@ module alpu_with_cache import exec_unit_dtypes::*; #( //WIP. THis module without
     .DATA_WIDTH(REG_WIDTH)
   ) cache (
     .clk      (clk),
-    .reset_n  (reset_n),
+    .reset_n  (reset_n)
     
   );
 

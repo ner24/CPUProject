@@ -1,6 +1,5 @@
 module counter_JK #( //TODO: add sim wrapper module for testing
-  parameter WIDTH = 3,
-  parameter INC_OR_DEC = 0 //0 for increment, 1 for decrement
+  parameter WIDTH = 3
 ) (
   input  wire clk,
   input  wire reset_n,
@@ -10,6 +9,7 @@ module counter_JK #( //TODO: add sim wrapper module for testing
   input  wire [WIDTH-1:0] set_val,
 
   input  wire             trig, //triggers increment or decrement (depending on param). 
+  input  wire             inc_or_dec,
 
   output wire [WIDTH-1:0] q
 );
@@ -27,7 +27,9 @@ module counter_JK #( //TODO: add sim wrapper module for testing
   assign set_any = (~reset_n) | set;
 
   wire [WIDTH:0] clk_chain; //extra bit at top is there to simplify logic below but should be ignored
-  assign clk_chain[0] = clk | set_any; //all JK flip flops need to be pulsed on set
+  wire clk_internal;
+  assign clk_internal = clk & trig;
+  assign clk_chain[0] = clk_internal | set_any; //all JK flip flops need to be pulsed on set
   generate for(genvar i = 0; i < WIDTH; i++) begin
     wire jkq;
     wire j, k;
@@ -43,7 +45,7 @@ module counter_JK #( //TODO: add sim wrapper module for testing
       .q(jkq)
     );
     assign q[i] = jkq;
-    assign clk_chain[i+1] = (INC_OR_DEC ? ~jkq : jkq) | set_any;
+    assign clk_chain[i+1] = (inc_or_dec ? ~jkq : jkq) | set_any;
   end endgenerate
 
 endmodule

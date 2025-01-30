@@ -1,14 +1,13 @@
 `ifndef INCLUDE_EXEC_UNIT_DTYPES
 `define INCLUDE_EXEC_UNIT_DTYPES
 
-`include "alu_parameters.sv"
+`include "design_parameters.sv"
 
-//yes, not actually a package
-package exec_unit_dtypes;
+package pkg_dtypes;
 
   localparam LOG2_NUM_ALPU = $clog2(`NUM_EXEC_UNITS);
   localparam LOG2_NUM_REG = $clog2(`NUM_REG);
-  localparam DATA_WIDTH = `ALU_REG_WIDTH;
+  localparam DATA_WIDTH = `WORD_WIDTH;
 
   typedef struct packed {
     logic [DATA_WIDTH-1:0]    data;
@@ -100,10 +99,10 @@ package exec_unit_dtypes;
     logic                  has_been_read;
   } type_ycache_data;
 
-  typedef struct packed {
+  /*typedef struct packed {
     logic               opx; //see type_alpu_channel_tx for description
     type_exec_unit_addr addr;
-  } type_icon_TXQentry;
+  } type_icon_TXQentry;*/
 
 endpackage
 

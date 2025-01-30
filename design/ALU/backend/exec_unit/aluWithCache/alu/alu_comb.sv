@@ -1,5 +1,5 @@
 //alu combinational logic only
-module alpu_comb #(
+module alu_comb #(
     parameter REG_WIDTH = 16
 ) (
     input  wire   [REG_WIDTH-1:0] a,
@@ -11,7 +11,7 @@ module alpu_comb #(
 );
     //twos complement inverter
     wire[REG_WIDTH - 1:0] invA;
-    alpu_inverter #(
+    alu_inverter #(
         .REG_WIDTH(REG_WIDTH)
     ) inv0 (
         .a(a),
@@ -31,7 +31,7 @@ module alpu_comb #(
     wire[REG_WIDTH-1:0] cla_lh_oX;
     wire[REG_WIDTH-1:0] cla_lh_cgen_out;
     wire[REG_WIDTH-1:0] cla_lh_cgen;
-    alpu_add_cla_lh #(
+    alu_add_cla_lh #(
         .REG_WIDTH(REG_WIDTH)
     ) cla_lh_0 (
         .a(invA),
@@ -48,7 +48,7 @@ module alpu_comb #(
     
     //top half
     wire[REG_WIDTH - 1:0] cla_s;
-    alpu_add_cla_uh #(
+    alu_add_cla_uh #(
         .REG_WIDTH(REG_WIDTH)
     ) cla_uh_0 (
         .oX(cla_lh_oX),
@@ -70,4 +70,4 @@ module alpu_comb #(
         assign out[i] = out_nI[i] ^ ctrl[0];
     end endgenerate
 
-endmodule: alpu_comb
+endmodule: alu_comb

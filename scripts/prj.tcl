@@ -77,7 +77,7 @@ dict with argv {
     puts "Setting design top module to $module_top"
     set_property top $module_top [get_fileset sources_1]
   } else {
-    echo "No design top module specified"
+    puts "No design top module specified"
     exit
   }
 
