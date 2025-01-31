@@ -13,8 +13,7 @@ package pkg_dtypes;
     logic [DATA_WIDTH-1:0]    data;
   } type_exec_unit_data;
 
-  typedef struct packed {
-    logic                     is_output; //i.e. not intermediate and to send back to main reg file. Should be MSB
+  typedef struct packed { //TODO: update when implementing front end
     logic [LOG2_NUM_ALPU-1:0] eu_idx;
     logic  [LOG2_NUM_REG-1:0] reg_idx;
   } type_exec_unit_addr;
