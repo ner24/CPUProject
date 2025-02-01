@@ -1,7 +1,7 @@
 `include "design_parameters.sv"
 
 module eu_xbuf import pkg_dtypes::*; #(
-
+  parameter NUM_IDX_BITS = 2 //buffer sizes equal 2**NUM_IDX_BITS
 ) (
   input wire clk,
   input wire reset_n,
@@ -17,17 +17,17 @@ module eu_xbuf import pkg_dtypes::*; #(
   output wire                      out_success
 
 );
-  localparam CACHE_IDX_WIDTH = `EU_CACHE_NUM_IDX_BITS-1;
+  localparam CACHE_IDX_WIDTH = NUM_IDX_BITS;
 
   typedef struct packed {
     logic hbr;
-    type_exec_unit_addr addr;
     type_exec_unit_data data;
   } type_xbuf_entry;
 
   //request validity
   //when both alu and icon have valid requests, prioritise
   //the icon unless the RAM is full
+  //More generally, for RX and TX, the input should always take priority over output (apart from when ram is full)
   wire alu_valid_int;
   wire icon_valid_int;
   wire [CACHE_IDX_WIDTH-1:0] num_elements_tracker;
@@ -121,8 +121,8 @@ module eu_xbuf import pkg_dtypes::*; #(
   assign ram_re = icon_valid_int | alu_valid_int;
 
   cache_DP #(
-    .IDX_BITS(2),
-    .DATA_WIDTH(DATA_WIDTH),
+    .IDX_BITS(NUM_IDX_BITS),
+    .DATA_WIDTH($bits(type_xbuf_entry)),
     .ADDR_WIDTH($bits(type_exec_unit_addr))
   ) ram (
     .clk(clk),

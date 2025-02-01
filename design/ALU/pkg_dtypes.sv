@@ -14,13 +14,15 @@ package pkg_dtypes;
   } type_exec_unit_data;
 
   typedef struct packed { //TODO: update when implementing front end
+    //logic                     uid;
     logic [LOG2_NUM_ALPU-1:0] eu_idx;
     logic  [LOG2_NUM_REG-1:0] reg_idx;
   } type_exec_unit_addr;
 
   typedef struct packed {
+    //logic                     uid;
     logic  [LOG2_NUM_REG-1:0] reg_idx;
-  } type_alpu_local_addr;
+  } type_alu_local_addr;
 
   /*typedef struct packed {
     logic [LOG2_NUM_ALPU-1:0] eu_idx;
@@ -36,7 +38,7 @@ package pkg_dtypes;
   //typedef type_icon_tx_channel type_icon_channel;
 
   typedef struct packed {
-    logic                  ready;
+    logic                  success;
   } type_icon_rx_channel;
 
   typedef struct packed {
@@ -54,14 +56,14 @@ package pkg_dtypes;
 
     type_exec_unit_addr    opd_addr;
     logic                  opd_ready; //ready to write to address opd (which means cache index has_been_read is high)
-  } type_alpu_channel_rx; //rx on alpu side
+  } type_alu_channel_rx; //rx on alu side
 
   typedef struct packed {
     type_exec_unit_data      opd_data;
     type_exec_unit_addr      opd_addr;
     logic                    opd_opx; //op0 if 0, op1 if 1. Used to assign to appropriate x buffer for foreign writes
     logic                    opd_valid; //can be low if no instruction is being processed
-  } type_alpu_channel_tx; //tx on alpu side
+  } type_alu_channel_tx; //tx on alu side
 
   //TODO: the addr and immediate lengths are significantly different
   //which causes area inefficiencies (especially when using immediates which are smaller of the two)
