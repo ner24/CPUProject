@@ -44,8 +44,8 @@ module cache_DP # ( //must read protected cache
   cache_entry rdatab;
   cache_entry wdata;
 
-  assign rhita_o  = &(~(rdataa.stored_tag ^ addra_i[ADDR_WIDTH-1:IDX_BITS]));
-  assign rhitb_o  = &(~(rdatab.stored_tag ^ addrb_i[ADDR_WIDTH-1:IDX_BITS]));
+  assign rhita_o  = rdataa.stored_tag == addra_i[ADDR_WIDTH-1:IDX_BITS];//&(~(rdataa.stored_tag ^ addra_i[ADDR_WIDTH-1:IDX_BITS]));
+  assign rhitb_o  = rdatab.stored_tag == addrb_i[ADDR_WIDTH-1:IDX_BITS];//&(~(rdatab.stored_tag ^ addrb_i[ADDR_WIDTH-1:IDX_BITS]));
   assign rdataa_o = rdataa.data;
   assign rdatab_o = rdatab.data;
 

@@ -16,7 +16,9 @@ module eu_ybuf import pkg_dtypes::*; #(
 
   input  wire type_alu_local_addr result_addr_i,
   input  wire type_exec_unit_data result_data_i,
-  input  wire                     result_valid_i
+  input  wire                     result_valid_i,
+  //outputs whether result was stored successfully
+  output wire                     result_success_o
 );
 
   typedef struct packed {
@@ -57,7 +59,7 @@ module eu_ybuf import pkg_dtypes::*; #(
   type_ybuf_entry r_rdataa;
   type_ybuf_entry r_rdatab;
   logic           r_fetch_success;
-  logic           r_hita;
+  //logic           r_hita;
 
   wire            r_hbr;
 
@@ -74,12 +76,14 @@ module eu_ybuf import pkg_dtypes::*; #(
   assign w_addrb = op1_req_addr_i;
   assign w_wdataa = ys_buffer.data;
 
-  assign r_hbr = r_hita & r_rdataa.hbr;
+  assign r_hbr = r_rdataa.hbr;
 
   assign op0_data_o = r_rdatab.data;
   assign op0_data_success_o = ~r_rdatab.hbr;
   assign op1_data_o = w_wdatab.data;
   assign op1_data_success_o = ~w_rdatab.hbr;
+
+  assign result_success_o = r_hbr;
 
   // ------------------------------
   // multiplex r and w wires
@@ -122,7 +126,7 @@ module eu_ybuf import pkg_dtypes::*; #(
     r_fetch_success = combined_fetch_success[y_sw_0];
     w_fetch_success = combined_fetch_success[~y_sw_0];
 
-    r_hita = combined_rhita[y_sw_0];
+    //r_hita = combined_rhita[y_sw_0];
   end
 
   // -----------------------
@@ -149,7 +153,8 @@ module eu_ybuf import pkg_dtypes::*; #(
 
       .rdataa_o(combined_rdataa[i]),
       .rdatab_o(combined_rdatab[i]),
-      .rhita_o(combined_rhita[i]),
+      //.rhita_o(combined_rhita[i]),
+      .rhita_o(),
       .rhitb_o(combined_fetch_success[i])
     );
   end endgenerate

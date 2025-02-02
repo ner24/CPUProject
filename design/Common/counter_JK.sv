@@ -8,8 +8,8 @@ module counter_JK #( //TODO: add sim wrapper module for testing
   input  wire [WIDTH-1:0] rst_val,
   input  wire [WIDTH-1:0] set_val,
 
-  input  wire             trig, //triggers increment or decrement (depending on param). 
-  input  wire             inc_or_dec,
+  input  wire             trig, //triggers increment or decrement
+  input  wire             inc_or_dec, //increment on 0, decrement on 1
 
   output wire [WIDTH-1:0] q
 );

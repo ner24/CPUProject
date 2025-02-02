@@ -5,8 +5,9 @@
 
 package pkg_dtypes;
 
-  localparam LOG2_NUM_ALPU = $clog2(`NUM_EXEC_UNITS);
-  localparam LOG2_NUM_REG = $clog2(`NUM_REG);
+  localparam REN_ADDR_SPEC_IDX_NUM_BITS = `REN_ADDR_SPEC_IDX_NUM_BITS;
+  localparam REN_ADDR_UID_NUM_BITS = `REN_ADDR_UID_NUM_BITS;
+  localparam LOG2_NUM_EXEC_UNITS = `LOG2_NUM_EXEC_UNITS;
   localparam DATA_WIDTH = `WORD_WIDTH;
 
   typedef struct packed {
@@ -14,14 +15,14 @@ package pkg_dtypes;
   } type_exec_unit_data;
 
   typedef struct packed { //TODO: update when implementing front end
-    //logic                     uid;
-    logic [LOG2_NUM_ALPU-1:0] eu_idx;
-    logic  [LOG2_NUM_REG-1:0] reg_idx;
+    logic [LOG2_NUM_EXEC_UNITS-1:0]        euidx;
+    logic [REN_ADDR_UID_NUM_BITS-1:0]      uid;
+    logic [REN_ADDR_SPEC_IDX_NUM_BITS-1:0] spec; //specific address (within specified uid)
   } type_exec_unit_addr;
 
   typedef struct packed {
-    //logic                     uid;
-    logic  [LOG2_NUM_REG-1:0] reg_idx;
+    logic [REN_ADDR_UID_NUM_BITS-1:0]  uid;
+    logic [LOG2_NUM_EXEC_UNITS-1:0]    spec;
   } type_alu_local_addr;
 
   /*typedef struct packed {
@@ -68,24 +69,26 @@ package pkg_dtypes;
   //TODO: the addr and immediate lengths are significantly different
   //which causes area inefficiencies (especially when using immediates which are smaller of the two)
   //How to fix?
-  localparam IQUEUE_IMM_PADDING = $bits(type_exec_unit_addr) - DATA_WIDTH;
+  localparam IQUEUE_IMM_PADDING = $bits(type_exec_unit_addr) - $bits(type_exec_unit_data);
   typedef struct packed {
-    logic [IQUEUE_IMM_PADDING-1:0] p;
+    logic [IQUEUE_IMM_PADDING-1:0] zero;
     type_exec_unit_data      data;
   } type_iqueue_immediate;
 
   typedef union packed {
     type_exec_unit_addr      as_addr;
-    type_iqueue_immediate    as_immediate;
+    type_iqueue_immediate    as_imm;
   } union_iqueue_operand;
+
+  typedef enum logic { IMM_OR_NONE, REG } type_instr_operand_type;
 
   typedef struct packed {
     //logic [?-1:0] operation; //WIP
     union_iqueue_operand     op0;
-    logic                    op0m; //m for mode: 1 for address, 0 for immediate
+    type_instr_operand_type  op0m;
 
-    union_iqueue_operand op1;
-    logic                op1m; //1 for address, 0 for immediate
+    union_iqueue_operand     op1;
+    type_instr_operand_type  op1m;
                                //NOTE: opxm assignments are based on path lengths. This gives shorter ones
     type_exec_unit_addr  opd;
   } type_iqueue_entry;
