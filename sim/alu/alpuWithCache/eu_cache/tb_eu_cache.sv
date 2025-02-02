@@ -1,0 +1,138 @@
+import uvm_pkg::*;
+`include "uvm_macros.svh"
+
+`include "design_parameters.sv"
+`include "simulation_parameters.sv"
+`include "seqItem_alpu_cache.sv"
+
+//typedef class eu_cache_monitor;
+
+module `SIM_TB_MODULE(eu_cache) import uvm_pkg::*; import pkg_dtypes::*; #(
+  parameter ADDR_WIDTH = 4,
+  parameter DATA_WIDTH = 4
+) (
+  input  wire                   clk,
+  input  wire                   reset_n,
+
+  // ALPU interface
+  // 2 buses: operands read, result write
+  output wire type_alu_channel_rx alu_rx_o,
+  input  wire type_alu_channel_tx alu_tx_i,
+
+  // Interconnect interface
+  // 3 channels: operands write, operand read
+  input  wire type_icon_tx_channel    icon_w0_i, //for op0
+  output wire type_icon_rx_channel icon_w0_rx_o,
+  input  wire type_icon_tx_channel    icon_w1_i, //for op1
+  output wire type_icon_rx_channel icon_w1_rx_o,
+  
+  //not using type_icon_tx_channel since attributes go in different directions
+  output wire type_exec_unit_data  icon_rdata_o,
+  input  wire type_exec_unit_addr  icon_raddr_i,
+  input  wire                      icon_rvalid_i,
+  output wire                      icon_rsuccess_o,
+
+  // Instruction reqeusts (from IQUEUE)
+  input  wire type_iqueue_entry curr_instr_i
+);
+  
+  intf_eu_cache #(
+  ) intf (
+    .clk(clk)
+  );
+  assign intf.reset_n      = reset_n;
+  assign intf.alu_rx_o     = alu_rx_o;
+  assign intf.icon_w0_i    = icon_w0_i;
+  assign intf.icon_w0_rx_o = icon_w0_rx_o;
+  assign intf.icon_w1_i    = icon_w1_i;
+  assign intf.icon_w1_rx_o = icon_w1_rx_o;
+  assign intf.icon_rdata_o = icon_rdata_o;
+  assign intf.icon_raddr_i = icon_raddr_i;
+  assign intf.icon_rvalid_i = icon_rvalid_i;
+  assign intf.icon_rsuccess_o = icon_rsuccess_o;
+
+  initial begin
+    uvm_config_db #( virtual intf_alpu_cache #() )::set(null, "*", "intf_eu_cache", intf);
+  end
+
+  eu_cache #(
+    .EU_IDX(0)
+  ) dut (
+    .clk      (clk),
+    .reset_n  (reset_n),
+    
+    .alu_rx_o(alu_rx_o),
+    .alu_tx_i(alu_tx_i),
+
+    .icon_w0_i(icon_w0_i),
+    .icon_w0_rx_o(icon_w0_rx_o),
+    .icon_w1_i(icon_w1_i),
+    .icon_w1_rx_o(icon_w1_rx_o),
+  
+    .icon_rdata_o(icon_rdata_o),
+    .icon_raddr_i(icon_raddr_i),
+    .icon_rvalid_i(icon_rvalid_i),
+    .icon_rsuccess_o(icon_rsuccess_o),
+
+    .curr_instr_i(curr_instr_i)
+  );
+
+  // --------------------
+  // VERIF
+  // --------------------
+  //alpu_cache_monitor#( .ADDR_WIDTH(ADDR_WIDTH), .DATA_WIDTH(DATA_WIDTH) ) verif_monitor;
+  initial begin
+    //verif_monitor = eu_cache_monitor#( .ADDR_WIDTH(ADDR_WIDTH), .DATA_WIDTH(DATA_WIDTH) )::type_id::create("monitor_alpu_cache", null);
+  end
+
+  //TODO: write asserts
+
+endmodule
+
+/*class eu_cache_monitor #(
+  parameter ADDR_WIDTH = 4,
+  parameter DATA_WIDTH = 4
+) extends uvm_monitor;
+  `uvm_component_param_utils(alpu_cache_monitor#( .ADDR_WIDTH(ADDR_WIDTH), .DATA_WIDTH(DATA_WIDTH) ))
+
+  virtual intf_alpu_cache #(
+    .ADDR_WIDTH(ADDR_WIDTH),
+    .DATA_WIDTH(DATA_WIDTH)
+  ) vintf;
+
+  uvm_analysis_port #(alpu_cache_sequence_item #( .ADDR_WIDTH(ADDR_WIDTH), .DATA_WIDTH(DATA_WIDTH) )) analysis_port;
+
+  function new(string name = "test_design_monitor", uvm_component parent = null);
+    super.new(name, parent);
+  endfunction
+
+  virtual function void build_phase(uvm_phase phase);
+    `uvm_info(get_full_name(), "Building...", UVM_LOW)
+    if(!uvm_config_db#(virtual intf_alpu_cache #( .ADDR_WIDTH(ADDR_WIDTH), .DATA_WIDTH(DATA_WIDTH) ))::get(this, "", "intf_alpu_cache", vintf)) begin
+      `uvm_fatal(get_type_name(), " Couldn't get vintf, check uvm config for interface?")
+    end
+    analysis_port = new("alpu_cache_analysis_port", this);
+  endfunction
+
+  virtual task run_phase(uvm_phase phase);
+    alpu_cache_sequence_item #(
+      .ADDR_WIDTH(ADDR_WIDTH),
+      .DATA_WIDTH(DATA_WIDTH)
+    ) sequence_item;
+    sequence_item = alpu_cache_sequence_item#( .ADDR_WIDTH(ADDR_WIDTH), .DATA_WIDTH(DATA_WIDTH) )::type_id::create("sequence_item");
+
+    forever begin
+      @(posedge vintf.clk);
+
+      seq_item.addr_i   <= vintf.addr_i;
+      seq_item.wdata_i  <= vintf.wdata_i;
+      seq_item.ce_i     <= vintf.ce_i;
+      seq_item.we_i     <= vintf.we_i;
+      seq_item.rdata_o  <= vintf.rdata_o;
+      seq_item.rvalid_o <= vintf.rvalid_o;
+      seq_item.wack_o   <= vintf.wack_o;
+      
+      analysis_port.write(sequence_item);
+    end
+  endtask
+endclass*/

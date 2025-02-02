@@ -1,13 +1,11 @@
 `include "uvm_macros.svh"
-`include "alu_parameters.sv"
+`include "design_parameters.sv"
 `include "simulation_parameters.sv"
 
 `include "test_operations.sv" //to trigger compile
 
 module alpu_tb_top import uvm_pkg::*; (
 );
-  localparam REG_WIDTH = `ALU_REG_WIDTH;
-
   logic clk;
   initial begin
     clk = 1'b0;
@@ -17,7 +15,6 @@ module alpu_tb_top import uvm_pkg::*; (
   end
 
   intf_alpu #(
-    .REG_WIDTH(REG_WIDTH)
   ) intf (
     .clk(clk)
   );
@@ -25,11 +22,10 @@ module alpu_tb_top import uvm_pkg::*; (
   initial begin
     `uvm_info("alpu_tb_top", "Adding alpu top interface to uvm config", UVM_MEDIUM)
     //uvm_config_db_options::turn_on_tracing();
-    uvm_config_db #( virtual intf_alpu #(.REG_WIDTH(REG_WIDTH)) )::set(null, "*", "intf_alpu_top", intf);
+    uvm_config_db #( virtual intf_alpu #() )::set(null, "*", "intf_alpu_top", intf);
   end
 
   `SIM_TB_MODULE(alpu) #(
-    .REG_WIDTH(REG_WIDTH),
     .USE_PIPELINED_ALPU(0)
   ) tb (
     .clk      (clk),
