@@ -1,6 +1,6 @@
 `include "simulation_parameters.sv"
 
-module cache_DP # ( //must read protected cache
+module cache_DP # (
   //Xilinx supports dual port ram blocks. Obviously comes with an area
   //impact compared to single port but this ram module is not tailored for large storage capacity
   //so area penalty can be accepted

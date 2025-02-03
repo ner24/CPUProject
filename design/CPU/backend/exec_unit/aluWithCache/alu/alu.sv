@@ -1,26 +1,30 @@
 `include "design_parameters.sv"
 
-module alu #(
-  parameter REG_WIDTH = `WORD_WIDTH,
+module alu import pkg_dtypes::*; #(
+  parameter DATA_WIDTH = `WORD_WIDTH,
   parameter USE_PIPELINED_ALU = `ALU_USE_PIPELINED_ALU
 ) (
   input  wire                   clk,
   input  wire                   reset_n,
 
-  input  logic            [3:0] instr_i,
-  input  wire   [REG_WIDTH-1:0] a_i,
-  input  wire   [REG_WIDTH-1:0] b_i,
-  input  wire                   cin_i,
-  output wire   [REG_WIDTH-1:0] out_o,
-  output wire                   cout_o
+  input  wire type_alu_channel_rx alu_rx_i,
+  output wire type_alu_channel_tx alu_tx_o,
+
+  input  wire type_iqueue_entry curr_instr_i,
+  input  wire                   curr_instr_valid_i
 );
+
+  wire cout_o; //placeholder. This should eventually go back to flags reg through separate channel
+
+  assign alu_tx.opd_valid = curr_instr_valid_i & alu_rx.op0_valid & alu_rx.op1_valid;
+  assign alu_tx.opd_addr  = alu_rx_i.opd_addr;
 
   // ----------------------
   // Instruction decoding
   // ----------------------
   logic [8:0] cir_decoded;
   always_comb begin: decode_instruction
-    case(instr_i)
+    case(curr_instr_i.specific_instr)
       //arithmetic and logic
       4'h 0: cir_decoded = 9'b 010001000 ; //NOT
       4'h 1: cir_decoded = 9'b 001000100 ; //AND
@@ -44,28 +48,28 @@ module alu #(
 
   generate if (USE_PIPELINED_ALU) begin: g_alu_comb_piped
     alu_comb_piped #(
-      .REG_WIDTH(REG_WIDTH)
+      .DATA_WIDTH(DATA_WIDTH)
     ) u_alu_comb (
       .clk(clk),
       .reset_n(reset_n),
       .pipe_active(1'b1),
 
-      .a(a_i),
-      .b(b_i),
-      .out(out_o),
+      .a(alu_rx_i.op0_data),
+      .b(alu_rx_i.op1_data),
+      .out(alu_tx_o.opd_data),
       .ctrl(cir_decoded[8:1]),
-      .cin(cin_i),
+      .cin(1'b0),
       .cout(cout_o)
     );
   end else begin: g_alu_comb_n_piped
     alu_comb #(
-      .REG_WIDTH(REG_WIDTH)
+      .DATA_WIDTH(DATA_WIDTH)
     ) u_alu_comb (
-      .a(a_i),
-      .b(b_i),
-      .out(out_o),
+      .a(alu_rx_i.op0_data),
+      .b(alu_rx_i.op1_data),
+      .out(alu_tx_o.opd_data),
       .ctrl(cir_decoded[8:1]),
-      .cin(cin_i),
+      .cin(1'b0),
       .cout(cout_o)
     );
   end endgenerate

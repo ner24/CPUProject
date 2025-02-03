@@ -24,9 +24,11 @@ env_setup:
 	mkdir -p $(VIVADO_DIR)
 
 #Generic
-CMD_GENERIC_BASE:= cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/prj.tcl -tclargs $(TCL_ARGS_EXTRA)
+CMD_GENERIC_BASE:= cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/prj.tcl
 open:
-	$(CMD_GENERIC_BASE) job_type nothing
+	$(CMD_GENERIC_BASE) -tclargs $(TCL_ARGS_EXTRA) job_type nothing
+open_gui: #macro for opening vivado gui
+	$(CMD_GENERIC_BASE) module_top tri_state_test open_gui 1 job_type nothing
 
 #ALPU
 CMD_ALPU_BASE:= cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/prj.tcl -tclargs module_top alpu sim_module_top alpu_tb_top $(TCL_ARGS_EXTRA)

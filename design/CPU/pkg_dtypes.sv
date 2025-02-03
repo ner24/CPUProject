@@ -9,6 +9,11 @@ package pkg_dtypes;
   localparam REN_ADDR_UID_NUM_BITS = `REN_ADDR_UID_NUM_BITS;
   localparam LOG2_NUM_EXEC_UNITS = `LOG2_NUM_EXEC_UNITS;
   localparam DATA_WIDTH = `WORD_WIDTH;
+  localparam LOG2_NUM_INSTRUCTIONS_PER_EXEC_TYPE = `LOG2_NUM_INSTRUCTIONS_PER_EXEC_TYPE;
+
+  // ------------------------------------------
+  // Exec unit data and address formats
+  // ------------------------------------------
 
   typedef struct packed {
     logic [DATA_WIDTH-1:0]    data;
@@ -24,6 +29,10 @@ package pkg_dtypes;
     logic [REN_ADDR_UID_NUM_BITS-1:0]  uid;
     logic [LOG2_NUM_EXEC_UNITS-1:0]    spec;
   } type_alu_local_addr;
+
+  // ------------------------------------------
+  // Interconnect formats
+  // ------------------------------------------
 
   /*typedef struct packed {
     logic [LOG2_NUM_ALPU-1:0] eu_idx;
@@ -49,26 +58,39 @@ package pkg_dtypes;
   } type_icon_channel;
 
   typedef struct packed {
+    type_exec_unit_addr    src_addr;
+    type_exec_unit_addr    dest_addr;
+    logic                  dest_opx;
+  } type_icon_instr;
+
+  // ------------------------------------------
+  // ALU interface
+  // ------------------------------------------
+
+  typedef struct packed {
     type_exec_unit_data    op0_data;
     logic                  op0_valid;
 
     type_exec_unit_data    op1_data;
     logic                  op1_valid;
 
-    type_exec_unit_addr    opd_addr;
+    type_exec_unit_addr    opd_addr; //pass opd addr through alu to better implement alu pipelines which take more than 0 cycles
     logic                  opd_ready; //ready to write to address opd (which means cache index has_been_read is high)
   } type_alu_channel_rx; //rx on alu side
 
   typedef struct packed {
     type_exec_unit_data      opd_data;
     type_exec_unit_addr      opd_addr;
-    logic                    opd_opx; //op0 if 0, op1 if 1. Used to assign to appropriate x buffer for foreign writes
+    //logic                    opd_opx; //op0 if 0, op1 if 1. Used to assign to appropriate x buffer for foreign writes
     logic                    opd_valid; //can be low if no instruction is being processed
   } type_alu_channel_tx; //tx on alu side
 
-  //TODO: the addr and immediate lengths are significantly different
-  //which causes area inefficiencies (especially when using immediates which are smaller of the two)
-  //How to fix?
+  // -----------------------------------
+  // Instruction format
+  // -----------------------------------
+
+  //operand format
+  //Note that decreasing the value of this param will increase area efficiency
   localparam IQUEUE_IMM_PADDING = $bits(type_exec_unit_addr) - $bits(type_exec_unit_data);
   typedef struct packed {
     logic [IQUEUE_IMM_PADDING-1:0] zero;
@@ -80,20 +102,38 @@ package pkg_dtypes;
     type_iqueue_immediate    as_imm;
   } union_iqueue_operand;
 
-  typedef enum logic { IMM_OR_NONE, REG } type_instr_operand_type;
+  typedef enum logic {
+    IMM_OR_NONE,
+    REG
+  } enum_instr_operand_type;
+
+  //opcode format
+  typedef enum logic[1:0] {
+    EXEC_UNIT, //instructions dispatched to exec units that do not update cmp flags
+    EXEC_UNIT_CMP, //instructions dispatched to exec units that update cmp flags
+    LDR_STR, //load/store
+    BRANCH //branch instruction
+  } enum_instr_execution_type;
 
   typedef struct packed {
-    //logic [?-1:0] operation; //WIP
+    enum_instr_execution_type exec_type;
+    logic [LOG2_NUM_INSTRUCTIONS_PER_EXEC_TYPE-1:0] specific_instr;
+  } type_iqueue_opcode;
+
+  //structure of whole instruction
+  typedef struct packed {
+    type_iqueue_opcode opcode;
+    
     union_iqueue_operand     op0;
-    type_instr_operand_type  op0m;
+    enum_instr_operand_type  op0m;
 
     union_iqueue_operand     op1;
-    type_instr_operand_type  op1m;
+    enum_instr_operand_type  op1m;
                                //NOTE: opxm assignments are based on path lengths. This gives shorter ones
     type_exec_unit_addr  opd;
   } type_iqueue_entry;
 
-  typedef struct packed {
+  /*typedef struct packed {
     type_exec_unit_data    data;
     logic                  has_been_read;
   } type_xcache_data;
@@ -101,7 +141,7 @@ package pkg_dtypes;
   typedef struct packed {
     type_exec_unit_data    data;
     logic                  has_been_read;
-  } type_ycache_data;
+  } type_ycache_data;*/
 
   /*typedef struct packed {
     logic               opx; //see type_alpu_channel_tx for description

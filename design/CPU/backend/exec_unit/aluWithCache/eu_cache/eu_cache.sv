@@ -7,7 +7,7 @@ module eu_cache import pkg_dtypes::*; #(
   input  wire                   clk,
   input  wire                   reset_n,
 
-  // ALPU interface
+  // ALU interface
   // 2 buses: operands read, result write
   output wire type_alu_channel_rx alu_rx_o,
   input  wire type_alu_channel_tx alu_tx_i,
@@ -146,7 +146,7 @@ module eu_cache import pkg_dtypes::*; #(
 
     .result_addr_i(opd_local_addr),
     .result_data_i(alu_tx_i.data),
-    .result_valid_i(~alu_res_opd_isforeign),
+    .result_valid_i(~alu_res_opd_isforeign & alu_tx_i.opd_valid),
     .result_success_o(opd_local_success)
   );
 
@@ -183,7 +183,7 @@ module eu_cache import pkg_dtypes::*; #(
 
     //from ALU
     .in_addr_i(alu_tx_i.opd_addr),
-    .in_valid_i(alu_res_opd_isforeign),
+    .in_valid_i(alu_res_opd_isforeign & alu_tx_i.opd_valid),
     .in_data_i(alu_tx_i.opd_data),
     .in_success_o(opd_foreign_success),
 
