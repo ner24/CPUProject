@@ -7,7 +7,7 @@ import uvm_pkg::*;
 class eu_cache_sequence_item #(
 ) extends uvm_sequence_item;
 
-  `uvm_object_param_utils( eu_cache_sequence_item #() )
+  `uvm_object_utils( eu_cache_sequence_item )
 
   
 

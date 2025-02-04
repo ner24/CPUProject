@@ -3,11 +3,11 @@ import uvm_pkg::*;
 
 `include "design_parameters.sv"
 `include "simulation_parameters.sv"
-`include "seqItem_alpu_cache.sv"
+`include "seqItem_exec_unit.sv"
 
 //typedef class eu_cache_monitor;
 
-module `SIM_TB_MODULE(eu_cache) import uvm_pkg::*; import pkg_dtypes::*; #(
+module `SIM_TB_MODULE(execution_unit) import uvm_pkg::*; import pkg_dtypes::*; #(
   parameter EU_IDX = 0
 ) (
   input  wire                   clk,
@@ -32,8 +32,7 @@ module `SIM_TB_MODULE(eu_cache) import uvm_pkg::*; import pkg_dtypes::*; #(
   output wire                      ready_for_next_instr_o
 );
   
-  intf_eu_cache #(
-  ) intf (
+  intf_eu intf (
     .clk(clk)
   );
   assign intf.reset_n      = reset_n;
@@ -50,7 +49,7 @@ module `SIM_TB_MODULE(eu_cache) import uvm_pkg::*; import pkg_dtypes::*; #(
   assign intf.ready_for_next_instr_o = ready_for_next_instr_o;
 
   initial begin
-    uvm_config_db #( virtual intf_alpu_cache #() )::set(null, "*", "intf_eu_cache", intf);
+    uvm_config_db #( virtual intf_eu )::set(null, "*", "intf_eu", intf);
   end
 
   execution_unit #(

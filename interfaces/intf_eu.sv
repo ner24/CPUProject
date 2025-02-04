@@ -1,4 +1,4 @@
-interface intf_alu import pkg_dtypes::*; #(
+interface intf_eu import pkg_dtypes::*; #(
 ) (
   input wire clk
 );
@@ -22,9 +22,5 @@ interface intf_alu import pkg_dtypes::*; #(
   type_iqueue_entry    dispatched_instr_i;
   logic                dispatched_instr_valid_i;
   logic                ready_for_next_instr_o;
-
-  initial begin
-    reset_n <= 1'b0;
-  end
     
 endinterface

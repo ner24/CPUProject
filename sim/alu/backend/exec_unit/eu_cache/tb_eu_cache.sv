@@ -3,7 +3,7 @@ import uvm_pkg::*;
 
 `include "design_parameters.sv"
 `include "simulation_parameters.sv"
-`include "seqItem_alpu_cache.sv"
+`include "seqItem_eu_cache.sv"
 
 //typedef class eu_cache_monitor;
 
@@ -35,8 +35,7 @@ module `SIM_TB_MODULE(eu_cache) import uvm_pkg::*; import pkg_dtypes::*; #(
   input  wire type_iqueue_entry curr_instr_i
 );
   
-  intf_eu_cache #(
-  ) intf (
+  intf_eu_cache intf (
     .clk(clk)
   );
   assign intf.reset_n      = reset_n;
@@ -51,7 +50,7 @@ module `SIM_TB_MODULE(eu_cache) import uvm_pkg::*; import pkg_dtypes::*; #(
   assign intf.icon_rsuccess_o = icon_rsuccess_o;
 
   initial begin
-    uvm_config_db #( virtual intf_alpu_cache #() )::set(null, "*", "intf_eu_cache", intf);
+    uvm_config_db #( virtual intf_eu_cache )::set(null, "*", "intf_eu_cache", intf);
   end
 
   eu_cache #(

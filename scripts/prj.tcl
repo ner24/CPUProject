@@ -15,6 +15,9 @@ dict with argv {
   set xpr_name proj_cpu.xpr
   set xpr $xpr_dir/$xpr_name
 
+  #mode sim define header that will be conditionally added
+  set mode_sim_def_file $script_path/define_mode_sim.sv
+
   set simset_name sim_test
   #set designset_name cpu_srcs #stick to default sources (sources_1)
 
@@ -51,9 +54,11 @@ dict with argv {
     create_fileset -simset $simset_name -verbose
     current_fileset -simset [get_filesets $simset_name] -verbose
     add_files -fileset $simset_name $root_dir/sim -verbose
+    add_files -fileset $simset_name $mode_sim_def_file -verbose
 
     #set properties
     set_property -name {xsim.compile.xvlog.more_options} -value "-L uvm -d MODE_SIMULATION -i $root_dir/projectHeaders -i $root_dir/sim/seqItems" -objects [get_fileset $simset_name] -verbose
+    set_property -name {xsim.elaborate.xelab.more_options} -value "-L uvm -d MODE_SIMULATION -i $root_dir/projectHeaders -i $root_dir/sim/seqItems" -objects [get_fileset $simset_name] -verbose
     set_property -name {xsim.simulate.custom_tcl} -value "$script_path/runSim.tcl" -objects [get_fileset $simset_name] -verbose
     set_property -name {xsim.simulate.runtime} -value "10000ns" -objects [get_fileset $simset_name] -verbose
   } else {
@@ -61,6 +66,9 @@ dict with argv {
     puts "Opening project"
     open_project $xpr
   }
+
+  #add custom processes
+  source $script_path/define_tcl_tasks.tcl
 
   #disable constraint files by default to stop missing port warnings
   set project_constraints [glob -directory "$root_dir/xdcs" -- *.xdc]
@@ -82,51 +90,29 @@ dict with argv {
   }
 
   #check job type exists
-  puts "Job type: $job_type"
   if {![info exists job_type]} {
     puts "No job type specified"
     exit
   }
+  puts "Job type: $job_type"
 
   #setup jobs
   switch $job_type {
     simlint {
-      if {[info exists sim_module_top]} { 
-        set_property top $sim_module_top [get_fileset $simset_name]
-      } else {
-        puts "Job requires sim_module_top but it is not specified"
-        exit
-      }
-
-      puts "Running sim lint"
-      update_compile_order -fileset $simset_name
-      synth_design -top $sim_module_top -include_dirs "$root_dir/projectHeaders" -lint
+      simlint
     }
 
     sim {
-      if {[info exists sim_module_top]} { 
-        puts "Setting sim top testbench to $sim_module_top"
-        set_property top $sim_module_top [get_fileset $simset_name]
-      } else {
-        puts "Job requires sim_module_top but it is not specified"
-        exit
-      }
-
-      puts "Running sim job"
-      update_compile_order -fileset $simset_name -verbose
-      launch_simulation -simset $simset_name
+      #sim "$sim_module_top" "$simset_name" "$mode_sim_def_file"
+      sim
     }
 
     lint {
-      puts "Running design lint"
-      update_compile_order -fileset sources_1
-      synth_design -top $module_top -include_dirs "$root_dir/projectHeaders" -lint
+      lint
     }
 
     elab {
-      puts "Running design elab"
-      update_compile_order -fileset sources_1
-      synth_design -top $module_top -include_dirs "$root_dir/projectHeaders" -rtl
+      elab
     }
 
     nothing {

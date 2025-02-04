@@ -30,29 +30,42 @@ open:
 open_gui: #macro for opening vivado gui
 	$(CMD_GENERIC_BASE) module_top tri_state_test open_gui 1 job_type nothing
 
-#ALPU
-CMD_ALPU_BASE:= cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/prj.tcl -tclargs module_top alpu sim_module_top alpu_tb_top $(TCL_ARGS_EXTRA)
-open_alpu:
-	$(CMD_ALPU_BASE) job_type nothing
-sim_alpu: env_setup
-	$(CMD_ALPU_BASE) job_type sim
-simlint_alpu: env_setup
-	$(CMD_ALPU_BASE) job_type simlint
-elab_alpu: env_setup
-	$(CMD_ALPU_BASE) job_type elab
-lint_alpu: env_setup
-	$(CMD_ALPU_BASE) job_type lint
-sim_alpu_old: env_setup
+#eu CACHE
+CMD_EU_BASE:= cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/prj.tcl -tclargs module_top execution_unit $(TCL_ARGS_EXTRA)
+open_eu: env_setup
+	$(CMD_EU_BASE) job_type nothing
+lint_eu: env_setup
+	$(CMD_EU_BASE) job_type lint
+elab_eu: env_setup
+	$(CMD_EU_BASE) job_type elab
+sim_eu: env_setup
+	$(CMD_ALU_BASE) job_type sim sim_module_top execution_unit_tb_top
+simlint_eu: env_setup
+	$(CMD_ALU_BASE) job_type simlint sim_module_top execution_unit_tb_top
+
+#alu
+CMD_ALU_BASE:= cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/prj.tcl -tclargs module_top alu sim_module_top alu_tb_top $(TCL_ARGS_EXTRA)
+open_alu:
+	$(CMD_ALU_BASE) job_type nothing
+sim_alu: env_setup
+	$(CMD_ALU_BASE) job_type sim
+simlint_alu: env_setup
+	$(CMD_ALU_BASE) job_type simlint
+elab_alu: env_setup
+	$(CMD_ALU_BASE) job_type elab
+lint_alu: env_setup
+	$(CMD_ALU_BASE) job_type lint
+sim_alu_old: env_setup
 	cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/initProject.tcl
 
-#ALPU CACHE
-CMD_ALPU_CACHE_BASE:= cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/prj.tcl -tclargs module_top alpu_cache $(TCL_ARGS_EXTRA)
-open_alpu_cache: env_setup
-	$(CMD_ALPU_CACHE_BASE) job_type nothing
-lint_alpu_cache: env_setup
-	$(CMD_ALPU_CACHE_BASE) job_type lint
-elab_alpu_cache: env_setup
-	$(CMD_ALPU_CACHE_BASE) job_type elab
+#eu CACHE
+CMD_eu_CACHE_BASE:= cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/prj.tcl -tclargs module_top eu_cache $(TCL_ARGS_EXTRA)
+open_eu_cache: env_setup
+	$(CMD_eu_CACHE_BASE) job_type nothing
+lint_eu_cache: env_setup
+	$(CMD_eu_CACHE_BASE) job_type lint
+elab_eu_cache: env_setup
+	$(CMD_eu_CACHE_BASE) job_type elab
 
 #cache DP
 CMD_CACHE_DP_BASE:= cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/prj.tcl -tclargs module_top cache_MRP_DP $(TCL_ARGS_EXTRA)

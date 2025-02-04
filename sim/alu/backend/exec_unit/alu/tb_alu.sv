@@ -13,7 +13,7 @@ module `SIM_TB_MODULE(alu) import uvm_pkg::*; import pkg_dtypes::*; #(
   input  wire type_alu_channel_rx alu_rx_i,
   output wire type_alu_channel_tx alu_tx_o,
 
-  input  wire type_iqueue_entry curr_instr_i,
+  input  wire type_iqueue_opcode curr_instr_i,
   input  wire                   curr_instr_valid_i
 );
 
@@ -22,14 +22,14 @@ module `SIM_TB_MODULE(alu) import uvm_pkg::*; import pkg_dtypes::*; #(
     .clk(clk),
     .reset_n(reset_n),
     
-    .alu_rx_i(alu_rx),
-    .alu_tx_o(alu_tx),
+    .alu_rx_i(alu_rx_i),
+    .alu_tx_o(alu_tx_o),
 
-    .curr_instr_i(curr_instr),
+    .curr_instr_i(curr_instr_i),
     .curr_instr_valid_i(curr_instr_to_exec_valid)
   );
 
-  intf_alu #() intf (
+  intf_alu intf (
     .clk(clk)
   );
   assign intf.reset_n            = reset_n;
@@ -39,7 +39,7 @@ module `SIM_TB_MODULE(alu) import uvm_pkg::*; import pkg_dtypes::*; #(
   assign intf.curr_instr_valid_i = curr_instr_valid_i;
 
   initial begin
-    uvm_config_db #( virtual intf_alpu #() )::set(null, "*", "intf_alu", intf);
+    uvm_config_db #( virtual intf_alu )::set(null, "*", "intf_alu", intf);
   end
 
   // --------------------
@@ -52,10 +52,10 @@ module `SIM_TB_MODULE(alu) import uvm_pkg::*; import pkg_dtypes::*; #(
     .alu_clk    (clk),
     .alu_resetn (intf.reset_n),
     
-    .alu_rx_i(alu_rx),
-    .alu_tx_o(alu_tx),
+    .alu_rx_i(alu_rx_i),
+    .alu_tx_o(alu_tx_o),
 
-    .curr_instr_i(curr_instr),
+    .curr_instr_i(curr_instr_i),
     .curr_instr_valid_i(curr_instr_to_exec_valid)
   );
 

@@ -26,12 +26,14 @@ module execution_unit import pkg_dtypes::*; #( //WIP. THis module without the IQ
   output wire                      ready_for_next_instr_o //if not, stall dispatch
 );
 
+  wire type_iqueue_entry curr_instr;
+
   wire type_alu_channel_rx alu_rx;
   wire type_alu_channel_tx alu_tx;
 
-  wire curr_instr_to_exec_valid;
+  assign alu_rx.opd_addr = curr_instr.opd;
 
-  wire type_iqueue_entry curr_instr;
+  wire curr_instr_to_exec_valid;
 
   `SIM_TB_MODULE(alu) #(
   ) alu (
@@ -41,7 +43,7 @@ module execution_unit import pkg_dtypes::*; #( //WIP. THis module without the IQ
     .alu_rx_i(alu_rx),
     .alu_tx_o(alu_tx),
 
-    .curr_instr_i(curr_instr),
+    .curr_instr_i(curr_instr.opcode),
     .curr_instr_valid_i(curr_instr_to_exec_valid)
   );
 
@@ -55,7 +57,7 @@ module execution_unit import pkg_dtypes::*; #( //WIP. THis module without the IQ
     
     .is_full_o(ready_for_next_instr_o), //cannot accept entries when full
     .curr_instr_to_exec_o(curr_instr),
-    .ready_for_next_instr_i(alu_rx.opd_ready), //tell queue to stall if not ready
+    .ready_for_next_instr_i(alu_rx.opd_store_success), //tell queue to stall if not ready
     .curr_instr_to_exec_valid_o(curr_instr_to_exec_valid)
   );
 

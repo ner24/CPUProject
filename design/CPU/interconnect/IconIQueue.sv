@@ -1,5 +1,5 @@
 
-module eu_iconIQueue import exec_unit_dtypes::*; #(
+module eu_iconIQueue #(
   parameter NUM_CHANNELS = 2,
 
   //NOTE: in this config, total iqueue size would be IQUEUE_LENGTH * NUM_CHANNELS

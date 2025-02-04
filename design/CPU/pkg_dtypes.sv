@@ -74,15 +74,21 @@ package pkg_dtypes;
     type_exec_unit_data    op1_data;
     logic                  op1_valid;
 
-    type_exec_unit_addr    opd_addr; //pass opd addr through alu to better implement alu pipelines which take more than 0 cycles
-    logic                  opd_ready; //ready to write to address opd (which means cache index has_been_read is high)
+    //pass opd addr through alu to better implement alu pipelines which take more than 0 cycles
+    type_exec_unit_addr    opd_addr;
+
+    //ready to write to address opd (which means cache index has_been_read is high)
+    //note that this is on the cache interface that sits at the end of the alu pipeline
+    //the other attributes in this struct are at the alu input interface
+    logic                  opd_store_success;
   } type_alu_channel_rx; //rx on alu side
 
   typedef struct packed {
     type_exec_unit_data      opd_data;
     type_exec_unit_addr      opd_addr;
-    //logic                    opd_opx; //op0 if 0, op1 if 1. Used to assign to appropriate x buffer for foreign writes
-    logic                    opd_valid; //can be low if no instruction is being processed
+
+    //can be low if no instruction is being processed
+    logic                    opd_valid;
   } type_alu_channel_tx; //tx on alu side
 
   // -----------------------------------
@@ -133,20 +139,44 @@ package pkg_dtypes;
     type_exec_unit_addr  opd;
   } type_iqueue_entry;
 
-  /*typedef struct packed {
-    type_exec_unit_data    data;
-    logic                  has_been_read;
-  } type_xcache_data;
+  // ----------------------------------------
+  // Instruction set
+  // ----------------------------------------
+  // note that the datatypes for all opcode types
+  // must be equal
 
-  typedef struct packed {
-    type_exec_unit_data    data;
-    logic                  has_been_read;
-  } type_ycache_data;*/
+  typedef enum logic [3:0] {
+    NOT,
+    AND,
+    OR,
+    XOR,
+    ADD,
+    SUB,
+    NAND,
+    NOR,
+    XNOR,
+    RSH,
+    LSH,
+    RRO,
+    LRO
+  } enum_instr_exec_unit;
 
-  /*typedef struct packed {
-    logic               opx; //see type_alpu_channel_tx for description
-    type_exec_unit_addr addr;
-  } type_icon_TXQentry;*/
+  typedef enum logic [3:0] {
+    LDR,
+    STR
+  } enum_instr_ldr_str;
+
+  typedef enum logic [3:0] {
+    B,    //unconditional branch
+    B_GT, //branch when greater than
+    B_LT, //branch when less than
+    B_EQ, //branch when equal
+    B_Z,  //branch on zero
+    B_NZ, //branch on non zero
+    B_MI, //branch on negative
+    B_PL, //branch on positive
+    B_OV  //branch on overflow
+  } enum_instr_branch;
 
 endpackage
 

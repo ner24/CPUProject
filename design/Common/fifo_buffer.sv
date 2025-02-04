@@ -54,7 +54,7 @@ module fifo_buffer # (
   xpm_memory_dpdistram #(
       .ADDR_WIDTH_A(ADDR_WIDTH),
       .ADDR_WIDTH_B(ADDR_WIDTH),
-      .BYTE_WRITE_WIDTH_A($bits(cache_entry)),
+      .BYTE_WRITE_WIDTH_A(DATA_WIDTH),
       .CLOCKING_MODE("common_clock"),
       .IGNORE_INIT_SYNTH(0),
       .MEMORY_INIT_FILE("none"),
@@ -62,8 +62,8 @@ module fifo_buffer # (
       .MEMORY_OPTIMIZATION("true"),
       .MEMORY_SIZE((2**LOG2_QUEUE_LENGTH)*DATA_WIDTH),
       .MESSAGE_CONTROL(`MODE_SIM),
-      .READ_DATA_WIDTH_A($bits(cache_entry)),
-      .READ_DATA_WIDTH_B($bits(cache_entry)),
+      .READ_DATA_WIDTH_A(DATA_WIDTH),
+      .READ_DATA_WIDTH_B(DATA_WIDTH),
       .READ_LATENCY_A(0),
       .READ_LATENCY_B(0),
       .READ_RESET_VALUE_A("0"),
@@ -74,7 +74,7 @@ module fifo_buffer # (
       .USE_EMBEDDED_CONSTRAINT(0),
       .USE_MEM_INIT(1),
       .USE_MEM_INIT_MMI(0),
-      .WRITE_DATA_WIDTH_A($bits(cache_entry))
+      .WRITE_DATA_WIDTH_A(DATA_WIDTH)
    )
    xpm_memory_dpdistram_inst (
       .douta(),   // READ_DATA_WIDTH_A-bit output: Data output for port A read operations.

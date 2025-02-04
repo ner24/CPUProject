@@ -25,30 +25,5 @@ interface intf_eu_cache import pkg_dtypes::*; #(
 
   // Instruction reqeusts (from IQUEUE)
   type_iqueue_entry curr_instr_i;
-
-  initial begin
-    reset_n <= 1'b0;
-  end
-
-  /*modport DRIVER_SIDE (
-    input clk,
-    output reset_n,
-    input rdata_o, rvalid_o, wack_o,
-    output addr_i, wdata_i, ce_i, we_i
-  );
-
-  modport DUT_SIDE (
-    input clk,
-    input reset_n,
-    output rdata_o, rvalid_o, wack_o,
-    input addr_i, wdata_i, ce_i, we_i
-  );
-
-  modport VERIF_SIDE (
-    input clk,
-    input reset_n,
-    input rdata_o, rvalid_o, wack_o,
-    input addr_i, wdata_i, ce_i, we_i
-  );*/
     
 endinterface

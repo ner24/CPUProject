@@ -52,8 +52,8 @@ module eu_prepop import pkg_dtypes::*; #(
     op1_success_o = 1'b0;
 
     if (op0_isreg_i) begin
-      type_exec_unit_addr op0_req_addr;
-      op0_req_addr = current_instr_i.op0.as_addr;
+      //type_exec_unit_addr op0_req_addr;
+      //op0_req_addr = current_instr_i.op0.as_addr;
       if (~register.opx & register.valid) begin
         op0_o = register.data;
         op0_success_o = 1'b1;
@@ -73,8 +73,8 @@ module eu_prepop import pkg_dtypes::*; #(
     end
 
     if (op1_isreg_i) begin
-      type_exec_unit_addr op1_req_addr;
-      op1_req_addr = current_instr_i.op1.as_addr;
+      //type_exec_unit_addr op1_req_addr;
+      //op1_req_addr = current_instr_i.op1.as_addr;
       if (register.opx & register.valid) begin
         op1_o = register.data;
         op1_success_o = 1'b1;
@@ -94,15 +94,18 @@ module eu_prepop import pkg_dtypes::*; #(
     end
   end
   
+  //only enable when only one operand was found for power saving
+  logic write_enable;
+  always_comb begin
+    write_enable = (op0_isreg_i & (op0_success_i | fop0_success_i))
+                  ^ (op1_isreg_i & (op1_success_i | fop1_success_i));
+  end
+
   type_prepop_entry register;
   always_ff @(posedge clk) begin
     if(~reset_n) begin
       register = 'b0;
     end else begin
-      //only enable when only one operand was found for power saving
-      logic write_enable;
-      write_enable = (op0_isreg_i & (op0_success_i | fop0_success_i))
-                   ^ (op1_isreg_i & (op1_success_i | fop1_success_i));
 
       if ((op0_success_o & op1_success_i) | (op0_success_i & op1_success_o)) begin
         register.valid = 1'b0; //set valid to 0 next cycle, i.e. reset reg for next instr

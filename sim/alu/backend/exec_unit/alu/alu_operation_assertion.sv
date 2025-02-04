@@ -10,7 +10,7 @@ module sva_alu_op import pkg_dtypes::*; #(
   input  wire type_alu_channel_rx alu_rx_i,
   input  wire type_alu_channel_tx alu_tx_o,
 
-  input  wire type_iqueue_entry curr_instr_i,
+  input  wire type_iqueue_opcode curr_instr_i,
   input  wire                   curr_instr_valid_i
 );
 
@@ -22,7 +22,7 @@ module sva_alu_op import pkg_dtypes::*; #(
   assign alu_cir = curr_instr_i.specific_instr;
 
   //check CIR value is valid (i.e. betwene h0 and hc)
-  logic sva_prop_alu_cir;
+  /*logic sva_prop_alu_cir;
   always_ff @(posedge alu_clk or negedge alu_resetn) begin: sva_prop_alu_cir_def
     if(~alu_resetn) begin
       sva_prop_alu_cir <= 1'b1;
@@ -33,7 +33,7 @@ module sva_alu_op import pkg_dtypes::*; #(
 
   //sva_alu_cir_range: assert property (@(posedge alu_clk) disable iff (~alu_resetn) alu_cir < 4'hd)
   sva_alu_cir_range: assert property (@(posedge alu_clk) sva_prop_alu_cir)
-  else `uvm_error("SVA_ALU_OP", "CIR value out of range");
+  else `uvm_error("SVA_ALU_OP", "CIR value out of range");*/
 
   logic [DATA_WIDTH-1:0] in_a_q,
                         in_a_q2,

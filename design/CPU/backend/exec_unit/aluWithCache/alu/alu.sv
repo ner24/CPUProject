@@ -10,37 +10,39 @@ module alu import pkg_dtypes::*; #(
   input  wire type_alu_channel_rx alu_rx_i,
   output wire type_alu_channel_tx alu_tx_o,
 
-  input  wire type_iqueue_entry curr_instr_i,
-  input  wire                   curr_instr_valid_i
+  input  wire type_iqueue_opcode  curr_instr_i,
+  input  wire                     curr_instr_valid_i
 );
 
   wire cout_o; //placeholder. This should eventually go back to flags reg through separate channel
 
-  assign alu_tx.opd_valid = curr_instr_valid_i & alu_rx.op0_valid & alu_rx.op1_valid;
-  assign alu_tx.opd_addr  = alu_rx_i.opd_addr;
+  assign alu_tx_o.opd_valid = curr_instr_valid_i & alu_rx_i.op0_valid & alu_rx_i.op1_valid;
+  assign alu_tx_o.opd_addr  = alu_rx_i.opd_addr;
 
   // ----------------------
   // Instruction decoding
   // ----------------------
+  wire enum_instr_exec_unit casted_specific_instr;
+  assign casted_specific_instr = enum_instr_exec_unit'(curr_instr_i.specific_instr);
   logic [8:0] cir_decoded;
   always_comb begin: decode_instruction
-    case(curr_instr_i.specific_instr)
+    case(casted_specific_instr)
       //arithmetic and logic
-      4'h 0: cir_decoded = 9'b 010001000 ; //NOT
-      4'h 1: cir_decoded = 9'b 001000100 ; //AND
-      4'h 2: cir_decoded = 9'b 001100100 ; //OR
-      4'h 3: cir_decoded = 9'b 000001000 ; //XOR
-      4'h 4: cir_decoded = 9'b 001011000 ; //ADD
-      4'h 5: cir_decoded = 9'b 101011000 ; //SUB
-      4'h 6: cir_decoded = 9'b 001000110 ; //NAND
-      4'h 7: cir_decoded = 9'b 001100110 ; //NOR
-      4'h 8: cir_decoded = 9'b 000001010 ; //XNOR
+      NOT : cir_decoded = 9'b 010001000 ;
+      AND : cir_decoded = 9'b 001000100 ;
+      OR  : cir_decoded = 9'b 001100100 ;
+      XOR : cir_decoded = 9'b 000001000 ;
+      ADD : cir_decoded = 9'b 001011000 ;
+      SUB : cir_decoded = 9'b 101011000 ;
+      NAND: cir_decoded = 9'b 001000110 ;
+      NOR : cir_decoded = 9'b 001100110 ;
+      XNOR: cir_decoded = 9'b 000001010 ;
 
       //barrel shift (WIP)
-      4'h 9: cir_decoded = 9'b 000000001 ; //RSH
-      4'h a: cir_decoded = 9'b 000000001 ; //LSH
-      4'h b: cir_decoded = 9'b 000000001 ; //RRO
-      4'h c: cir_decoded = 9'b 000000001 ; //LRO
+      RSH : cir_decoded = 9'b 000000001 ;
+      LSH : cir_decoded = 9'b 000000001 ;
+      RRO : cir_decoded = 9'b 000000001 ;
+      LRO : cir_decoded = 9'b 000000001 ;
 
       default: cir_decoded = 9'b 000000000 ; //should never hit
     endcase

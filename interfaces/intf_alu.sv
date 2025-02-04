@@ -8,11 +8,7 @@ interface intf_alu import pkg_dtypes::*; #(
   type_alu_channel_rx alu_rx_i;
   type_alu_channel_tx alu_tx_o;
 
-  type_iqueue_entry curr_instr_i;
-  logic             curr_instr_valid_i;
-
-  initial begin
-    reset_n <= 1'b0;
-  end
+  type_iqueue_opcode  curr_instr_i;
+  logic               curr_instr_valid_i;
     
 endinterface

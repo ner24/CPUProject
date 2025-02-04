@@ -36,10 +36,6 @@ module eu_xbuf import pkg_dtypes::*; #(
   wire is_ram_full;
   
   assign is_ram_full = num_elements_tracker == ((CACHE_IDX_WIDTH**2)-1);
-  assign req_valid_int = req_addr_i & (~in_valid_i | is_ram_full);
-  assign in_valid_int = in_valid_i & ~is_ram_full;
-
-  //alu_valid and icon_valid cannot be high at same time
 
 
   //RAM port wires
@@ -49,6 +45,7 @@ module eu_xbuf import pkg_dtypes::*; #(
 
   wire type_xbuf_entry rentry;
   type_xbuf_entry wentry;
+  type_exec_unit_addr waddr;
 
   wire ram_we;
   wire ram_re;
@@ -69,11 +66,17 @@ module eu_xbuf import pkg_dtypes::*; #(
       in_data_q = 'b0;
       in_valid_q = 'b0;
     end else if(in_dff_we) begin
-      in_addr_q = in_data_i;
+      in_addr_q = in_addr_i;
       in_data_q = in_data_i;
       in_valid_q = in_valid_i;
     end
   end
+
+  //validity assignments (added here as it depends on input DFF)
+  //because priority should only be given to req if in and in_q are low
+  //note that alu_valid and icon_valid cannot be high at same time
+  assign req_valid_int = req_addr_i & (~(in_valid_i & in_valid_q) | is_ram_full);
+  assign in_valid_int = in_valid_i & ~is_ram_full;
 
   counter_JK #(.WIDTH(CACHE_IDX_WIDTH)) num_unread_elements_ctr (
     .clk(clk),
@@ -112,23 +115,29 @@ module eu_xbuf import pkg_dtypes::*; #(
   // ------------------------------
   // RAM port assignments
   // ------------------------------
+  always_comb begin
+    if(in_valid_int) begin
+      waddr = in_addr_q;
+    end else begin
+      waddr = addr_to_update_hbr_q;
+    end
+  end
+
   assign ram_ready_to_write = rhit & rentry.hbr;
   assign ram_entry_ready_to_use = rhit & ~rentry.hbr;
   always_comb begin
     if (in_valid_int) begin
       wentry.hbr = 1'b0;
-      wentry.addr = in_addr_q;
       wentry.data = in_data_q;
     end else if (req_valid_int) begin
       wentry.hbr = 1'b1;
       wentry.data = 'bx;
-      wentry.addr = req_addr_i;
     end
   end
   assign ram_we = in_valid_int ? in_valid_q :
                   req_valid_int ? addr_to_update_hbr_q_valid : 1'b0;
   assign ram_re = in_valid_int | req_valid_int;
-
+  
   cache_DP #(
     .IDX_BITS(NUM_IDX_BITS),
     .DATA_WIDTH($bits(type_xbuf_entry)),
@@ -137,14 +146,14 @@ module eu_xbuf import pkg_dtypes::*; #(
     .clk(clk),
     .reset_n(reset_n),
 
-    .addra_i(wentry.addr),
-    .addrb_i(rentry.addr),
+    .addra_i(waddr),
+    .addrb_i(req_addr_i),
 
-    .wdata_i(wentry.data),
+    .wdata_i(wentry),
 
     .cea_i(ram_we),
     .ceb_i(ram_re),
-    .we_i(ram_we), //means rdataa and rhita will do nothing
+    .we_i(1'b1), //means rdataa and rhita will do nothing
 
     .rdataa_o(), //not used
     .rdatab_o(rentry),

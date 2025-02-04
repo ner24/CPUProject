@@ -9,7 +9,8 @@ module eu_cache import pkg_dtypes::*; #(
 
   // ALU interface
   // 2 buses: operands read, result write
-  output wire type_alu_channel_rx alu_rx_o,
+  //inout is dirty fix
+  inout wire type_alu_channel_rx alu_rx_o,
   input  wire type_alu_channel_tx alu_tx_i,
 
   // Interconnect interface
@@ -41,15 +42,6 @@ module eu_cache import pkg_dtypes::*; #(
   assign alu_res_opd_isforeign    = alu_tx_i.opd_addr.euidx == EU_IDX;
 
   // --------------------------
-  // ALU interface
-  // --------------------------
-  //output register for storing one of the already prepared operands
-  //e.g. if op1 fetch gets delayed but op0 does not, keep op0 in this register
-  //then when op1 is finally fetched, pass it to alu directly and op0 from register
-
-  wire rx0_alu_req_channel;
-
-  // --------------------------
   // Operand channels
   // --------------------------
   
@@ -69,22 +61,25 @@ module eu_cache import pkg_dtypes::*; #(
   wire type_exec_unit_data op1_data;
   wire                     op1_success;
 
-  //opd
-  wire type_exec_unit_data opd_data;
-  wire                     opd_valid;
-
   wire                     opd_foreign_success;
   wire                     opd_local_success;
-  wire                     opd_stored_success;
-  assign opd_stored_success = opd_foreign_success | opd_local_success;
+  wire                     opd_store_success;
+  assign opd_store_success = opd_foreign_success | opd_local_success;
+  assign alu_rx_o.opd_store_success = opd_store_success;
 
   // --------------------------
   // Prepared op reg
   // --------------------------
+  //output register for storing one of the already prepared operands
+  //e.g. if op1 fetch gets delayed but op0 does not, keep op0 in this register
+  //then when op1 is finally fetched, pass it to alu directly and op0 from register
 
   eu_prepop #(
     .EU_IDX(EU_IDX)
   ) prepop (
+    .clk(clk),
+    .reset_n(reset_n),
+
     //foreign op0
     .fop0_data_i(fop0_data),
     .fop0_success_i(fop0_success),
@@ -102,7 +97,7 @@ module eu_cache import pkg_dtypes::*; #(
     .op1_success_i(op1_success),
 
     //iqueue requested addresses
-    .current_instr_i(ireq_curr_instr_i),
+    .current_instr_i(curr_instr_i),
     .op0_isreg_i(curr_instr_op0_isreg),
     .op0_isforeign_i(curr_instr_op0_isforeign),
     .op1_isreg_i(curr_instr_op1_isreg),
@@ -125,8 +120,8 @@ module eu_cache import pkg_dtypes::*; #(
   assign op0_local_addr.spec = curr_instr_i.op0.as_addr.spec;
   assign op1_local_addr.uid = curr_instr_i.op1.as_addr.uid;
   assign op1_local_addr.spec = curr_instr_i.op1.as_addr.spec;
-  assign opd_local_addr.uid = alu_tx_i.opd.addr.uid;
-  assign opd_local_addr.spec = alu_tx_i.opd.addr.spec;
+  assign opd_local_addr.uid = alu_tx_i.opd_addr.uid;
+  assign opd_local_addr.spec = alu_tx_i.opd_addr.spec;
 
   eu_ybuf #(
     .NUM_IDX_BITS(`EU_CACHE_YBUF_NUM_IDX_BITS)
@@ -145,7 +140,7 @@ module eu_cache import pkg_dtypes::*; #(
     .op1_data_success_o(op1_success),
 
     .result_addr_i(opd_local_addr),
-    .result_data_i(alu_tx_i.data),
+    .result_data_i(alu_tx_i.opd_data),
     .result_valid_i(~alu_res_opd_isforeign & alu_tx_i.opd_valid),
     .result_success_o(opd_local_success)
   );
@@ -154,26 +149,43 @@ module eu_cache import pkg_dtypes::*; #(
   // X buffers
   // --------------------------
 
-  generate for (genvar g_opx = 0; g_opx < 2; g_opx++) begin: g_rx
-    eu_xbuf #(
+  eu_xbuf #(
       .NUM_IDX_BITS(`EU_CACHE_XBUF_NUM_IDX_BITS)
-    ) xbuf (
-      .clk(clk),
-      .reset_n(reset_n),
+  ) rx0_xbuf (
+    .clk(clk),
+    .reset_n(reset_n),
 
-      //from ICON
-      .in_addr_i(g_opx ? icon_w1_i.addr : icon_w0_i.addr),
-      .in_valid_i(g_opx ? icon_w1_i.valid : icon_w0_i.valid),
-      .in_data_i(g_opx ? icon_w1_i.data : icon_w0_i.data),
-      .in_success_o(g_opx ? icon_w1_rx_o.success : icon_w0_rx_o.success),
+    //from ICON
+    .in_addr_i(icon_w0_i.addr),
+    .in_valid_i(icon_w0_i.valid),
+    .in_data_i(icon_w0_i.data),
+    .in_success_o(icon_w0_rx_o.success),
 
-      //to ALU (so req will be from current instr)
-      .req_addr_i(g_opx ? curr_instr_i.op1.as_addr : curr_instr_i.op0.as_addr),
-      .req_valid_i(g_opx ? curr_instr_op1_isforeign : curr_instr_op0_isforeign),
-      .resp_data_o(g_opx ? fop1_data : fop0_data),
-      .resp_success_o(g_opx ? fop1_success : fop0_success)
-    );
-  end endgenerate
+    //to ALU (so req will be from current instr)
+    .req_addr_i(curr_instr_i.op0.as_addr),
+    .req_valid_i(curr_instr_op0_isforeign),
+    .resp_data_o(fop0_data),
+    .resp_success_o(fop0_success)
+  );
+
+  eu_xbuf #(
+    .NUM_IDX_BITS(`EU_CACHE_XBUF_NUM_IDX_BITS)
+  ) rx1_xbuf (
+    .clk(clk),
+    .reset_n(reset_n),
+
+    //from ICON
+    .in_addr_i(icon_w1_i.addr),
+    .in_valid_i(icon_w1_i.valid),
+    .in_data_i(icon_w1_i.data),
+    .in_success_o(icon_w1_rx_o.success),
+
+    //to ALU (so req will be from current instr)
+    .req_addr_i(curr_instr_i.op1.as_addr),
+    .req_valid_i(curr_instr_op1_isforeign),
+    .resp_data_o(fop1_data),
+    .resp_success_o(fop1_success)
+  );
 
   eu_xbuf #(
     .NUM_IDX_BITS(`EU_CACHE_XBUF_NUM_IDX_BITS)
@@ -196,3 +208,35 @@ module eu_cache import pkg_dtypes::*; #(
 
 
 endmodule
+
+/*generate for (genvar g_opx = 0; g_opx < 2; g_opx++) begin: g_rx
+    eu_xbuf #(
+      .NUM_IDX_BITS(`EU_CACHE_XBUF_NUM_IDX_BITS)
+    ) xbuf (
+      .clk(clk),
+      .reset_n(reset_n),
+
+      //from ICON
+      .in_addr_i(g_opx ? icon_w1_i.addr : icon_w0_i.addr),
+      .in_valid_i(g_opx ? icon_w1_i.valid : icon_w0_i.valid),
+      .in_data_i(g_opx ? icon_w1_i.data : icon_w0_i.data),
+      .in_success_o(g_opx ? icon_w1_rx_o.success : icon_w0_rx_o.success),
+
+      //to ALU (so req will be from current instr)
+      .req_addr_i(g_opx ? curr_instr_i.op1.as_addr : curr_instr_i.op0.as_addr),
+      .req_valid_i(g_opx ? curr_instr_op1_isforeign : curr_instr_op0_isforeign),
+      .resp_data_o(g_opx ? fop1_data : fop0_data),
+      .resp_success_o(g_opx ? fop1_success : fop0_success)
+    );
+  end endgenerate*/
+
+/*//concat outputs as ternary ops create muxes which causes illegal output port assigns
+  wire type_exec_unit_data fop_data [1:0];
+  wire                     fop_success [1:0];
+  wire                     icon_wx_rx_success [1:0];
+  assign fop_data[0] = fop0_data;
+  assign fop_data[1] = fop1_data;
+  assign fop_success[0] = fop0_success;
+  assign fop_success[1] = fop1_success;
+  assign icon_wx_rx_success[0] = icon_w0_rx_o.success;
+  assign icon_wx_rx_success[1] = icon_w1_rx_o.success;*/

@@ -56,9 +56,9 @@ module eu_ybuf import pkg_dtypes::*; #(
 
   wire  type_alu_local_addr r_addra;
   wire  type_alu_local_addr r_addrb;
-  type_ybuf_entry r_rdataa;
-  type_ybuf_entry r_rdatab;
-  logic           r_fetch_success;
+  wire  type_ybuf_entry r_rdataa;
+  wire  type_ybuf_entry r_rdatab;
+  wire            r_fetch_success;
   //logic           r_hita;
 
   wire            r_hbr;
@@ -66,8 +66,8 @@ module eu_ybuf import pkg_dtypes::*; #(
   wire type_alu_local_addr w_addra;
   wire type_alu_local_addr w_addrb;
   wire type_ybuf_entry w_wdataa;
-  type_ybuf_entry w_rdatab;
-  logic           w_fetch_success;
+  wire type_ybuf_entry w_rdatab;
+  wire            w_fetch_success;
   
   assign r_addra = result_addr_i;
   assign r_addrb = op0_req_addr_i;
@@ -79,9 +79,9 @@ module eu_ybuf import pkg_dtypes::*; #(
   assign r_hbr = r_rdataa.hbr;
 
   assign op0_data_o = r_rdatab.data;
-  assign op0_data_success_o = ~r_rdatab.hbr;
-  assign op1_data_o = w_wdatab.data;
-  assign op1_data_success_o = ~w_rdatab.hbr;
+  assign op0_data_success_o = r_fetch_success & ~r_rdatab.hbr;
+  assign op1_data_o = w_rdatab.data;
+  assign op1_data_success_o = w_fetch_success & ~w_rdatab.hbr;
 
   assign result_success_o = r_hbr;
 
@@ -90,44 +90,56 @@ module eu_ybuf import pkg_dtypes::*; #(
   // ------------------------------
 
   //used for swapping r and w markers on the buffers
-  logic y_sw [1:0];
-  logic y_sw_0;
+  logic y_sw;
+  //logic y_sw_0;
   always_ff @(posedge clk) begin
     if(~reset_n) begin
-      y_sw[0] = 1'b0;
+      y_sw = 1'b0;
     end else begin
       if (enable_ybufs) begin
-        y_sw[0] = ~y_sw[0];
+        y_sw = ~y_sw;
       end
     end
   end
   always_comb begin
-    y_sw[1] = ~y_sw[0];
-    y_sw_0 = y_sw[0];
+    //y_sw[1] = ~y_sw[0];
+    //y_sw_0 = y_sw[0];
   end
 
-  type_alu_local_addr combined_addra [1:0];
-  type_alu_local_addr combined_addrb [1:0];
+  wire type_alu_local_addr combined_addra [1:0];
+  wire type_alu_local_addr combined_addrb [1:0];
   wire type_ybuf_entry combined_rdataa [1:0];
   wire type_ybuf_entry combined_rdatab [1:0];
   wire combined_fetch_success [1:0];
-  wire combined_rhita [1:0];
+  //wire combined_rhita [1:0];
 
-  always_comb begin //when sw is 0, y0 is r and y1 is w
-    combined_addra[y_sw_0] = r_addra;
-    combined_addrb[y_sw_0] = r_addrb;
-    combined_addra[~y_sw_0] = w_addra;
-    combined_addrb[~y_sw_0] = w_addrb;
+  assign combined_addra[0] = y_sw ? w_addra : r_addra;
+  assign combined_addra[1] = y_sw ? r_addra : w_addra;
+  assign combined_addrb[0] = y_sw ? w_addrb : r_addrb;
+  assign combined_addrb[1] = y_sw ? r_addrb : w_addrb;
 
-    r_rdataa = combined_rdataa[y_sw_0];
-    r_rdatab = combined_rdatab[y_sw_0];
-    w_rdatab = combined_rdatab[~y_sw_0];
+  assign r_rdataa = y_sw ? combined_rdataa[1] : combined_rdataa[0];
+  assign r_rdatab = y_sw ? combined_rdatab[1] : combined_rdatab[0];
+  assign w_rdatab = y_sw ? combined_rdatab[0] : combined_rdatab[1];
 
-    r_fetch_success = combined_fetch_success[y_sw_0];
-    w_fetch_success = combined_fetch_success[~y_sw_0];
+  assign r_fetch_success = y_sw ? combined_fetch_success[1] : combined_fetch_success[0];
+  assign w_fetch_success = y_sw ? combined_fetch_success[0] : combined_fetch_success[1];
+
+  /*always_comb begin //when sw is 0, y0 is r and y1 is w
+    combined_addra[y_sw[0]] = r_addra;
+    combined_addrb[y_sw[0]] = r_addrb;
+    combined_addra[y_sw[1]] = w_addra;
+    combined_addrb[y_sw[1]] = w_addrb;
+
+    r_rdataa = combined_rdataa[y_sw[0]];
+    r_rdatab = combined_rdatab[y_sw[0]];
+    w_rdatab = combined_rdatab[y_sw[1]];
+
+    r_fetch_success = combined_fetch_success[y_sw[0]];
+    w_fetch_success = combined_fetch_success[y_sw[1]];
 
     //r_hita = combined_rhita[y_sw_0];
-  end
+  end*/
 
   // -----------------------
   // y buffers
@@ -142,20 +154,20 @@ module eu_ybuf import pkg_dtypes::*; #(
       .clk(clk),
       .reset_n(reset_n),
 
-      .addra_i(combined_addra[i]),
-      .addrb_i(combined_addrb[i]),
+      .addra_i(combined_addra[y_idx]),
+      .addrb_i(combined_addrb[y_idx]),
 
       .wdata_i(w_wdataa),
 
       .cea_i(enable_ybufs),
       .ceb_i(enable_ybufs),
-      .we_i(y_sw[i]), //means when sw is 0, y0 is r and y1 is w
+      .we_i(y_idx ? ~y_sw : y_sw), //means when sw is 0, y0 is r and y1 is w
 
-      .rdataa_o(combined_rdataa[i]),
-      .rdatab_o(combined_rdatab[i]),
-      //.rhita_o(combined_rhita[i]),
+      .rdataa_o(combined_rdataa[y_idx]),
+      .rdatab_o(combined_rdatab[y_idx]),
+      //.rhita_o(combined_rhita[y_idx]),
       .rhita_o(),
-      .rhitb_o(combined_fetch_success[i])
+      .rhitb_o(combined_fetch_success[y_idx])
     );
   end endgenerate
 

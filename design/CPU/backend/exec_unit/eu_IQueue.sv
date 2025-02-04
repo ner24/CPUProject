@@ -8,7 +8,7 @@ module eu_IQueue import pkg_dtypes::*; #(
   input  wire                   dispatched_instr_valid_i,
   
   output wire                   is_full_o, //cannot accept entries when full
-  input  wire type_iqueue_entry curr_instr_to_exec_o,
+  output wire type_iqueue_entry curr_instr_to_exec_o,
   input  wire                   ready_for_next_instr_i, //tell queue to stall if not ready
   output wire                   curr_instr_to_exec_valid_o
 );
