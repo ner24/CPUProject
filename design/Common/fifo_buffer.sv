@@ -21,12 +21,9 @@ module fifo_buffer # (
   wire wvalid;
   wire rvalid;
 
-  logic [ADDR_WIDTH-1:0] waddr;
-  logic [ADDR_WIDTH-1:0] raddr;
-
   logic [ADDR_WIDTH-1:0] ptr_head;
   logic [ADDR_WIDTH-1:0] ptr_tail;
-  logic full;
+  wire  full;
   wire  empty;
 
   assign wvalid = wvalid_i & ~full;
@@ -34,20 +31,23 @@ module fifo_buffer # (
   always_ff @(posedge clk) begin: ff_ptrs
     if(~reset_n) begin
       ptr_head = {ADDR_WIDTH{1'b0}};
-      ptr_tail = {ADDR_WIDTH{1'b1}};
+      ptr_tail = {ADDR_WIDTH{1'b0}};
     end else begin
-      raddr = ptr_tail;
       ptr_tail = rvalid ? ptr_tail + 1'b1 : ptr_tail;
-      waddr = ptr_head;
       ptr_head = wvalid ? ptr_head + 1'b1 : ptr_head;
     end
   end
 
+  wire [ADDR_WIDTH-1:0] waddr;
+  wire [ADDR_WIDTH-1:0] raddr;
+  assign waddr = ptr_head;
+  assign raddr = ptr_tail;
+
   //empty when both ptrs are equal
-  assign empty = ptr_tail == (ptr_head - 1'b1);
+  assign empty = ptr_tail == ptr_head;
   assign empty_o = empty;
   //full when head = tail - 1
-  assign full = ptr_head == ptr_tail;
+  assign full = ptr_head == (ptr_tail - 1'b1);
   assign full_o = full;
 
   //ram instance
@@ -72,7 +72,7 @@ module fifo_buffer # (
       .RST_MODE_B("SYNC"),
       .SIM_ASSERT_CHK(`MODE_SIM),
       .USE_EMBEDDED_CONSTRAINT(0),
-      .USE_MEM_INIT(1),
+      .USE_MEM_INIT(0),
       .USE_MEM_INIT_MMI(0),
       .WRITE_DATA_WIDTH_A(DATA_WIDTH)
    )
@@ -88,10 +88,10 @@ module fifo_buffer # (
                        // "independent_clock". Unused when parameter CLOCKING_MODE is "common_clock".
 
       .dina(wdata_i),     // WRITE_DATA_WIDTH_A-bit input: Data input for port A write operations.
-      .ena(wvalid_i),       // 1-bit input: Memory enable signal for port A. Must be high on clock cycles when read
+      .ena(wvalid),       // 1-bit input: Memory enable signal for port A. Must be high on clock cycles when read
                        // or write operations are initiated. Pipelined internally.
 
-      .enb(rready_i),       // 1-bit input: Memory enable signal for port B. Must be high on clock cycles when read
+      .enb(rvalid),       // 1-bit input: Memory enable signal for port B. Must be high on clock cycles when read
                        // or write operations are initiated. Pipelined internally.
 
       .regcea(1'b1), // 1-bit input: Clock Enable for the last register stage on the output data path.

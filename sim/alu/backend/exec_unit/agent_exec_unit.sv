@@ -30,6 +30,7 @@ class execution_unit_driver extends uvm_driver #(execution_unit_sequence_item);
   endfunction
   
   virtual task reset_phase(uvm_phase phase);
+    vintf.reset_n = 1'b0;
     @(posedge vintf.clk);
     vintf.reset_n = 1'b1;
   endtask

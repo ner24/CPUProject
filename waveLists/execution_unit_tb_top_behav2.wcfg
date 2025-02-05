@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="execution_unit_tb_top_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_simulation_parameters_sv_3047865137 " />
+            <top_module name="execution_unit_tb_top" />
+            <top_module name="glbl" />
+            <top_module name="pkg_dtypes" />
+            <top_module name="std" />
+            <top_module name="uvm_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="21.001 ns"></ZoomEndTime>
+      <Cursor1Time time="3.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="194"></NameColumnWidth>
+      <ValueColumnWidth column_width="87"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="17" />
+   <wvobject fp_name="/execution_unit_tb_top/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/alu/curr_instr_i" type="array">
+      <obj_property name="ElementShortName">curr_instr_i</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/alu/curr_instr_valid_i" type="logic">
+      <obj_property name="ElementShortName">curr_instr_valid_i</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_valid_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/alu/alu_rx_i.op0_data" type="array">
+      <obj_property name="ElementShortName">.op0_data</obj_property>
+      <obj_property name="ObjectShortName">.op0_data</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/alu/alu_rx_i.op1_data" type="array">
+      <obj_property name="ElementShortName">.op1_data</obj_property>
+      <obj_property name="ObjectShortName">.op1_data</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/alu/alu_rx_i.op1_valid" type="logic">
+      <obj_property name="ElementShortName">.op1_valid</obj_property>
+      <obj_property name="ObjectShortName">.op1_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/alu/alu_rx_i.op0_valid" type="logic">
+      <obj_property name="ElementShortName">.op0_valid</obj_property>
+      <obj_property name="ObjectShortName">.op0_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/ram/empty" type="logic">
+      <obj_property name="ElementShortName">empty</obj_property>
+      <obj_property name="ObjectShortName">empty</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/curr_instr_to_exec_valid" type="logic">
+      <obj_property name="ElementShortName">curr_instr_to_exec_valid</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_to_exec_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/is_empty" type="logic">
+      <obj_property name="ElementShortName">is_empty</obj_property>
+      <obj_property name="ObjectShortName">is_empty</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/ram/rvalid" type="logic">
+      <obj_property name="ElementShortName">rvalid</obj_property>
+      <obj_property name="ObjectShortName">rvalid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/ram/rready_i" type="logic">
+      <obj_property name="ElementShortName">rready_i</obj_property>
+      <obj_property name="ObjectShortName">rready_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/ram/rdata_o" type="array">
+      <obj_property name="ElementShortName">rdata_o[34:0]</obj_property>
+      <obj_property name="ObjectShortName">rdata_o[34:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/ram/ptr_head" type="array">
+      <obj_property name="ElementShortName">ptr_head[2:0]</obj_property>
+      <obj_property name="ObjectShortName">ptr_head[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/ram/ptr_tail" type="array">
+      <obj_property name="ElementShortName">ptr_tail[2:0]</obj_property>
+      <obj_property name="ObjectShortName">ptr_tail[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/ram/wvalid" type="logic">
+      <obj_property name="ElementShortName">wvalid</obj_property>
+      <obj_property name="ObjectShortName">wvalid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/curr_instr_to_exec_valid_o" type="logic">
+      <obj_property name="ElementShortName">curr_instr_to_exec_valid_o</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_to_exec_valid_o</obj_property>
+   </wvobject>
+</wave_config>

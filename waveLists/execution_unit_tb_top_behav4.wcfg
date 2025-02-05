@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="execution_unit_tb_top_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_simulation_parameters_sv_4136123323 " />
+            <top_module name="execution_unit_tb_top" />
+            <top_module name="glbl" />
+            <top_module name="pkg_dtypes" />
+            <top_module name="std" />
+            <top_module name="uvm_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="21.001 ns"></ZoomEndTime>
+      <Cursor1Time time="5.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="174"></NameColumnWidth>
+      <ValueColumnWidth column_width="72"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="29" />
+   <wvobject fp_name="/execution_unit_tb_top/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/prepop/fop0_data_i" type="array">
+      <obj_property name="ElementShortName">fop0_data_i</obj_property>
+      <obj_property name="ObjectShortName">fop0_data_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/prepop/op0_data_i" type="array">
+      <obj_property name="ElementShortName">op0_data_i</obj_property>
+      <obj_property name="ObjectShortName">op0_data_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/prepop/fop1_data_i" type="array">
+      <obj_property name="ElementShortName">fop1_data_i</obj_property>
+      <obj_property name="ObjectShortName">fop1_data_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/prepop/op0_data_i" type="array">
+      <obj_property name="ElementShortName">op0_data_i</obj_property>
+      <obj_property name="ObjectShortName">op0_data_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/prepop/register" type="array">
+      <obj_property name="ElementShortName">register</obj_property>
+      <obj_property name="ObjectShortName">register</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/prepop/op0_o" type="array">
+      <obj_property name="ElementShortName">op0_o</obj_property>
+      <obj_property name="ObjectShortName">op0_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/prepop/op1_o" type="array">
+      <obj_property name="ElementShortName">op1_o</obj_property>
+      <obj_property name="ObjectShortName">op1_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/prepop/op0_isforeign_i" type="logic">
+      <obj_property name="ElementShortName">op0_isforeign_i</obj_property>
+      <obj_property name="ObjectShortName">op0_isforeign_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/prepop/op1_isforeign_i" type="logic">
+      <obj_property name="ElementShortName">op1_isforeign_i</obj_property>
+      <obj_property name="ObjectShortName">op1_isforeign_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/curr_instr" type="array">
+      <obj_property name="ElementShortName">curr_instr</obj_property>
+      <obj_property name="ObjectShortName">curr_instr</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/curr_instr_to_exec_valid_o" type="logic">
+      <obj_property name="ElementShortName">curr_instr_to_exec_valid_o</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_to_exec_valid_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/ready_for_next_instr_i" type="logic">
+      <obj_property name="ElementShortName">ready_for_next_instr_i</obj_property>
+      <obj_property name="ObjectShortName">ready_for_next_instr_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/ram/ptr_head" type="array">
+      <obj_property name="ElementShortName">ptr_head[2:0]</obj_property>
+      <obj_property name="ObjectShortName">ptr_head[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/ram/empty_o" type="logic">
+      <obj_property name="ElementShortName">empty_o</obj_property>
+      <obj_property name="ObjectShortName">empty_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/alu/dut/curr_instr_valid_i" type="logic">
+      <obj_property name="ElementShortName">curr_instr_valid_i</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_valid_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/alu/dut/curr_instr_i" type="array">
+      <obj_property name="ElementShortName">curr_instr_i</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/alu/dut/alu_tx_o.opd_valid" type="logic">
+      <obj_property name="ElementShortName">.opd_valid</obj_property>
+      <obj_property name="ObjectShortName">.opd_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/fop1_data" type="array">
+      <obj_property name="ElementShortName">fop1_data</obj_property>
+      <obj_property name="ObjectShortName">fop1_data</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/fop1_success" type="logic">
+      <obj_property name="ElementShortName">fop1_success</obj_property>
+      <obj_property name="ObjectShortName">fop1_success</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/rx0_xbuf/req_addr_i" type="array">
+      <obj_property name="ElementShortName">req_addr_i</obj_property>
+      <obj_property name="ObjectShortName">req_addr_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/rx0_xbuf/req_valid_i" type="logic">
+      <obj_property name="ElementShortName">req_valid_i</obj_property>
+      <obj_property name="ObjectShortName">req_valid_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/rx0_xbuf/is_ram_full" type="logic">
+      <obj_property name="ElementShortName">is_ram_full</obj_property>
+      <obj_property name="ObjectShortName">is_ram_full</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/rx0_xbuf/in_valid_i" type="logic">
+      <obj_property name="ElementShortName">in_valid_i</obj_property>
+      <obj_property name="ObjectShortName">in_valid_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/rx0_xbuf/in_valid_q" type="logic">
+      <obj_property name="ElementShortName">in_valid_q</obj_property>
+      <obj_property name="ObjectShortName">in_valid_q</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/rx0_xbuf/in_not_active" type="logic">
+      <obj_property name="ElementShortName">in_not_active</obj_property>
+      <obj_property name="ObjectShortName">in_not_active</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/rx0_xbuf/req_valid_int" type="logic">
+      <obj_property name="ElementShortName">req_valid_int</obj_property>
+      <obj_property name="ObjectShortName">req_valid_int</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/rx0_xbuf/resp_data_o" type="array">
+      <obj_property name="ElementShortName">resp_data_o</obj_property>
+      <obj_property name="ObjectShortName">resp_data_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/rx0_xbuf/ram_re" type="logic">
+      <obj_property name="ElementShortName">ram_re</obj_property>
+      <obj_property name="ObjectShortName">ram_re</obj_property>
+   </wvobject>
+</wave_config>

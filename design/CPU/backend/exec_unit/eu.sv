@@ -34,6 +34,7 @@ module execution_unit import pkg_dtypes::*; #( //WIP. THis module without the IQ
   assign alu_rx.opd_addr = curr_instr.opd;
 
   wire curr_instr_to_exec_valid;
+  wire ready_for_next_instr;
 
   `SIM_TB_MODULE(alu) #(
   ) alu (
@@ -44,7 +45,9 @@ module execution_unit import pkg_dtypes::*; #( //WIP. THis module without the IQ
     .alu_tx_o(alu_tx),
 
     .curr_instr_i(curr_instr.opcode),
-    .curr_instr_valid_i(curr_instr_to_exec_valid)
+    .curr_instr_valid_i(curr_instr_to_exec_valid),
+
+    .ready_for_next_instr_o(ready_for_next_instr)
   );
 
   eu_IQueue #(
@@ -57,7 +60,9 @@ module execution_unit import pkg_dtypes::*; #( //WIP. THis module without the IQ
     
     .is_full_o(ready_for_next_instr_o), //cannot accept entries when full
     .curr_instr_to_exec_o(curr_instr),
-    .ready_for_next_instr_i(alu_rx.opd_store_success), //tell queue to stall if not ready
+    //tell queue to stall if not ready due to:
+    //opd not being stored yet (stall on receiver)
+    .ready_for_next_instr_i(ready_for_next_instr),
     .curr_instr_to_exec_valid_o(curr_instr_to_exec_valid)
   );
 

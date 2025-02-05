@@ -4,7 +4,7 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 
-`include "agent_exec_unit.sv"
+`include "../agent_exec_unit.sv"
 
 class execution_unit_env extends uvm_env;
   `uvm_component_utils(execution_unit_env)
@@ -42,18 +42,13 @@ class test_general_sequence extends uvm_sequence#(execution_unit_sequence_item);
     start_item(seq_item);
 
     seq_item.icon_rx0_i      = '{default: 'b0};
-    seq_item.icon_rx0_resp_o = 'b0;
     seq_item.icon_rx1_i      = 'b0;
-    seq_item.icon_rx1_resp_o = 'b0;
     
-    seq_item.icon_tx_data_o      = 'b0;
     seq_item.icon_tx_addr_i      = 'b0;
     seq_item.icon_tx_req_valid_i = 'b0;
-    seq_item.icon_tx_success_o   = 'b0;
 
     seq_item.dispatched_instr_i       = 'b0;
     seq_item.dispatched_instr_valid_i = 'b0;
-    seq_item.ready_for_next_instr_o   = 'b0;
       
     finish_item(seq_item);
   endtask

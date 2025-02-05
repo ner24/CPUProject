@@ -74,7 +74,7 @@ module cache_DP # (
       .RST_MODE_B("SYNC"),
       .SIM_ASSERT_CHK(`MODE_SIM),
       .USE_EMBEDDED_CONSTRAINT(0),
-      .USE_MEM_INIT(1),
+      .USE_MEM_INIT(0),
       .USE_MEM_INIT_MMI(0),
       .WRITE_DATA_WIDTH_A($bits(cache_entry))
    )

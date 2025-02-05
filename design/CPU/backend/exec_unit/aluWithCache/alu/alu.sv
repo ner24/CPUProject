@@ -11,13 +11,18 @@ module alu import pkg_dtypes::*; #(
   output wire type_alu_channel_tx alu_tx_o,
 
   input  wire type_iqueue_opcode  curr_instr_i,
-  input  wire                     curr_instr_valid_i
+  input  wire                     curr_instr_valid_i,
+
+  output wire                     ready_for_next_instr_o
 );
 
   wire cout_o; //placeholder. This should eventually go back to flags reg through separate channel
 
+  //since alu is stateless, opd_valid can just be high when instruction operands are ready
   assign alu_tx_o.opd_valid = curr_instr_valid_i & alu_rx_i.op0_valid & alu_rx_i.op1_valid;
   assign alu_tx_o.opd_addr  = alu_rx_i.opd_addr;
+  
+  assign ready_for_next_instr_o = alu_rx_i.opd_store_success & alu_rx_i.op0_valid & alu_rx_i.op1_valid;
 
   // ----------------------
   // Instruction decoding

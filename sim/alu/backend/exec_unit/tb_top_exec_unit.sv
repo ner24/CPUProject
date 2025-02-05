@@ -2,7 +2,10 @@
 `include "design_parameters.sv"
 `include "simulation_parameters.sv"
 
-`include "test_general.sv" //to trigger compile
+//tests have to be included to trigger compile
+//so uvm can find them
+//`include "eu_tests/test_general.sv"
+`include "eu_tests/test_rx0_add_rx1.sv"
 
 //`timescale 100ps/1ps
 
@@ -48,6 +51,7 @@ module execution_unit_tb_top import uvm_pkg::*; (
   );
 
   initial begin
-    run_test("execution_unit_test_general");
+    //run_test("execution_unit_test_general");
+    run_test("execution_unit_test_rx0_add_rx1");
   end
 endmodule

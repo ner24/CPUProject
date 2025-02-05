@@ -122,7 +122,7 @@ module eu_ybuf import pkg_dtypes::*; #(
   assign r_rdatab = y_sw ? combined_rdatab[1] : combined_rdatab[0];
   assign w_rdatab = y_sw ? combined_rdatab[0] : combined_rdatab[1];
 
-  assign r_fetch_success = y_sw ? combined_fetch_success[1] : combined_fetch_success[0];
+  assign r_fetch_success = y_sw ? combined_fetch_success[1] : combined_fetch_success[0]; //TODO: this should only be high when entry is valid (add n_hbr)
   assign w_fetch_success = y_sw ? combined_fetch_success[0] : combined_fetch_success[1];
 
   /*always_comb begin //when sw is 0, y0 is r and y1 is w

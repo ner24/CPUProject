@@ -13,6 +13,9 @@ module eu_IQueue import pkg_dtypes::*; #(
   output wire                   curr_instr_to_exec_valid_o
 );
 
+  wire is_empty;
+  assign curr_instr_to_exec_valid_o = ~is_empty;
+
   fifo_buffer #(
     .LOG2_QUEUE_LENGTH(LOG2_QUEUE_LENGTH),
     .DATA_WIDTH($bits(curr_instr_to_exec_o))
@@ -27,7 +30,7 @@ module eu_IQueue import pkg_dtypes::*; #(
     .rready_i(ready_for_next_instr_i),
 
     .full_o(is_full_o),
-    .empty_o(curr_instr_to_exec_valid_o)
+    .empty_o(is_empty)
   );
 
 endmodule

@@ -10,5 +10,7 @@ interface intf_alu import pkg_dtypes::*; #(
 
   type_iqueue_opcode  curr_instr_i;
   logic               curr_instr_valid_i;
+
+  logic               ready_for_next_instr_o;
     
 endinterface

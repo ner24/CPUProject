@@ -22,7 +22,9 @@ module eu_xbuf import pkg_dtypes::*; #(
   localparam CACHE_IDX_WIDTH = NUM_IDX_BITS;
 
   typedef struct packed {
-    logic hbr;
+    //hbr is also the ~valid flag
+    //so, to initialise memory to all invalid with all 0s, use n_hbr instead
+    logic n_hbr;
     type_exec_unit_data data;
   } type_xbuf_entry;
 
@@ -32,7 +34,7 @@ module eu_xbuf import pkg_dtypes::*; #(
   //More generally, for RX and TX, the input should always take priority over output (apart from when ram is full)
   wire req_valid_int;
   wire in_valid_int;
-  wire [CACHE_IDX_WIDTH-1:0] num_elements_tracker;
+  logic [CACHE_IDX_WIDTH-1:0] num_elements_tracker;
   wire is_ram_full;
   
   assign is_ram_full = num_elements_tracker == ((CACHE_IDX_WIDTH**2)-1);
@@ -41,9 +43,10 @@ module eu_xbuf import pkg_dtypes::*; #(
   //RAM port wires
   wire rhit;
   wire ram_ready_to_write;
-  wire ram_entry_ready_to_use;
+  wire ram_entry_ready_to_use; //i.e. ram entry contains valid entry ready to be used in alu
 
   wire type_xbuf_entry rentry;
+  type_exec_unit_addr raddr;
   type_xbuf_entry wentry;
   type_exec_unit_addr waddr;
 
@@ -55,7 +58,7 @@ module eu_xbuf import pkg_dtypes::*; #(
   // --------------------
 
   wire in_dff_we;
-  assign in_dff_we = in_valid_int & ram_ready_to_write & req_valid_i;
+  assign in_dff_we = in_valid_int & ram_ready_to_write;
 
   type_exec_unit_addr  in_addr_q;
   type_exec_unit_data  in_data_q;
@@ -69,25 +72,10 @@ module eu_xbuf import pkg_dtypes::*; #(
       in_addr_q = in_addr_i;
       in_data_q = in_data_i;
       in_valid_q = in_valid_i;
+    end else if (in_valid_q) begin
+      in_valid_q = 1'b0;
     end
   end
-
-  //validity assignments (added here as it depends on input DFF)
-  //because priority should only be given to req if in and in_q are low
-  //note that alu_valid and icon_valid cannot be high at same time
-  assign req_valid_int = req_addr_i & (~(in_valid_i & in_valid_q) | is_ram_full);
-  assign in_valid_int = in_valid_i & ~is_ram_full;
-
-  counter_JK #(.WIDTH(CACHE_IDX_WIDTH)) num_unread_elements_ctr (
-    .clk(clk),
-    .reset_n(reset_n),
-    .set(1'b0),
-    .set_val({CACHE_IDX_WIDTH{1'bx}}), //not used
-    .rst_val({CACHE_IDX_WIDTH{1'b0}}),
-    .trig(in_dff_we | resp_success_o),
-    .inc_or_dec(resp_success_o & ~in_dff_we),
-    .q(num_elements_tracker)
-  );
 
   // ------------------------------
   // Output HBR update DFF
@@ -96,21 +84,29 @@ module eu_xbuf import pkg_dtypes::*; #(
   wire out_dff_we;
   assign out_dff_we = req_valid_int & ram_entry_ready_to_use;
 
-  type_exec_unit_addr addr_to_update_hbr_q;
-  logic addr_to_update_hbr_q_valid;
+  type_exec_unit_addr addr_to_update_n_hbr_q;
+  logic addr_to_update_n_hbr_q_valid;
   always_ff @(posedge clk) begin
     if(~reset_n) begin
-      addr_to_update_hbr_q <= 'b0;
-      addr_to_update_hbr_q_valid <= 'b0;
+      addr_to_update_n_hbr_q <= 'b0;
+      addr_to_update_n_hbr_q_valid <= 'b0;
     end else begin
       if(out_dff_we) begin
-        addr_to_update_hbr_q <= req_addr_i;
-        addr_to_update_hbr_q_valid <= 1'b1;
-      end else begin
-        addr_to_update_hbr_q_valid <= 1'b0;
+        addr_to_update_n_hbr_q <= req_addr_i;
+        addr_to_update_n_hbr_q_valid <= 1'b1;
+      end else if (addr_to_update_n_hbr_q_valid) begin
+        addr_to_update_n_hbr_q_valid <= 1'b0;
       end
     end
   end
+
+  //validity assignments (added here as it depends on input DFF)
+  //because priority should only be given to req if in and in_q are low
+  //note that alu_valid and icon_valid cannot be high at same time
+  wire in_not_active;
+  assign in_not_active = ~(in_valid_i | in_valid_q);
+  assign req_valid_int = req_valid_i & ( in_not_active | is_ram_full );
+  assign in_valid_int = in_valid_i & ~is_ram_full & ~addr_to_update_n_hbr_q_valid;
 
   // ------------------------------
   // RAM port assignments
@@ -118,24 +114,25 @@ module eu_xbuf import pkg_dtypes::*; #(
   always_comb begin
     if(in_valid_int) begin
       waddr = in_addr_q;
+      raddr = in_addr_i;
     end else begin
-      waddr = addr_to_update_hbr_q;
+      waddr = addr_to_update_n_hbr_q;
+      raddr = req_addr_i;
     end
   end
 
-  assign ram_ready_to_write = rhit & rentry.hbr;
-  assign ram_entry_ready_to_use = rhit & ~rentry.hbr;
+  assign ram_ready_to_write = ~rentry.n_hbr;
+  assign ram_entry_ready_to_use = rhit & rentry.n_hbr;
   always_comb begin
-    if (in_valid_int) begin
-      wentry.hbr = 1'b0;
+    if (in_valid_q) begin
+      wentry.n_hbr = 1'b1;
       wentry.data = in_data_q;
-    end else if (req_valid_int) begin
-      wentry.hbr = 1'b1;
+    end else if (addr_to_update_n_hbr_q_valid) begin
+      wentry.n_hbr = 1'b0;
       wentry.data = 'bx;
     end
   end
-  assign ram_we = in_valid_int ? in_valid_q :
-                  req_valid_int ? addr_to_update_hbr_q_valid : 1'b0;
+  assign ram_we = in_valid_q | addr_to_update_n_hbr_q_valid;
   assign ram_re = in_valid_int | req_valid_int;
   
   cache_DP #(
@@ -147,7 +144,7 @@ module eu_xbuf import pkg_dtypes::*; #(
     .reset_n(reset_n),
 
     .addra_i(waddr),
-    .addrb_i(req_addr_i),
+    .addrb_i(raddr),
 
     .wdata_i(wentry),
 
@@ -161,10 +158,34 @@ module eu_xbuf import pkg_dtypes::*; #(
     .rhitb_o(rhit)
   );
 
-  assign resp_success_o = ~rentry.hbr;
+  assign resp_success_o = rhit & rentry.n_hbr;
   assign in_success_o = in_dff_we;
 
   assign resp_data_o = rentry.data;
+
+  always_ff @(posedge clk) begin
+    if (~reset_n) begin
+      num_elements_tracker = 'b0;
+    end else begin
+      //note that this updates in sync with ram_we
+      //the memory itself updates a cycle after ram_we
+      if(in_valid_q) begin
+        num_elements_tracker = num_elements_tracker + 1;
+      end else if (addr_to_update_n_hbr_q_valid) begin
+        num_elements_tracker = num_elements_tracker - 1;
+      end
+    end
+  end
+  /*counter_JK #(.WIDTH(CACHE_IDX_WIDTH)) num_unread_elements_ctr (
+    .clk(clk),
+    .reset_n(reset_n),
+    .set(1'b0),
+    .set_val({CACHE_IDX_WIDTH{1'bx}}), //not used
+    .rst_val({CACHE_IDX_WIDTH{1'b0}}),
+    .trig(in_dff_we | resp_success_o),
+    .inc_or_dec(resp_success_o & ~in_dff_we),
+    .q(num_elements_tracker)
+  );*/
 
 endmodule
 

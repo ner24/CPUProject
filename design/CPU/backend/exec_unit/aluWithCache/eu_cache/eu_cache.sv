@@ -36,9 +36,9 @@ module eu_cache import pkg_dtypes::*; #(
   wire curr_instr_op1_isforeign;
   wire alu_res_opd_isforeign;
   assign curr_instr_op0_isreg     = curr_instr_i.op0m == REG;
-  assign curr_instr_op0_isforeign = curr_instr_op0_isreg ? curr_instr_i.op0.as_addr.euidx == EU_IDX : 1'b0;
+  assign curr_instr_op0_isforeign = curr_instr_op0_isreg ? ~(curr_instr_i.op0.as_addr.euidx == EU_IDX) : 1'b0;
   assign curr_instr_op1_isreg     = curr_instr_i.op1m == REG;
-  assign curr_instr_op1_isforeign = curr_instr_op1_isreg ? curr_instr_i.op1.as_addr.euidx == EU_IDX : 1'b0;
+  assign curr_instr_op1_isforeign = curr_instr_op1_isreg ? ~(curr_instr_i.op1.as_addr.euidx == EU_IDX) : 1'b0;
   assign alu_res_opd_isforeign    = alu_tx_i.opd_addr.euidx == EU_IDX;
 
   // --------------------------

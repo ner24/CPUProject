@@ -4,7 +4,7 @@
 // --------------------------------
 // Architectural/general params
 // --------------------------------
-`define WORD_WIDTH 4
+`define WORD_WIDTH 8
 `define NUM_REG 8 //number of architectural r registers
 `define LOG2_NUM_INSTRUCTIONS_PER_EXEC_TYPE 4
 

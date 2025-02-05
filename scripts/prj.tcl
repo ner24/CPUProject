@@ -61,6 +61,8 @@ dict with argv {
     set_property -name {xsim.elaborate.xelab.more_options} -value "-L uvm -d MODE_SIMULATION -i $root_dir/projectHeaders -i $root_dir/sim/seqItems" -objects [get_fileset $simset_name] -verbose
     set_property -name {xsim.simulate.custom_tcl} -value "$script_path/runSim.tcl" -objects [get_fileset $simset_name] -verbose
     set_property -name {xsim.simulate.runtime} -value "10000ns" -objects [get_fileset $simset_name] -verbose
+    set_property -name {xsim.compile.xsc.mt_level} -value "8" -objects [get_fileset $simset_name] -verbose
+    set_property -name {xsim.elaborate.xsc.mt_level} -value "8" -objects [get_fileset $simset_name] -verbose
   } else {
     #faster way but only use if sources havn't been moved around
     puts "Opening project"
