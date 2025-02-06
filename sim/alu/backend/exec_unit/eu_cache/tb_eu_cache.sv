@@ -32,7 +32,8 @@ module `SIM_TB_MODULE(eu_cache) import uvm_pkg::*; import pkg_dtypes::*; #(
   output wire                      icon_rsuccess_o,
 
   // Instruction reqeusts (from IQUEUE)
-  input  wire type_iqueue_entry curr_instr_i
+  input  wire type_iqueue_entry curr_instr_i,
+  input  wire                   curr_instr_valid_i
 );
   
   intf_eu_cache intf (
@@ -48,6 +49,7 @@ module `SIM_TB_MODULE(eu_cache) import uvm_pkg::*; import pkg_dtypes::*; #(
   assign intf.icon_raddr_i = icon_raddr_i;
   assign intf.icon_rvalid_i = icon_rvalid_i;
   assign intf.icon_rsuccess_o = icon_rsuccess_o;
+  assign intf.curr_instr_valid_i = curr_instr_valid_i;
 
   initial begin
     uvm_config_db #( virtual intf_eu_cache )::set(null, "*", "intf_eu_cache", intf);
@@ -72,7 +74,8 @@ module `SIM_TB_MODULE(eu_cache) import uvm_pkg::*; import pkg_dtypes::*; #(
     .icon_rvalid_i(icon_rvalid_i),
     .icon_rsuccess_o(icon_rsuccess_o),
 
-    .curr_instr_i(curr_instr_i)
+    .curr_instr_i(curr_instr_i),
+    .curr_instr_valid_i(curr_instr_valid_i)
   );
 
   // --------------------

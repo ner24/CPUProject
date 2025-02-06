@@ -89,7 +89,8 @@ module execution_unit import pkg_dtypes::*; #( //WIP. THis module without the IQ
     .icon_rsuccess_o(icon_tx_success_o),
 
     // Instruction reqeusts (from IQUEUE)
-    .curr_instr_i(curr_instr)
+    .curr_instr_i(curr_instr),
+    .curr_instr_valid_i(curr_instr_to_exec_valid)
   );
 
 endmodule

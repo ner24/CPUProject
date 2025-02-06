@@ -113,11 +113,15 @@ module eu_xbuf import pkg_dtypes::*; #(
   // ------------------------------
   always_comb begin
     if(in_valid_int) begin
-      waddr = in_addr_q;
       raddr = in_addr_i;
     end else begin
-      waddr = addr_to_update_n_hbr_q;
       raddr = req_addr_i;
+    end
+
+    if(in_valid_q) begin
+      waddr = in_addr_q;
+    end else begin
+      waddr = addr_to_update_n_hbr_q;
     end
   end
 
@@ -129,7 +133,7 @@ module eu_xbuf import pkg_dtypes::*; #(
       wentry.data = in_data_q;
     end else if (addr_to_update_n_hbr_q_valid) begin
       wentry.n_hbr = 1'b0;
-      wentry.data = 'bx;
+      wentry.data = 'b0;
     end
   end
   assign ram_we = in_valid_q | addr_to_update_n_hbr_q_valid;
@@ -158,7 +162,7 @@ module eu_xbuf import pkg_dtypes::*; #(
     .rhitb_o(rhit)
   );
 
-  assign resp_success_o = rhit & rentry.n_hbr;
+  assign resp_success_o = req_valid_i & rhit & rentry.n_hbr;
   assign in_success_o = in_dff_we;
 
   assign resp_data_o = rentry.data;

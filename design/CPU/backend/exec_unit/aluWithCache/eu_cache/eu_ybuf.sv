@@ -22,18 +22,20 @@ module eu_ybuf import pkg_dtypes::*; #(
 );
 
   typedef struct packed {
-    logic hbr;
+    logic n_hbr;
     type_exec_unit_data data;
   } type_ybuf_entry;
 
   //if no requests, send to sleep
   wire enable_ybufs;
-  assign enable_ybufs = op0_req_addr_valid_i | op1_req_addr_valid_i;
+  assign enable_ybufs = op0_req_addr_valid_i | op1_req_addr_valid_i | result_valid_i;
 
   // ------------------------------
   // ys buffer
   // ------------------------------
+  wire result_store_slot_available;
 
+  logic ys_valid;
   typedef struct packed {
     type_alu_local_addr addr;
     type_exec_unit_data data;
@@ -42,10 +44,17 @@ module eu_ybuf import pkg_dtypes::*; #(
   always_ff @(posedge clk) begin: ff_ys_buffer
     if(~reset_n) begin
       ys_buffer = 'b0;
+      ys_valid = 1'b0;
     end else begin
-      if (result_valid_i) begin
+      //result_store_slot_available is high when hbr check passes
+      //for requested cache address
+      if (result_valid_i & result_store_slot_available) begin
         ys_buffer.addr = result_addr_i;
         ys_buffer.data = result_data_i;
+        ys_valid = 1'b1;
+      end else if (enable_ybufs) begin
+        //"freeze" ys buffer when disabled
+        ys_valid = 1'b0;
       end
     end
   end
@@ -61,7 +70,7 @@ module eu_ybuf import pkg_dtypes::*; #(
   wire            r_fetch_success;
   //logic           r_hita;
 
-  wire            r_hbr;
+  wire            r_n_hbr;
 
   wire type_alu_local_addr w_addra;
   wire type_alu_local_addr w_addrb;
@@ -76,14 +85,15 @@ module eu_ybuf import pkg_dtypes::*; #(
   assign w_addrb = op1_req_addr_i;
   assign w_wdataa = ys_buffer.data;
 
-  assign r_hbr = r_rdataa.hbr;
+  assign r_n_hbr = r_rdataa.n_hbr;
 
   assign op0_data_o = r_rdatab.data;
-  assign op0_data_success_o = r_fetch_success & ~r_rdatab.hbr;
+  assign op0_data_success_o = r_fetch_success & r_rdatab.n_hbr;
   assign op1_data_o = w_rdatab.data;
-  assign op1_data_success_o = w_fetch_success & ~w_rdatab.hbr;
+  assign op1_data_success_o = w_fetch_success & w_rdatab.n_hbr;
 
-  assign result_success_o = r_hbr;
+  assign result_store_slot_available = ~r_n_hbr;
+  assign result_success_o = result_valid_i & result_store_slot_available;
 
   // ------------------------------
   // multiplex r and w wires
@@ -122,7 +132,7 @@ module eu_ybuf import pkg_dtypes::*; #(
   assign r_rdatab = y_sw ? combined_rdatab[1] : combined_rdatab[0];
   assign w_rdatab = y_sw ? combined_rdatab[0] : combined_rdatab[1];
 
-  assign r_fetch_success = y_sw ? combined_fetch_success[1] : combined_fetch_success[0]; //TODO: this should only be high when entry is valid (add n_hbr)
+  assign r_fetch_success = y_sw ? combined_fetch_success[1] : combined_fetch_success[0];
   assign w_fetch_success = y_sw ? combined_fetch_success[0] : combined_fetch_success[1];
 
   /*always_comb begin //when sw is 0, y0 is r and y1 is w
@@ -145,7 +155,10 @@ module eu_ybuf import pkg_dtypes::*; #(
   // y buffers
   // -----------------------
 
-  generate for(genvar y_idx = 0; y_idx < 2; y_idx++) begin
+  generate for(genvar y_idx = 0; y_idx < 2; y_idx++) begin: g_ybuf
+    wire we;
+    assign we = ys_valid & (y_idx ? ~y_sw : y_sw);
+
     cache_DP #(
       .IDX_BITS(NUM_IDX_BITS),
       .DATA_WIDTH($bits(type_ybuf_entry)),
@@ -161,7 +174,7 @@ module eu_ybuf import pkg_dtypes::*; #(
 
       .cea_i(enable_ybufs),
       .ceb_i(enable_ybufs),
-      .we_i(y_idx ? ~y_sw : y_sw), //means when sw is 0, y0 is r and y1 is w
+      .we_i(we), //means when sw is 0, y0 is r and y1 is w
 
       .rdataa_o(combined_rdataa[y_idx]),
       .rdatab_o(combined_rdatab[y_idx]),

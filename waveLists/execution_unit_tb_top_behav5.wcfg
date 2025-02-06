@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="execution_unit_tb_top_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_simulation_parameters_sv_4136123323 " />
+            <top_module name="execution_unit_tb_top" />
+            <top_module name="glbl" />
+            <top_module name="pkg_dtypes" />
+            <top_module name="std" />
+            <top_module name="uvm_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="21.001 ns"></ZoomEndTime>
+      <Cursor1Time time="7.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="169"></NameColumnWidth>
+      <ValueColumnWidth column_width="72"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="20" />
+   <wvobject fp_name="/execution_unit_tb_top/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/alu/dut/curr_instr_i" type="array">
+      <obj_property name="ElementShortName">curr_instr_i</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/alu/dut/alu_rx_i" type="array">
+      <obj_property name="ElementShortName">alu_rx_i</obj_property>
+      <obj_property name="ObjectShortName">alu_rx_i</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/alu/dut/alu_tx_o" type="array">
+      <obj_property name="ElementShortName">alu_tx_o</obj_property>
+      <obj_property name="ObjectShortName">alu_tx_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/alu_tx_i" type="array">
+      <obj_property name="ElementShortName">alu_tx_i</obj_property>
+      <obj_property name="ObjectShortName">alu_tx_i</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/alu_res_opd_isforeign" type="logic">
+      <obj_property name="ElementShortName">alu_res_opd_isforeign</obj_property>
+      <obj_property name="ObjectShortName">alu_res_opd_isforeign</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/ybufs/ys_buffer" type="array">
+      <obj_property name="ElementShortName">ys_buffer</obj_property>
+      <obj_property name="ObjectShortName">ys_buffer</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/ybufs/w_wdataa" type="array">
+      <obj_property name="ElementShortName">w_wdataa</obj_property>
+      <obj_property name="ObjectShortName">w_wdataa</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/ybufs/w_addra" type="array">
+      <obj_property name="ElementShortName">w_addra</obj_property>
+      <obj_property name="ObjectShortName">w_addra</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/ybufs/enable_ybufs" type="logic">
+      <obj_property name="ElementShortName">enable_ybufs</obj_property>
+      <obj_property name="ObjectShortName">enable_ybufs</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/ybufs/w_addra" type="array">
+      <obj_property name="ElementShortName">w_addra</obj_property>
+      <obj_property name="ObjectShortName">w_addra</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/ybufs/\g_ybuf[0].ram /wdata" type="array">
+      <obj_property name="ElementShortName">wdata</obj_property>
+      <obj_property name="ObjectShortName">wdata</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/ybufs/\g_ybuf[0].ram /we_i" type="logic">
+      <obj_property name="ElementShortName">we_i</obj_property>
+      <obj_property name="ObjectShortName">we_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/ybufs/ys_valid" type="logic">
+      <obj_property name="ElementShortName">ys_valid</obj_property>
+      <obj_property name="ObjectShortName">ys_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/ybufs/\g_ybuf[0].ram /xpm_memory_dpdistram_inst/xpm_memory_base_inst/mem" type="array">
+      <obj_property name="ElementShortName">mem[0:15][10:0]</obj_property>
+      <obj_property name="ObjectShortName">mem[0:15][10:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/ybufs/\g_ybuf[1].ram /xpm_memory_dpdistram_inst/xpm_memory_base_inst/mem" type="array">
+      <obj_property name="ElementShortName">mem[0:15][10:0]</obj_property>
+      <obj_property name="ObjectShortName">mem[0:15][10:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/ybufs/y_sw" type="logic">
+      <obj_property name="ElementShortName">y_sw</obj_property>
+      <obj_property name="ObjectShortName">y_sw</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/ybufs/op0_req_addr_valid_i" type="logic">
+      <obj_property name="ElementShortName">op0_req_addr_valid_i</obj_property>
+      <obj_property name="ObjectShortName">op0_req_addr_valid_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/ybufs/op1_req_addr_valid_i" type="logic">
+      <obj_property name="ElementShortName">op1_req_addr_valid_i</obj_property>
+      <obj_property name="ObjectShortName">op1_req_addr_valid_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/cache/dut/curr_instr_i" type="array">
+      <obj_property name="ElementShortName">curr_instr_i</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_i</obj_property>
+   </wvobject>
+</wave_config>

@@ -25,5 +25,6 @@ interface intf_eu_cache import pkg_dtypes::*; #(
 
   // Instruction reqeusts (from IQUEUE)
   type_iqueue_entry curr_instr_i;
+  logic             curr_instr_valid_i;
     
 endinterface

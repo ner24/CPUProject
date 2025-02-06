@@ -10,7 +10,7 @@ module eu_cache import pkg_dtypes::*; #(
   // ALU interface
   // 2 buses: operands read, result write
   //inout is dirty fix
-  inout wire type_alu_channel_rx alu_rx_o,
+  output wire type_alu_channel_rx alu_rx_o,
   input  wire type_alu_channel_tx alu_tx_i,
 
   // Interconnect interface
@@ -27,7 +27,8 @@ module eu_cache import pkg_dtypes::*; #(
   output wire                      icon_rsuccess_o,
 
   // Instruction reqeusts (from IQUEUE)
-  input  wire type_iqueue_entry curr_instr_i
+  input  wire type_iqueue_entry curr_instr_i,
+  input  wire                   curr_instr_valid_i
 );
 
   wire curr_instr_op0_isreg;
@@ -39,7 +40,7 @@ module eu_cache import pkg_dtypes::*; #(
   assign curr_instr_op0_isforeign = curr_instr_op0_isreg ? ~(curr_instr_i.op0.as_addr.euidx == EU_IDX) : 1'b0;
   assign curr_instr_op1_isreg     = curr_instr_i.op1m == REG;
   assign curr_instr_op1_isforeign = curr_instr_op1_isreg ? ~(curr_instr_i.op1.as_addr.euidx == EU_IDX) : 1'b0;
-  assign alu_res_opd_isforeign    = alu_tx_i.opd_addr.euidx == EU_IDX;
+  assign alu_res_opd_isforeign    = ~(alu_tx_i.opd_addr.euidx == EU_IDX);
 
   // --------------------------
   // Operand channels
@@ -130,9 +131,9 @@ module eu_cache import pkg_dtypes::*; #(
     .reset_n(reset_n),
 
     .op0_req_addr_i(op0_local_addr),
-    .op0_req_addr_valid_i(~curr_instr_op0_isforeign),
+    .op0_req_addr_valid_i(curr_instr_valid_i & ~curr_instr_op0_isforeign),
     .op1_req_addr_i(op1_local_addr),
-    .op1_req_addr_valid_i(~curr_instr_op1_isforeign),
+    .op1_req_addr_valid_i(curr_instr_valid_i & ~curr_instr_op1_isforeign),
 
     .op0_data_o(op0_data),
     .op0_data_success_o(op0_success),
@@ -163,7 +164,7 @@ module eu_cache import pkg_dtypes::*; #(
 
     //to ALU (so req will be from current instr)
     .req_addr_i(curr_instr_i.op0.as_addr),
-    .req_valid_i(curr_instr_op0_isforeign),
+    .req_valid_i(curr_instr_valid_i & curr_instr_op0_isforeign),
     .resp_data_o(fop0_data),
     .resp_success_o(fop0_success)
   );
@@ -182,7 +183,7 @@ module eu_cache import pkg_dtypes::*; #(
 
     //to ALU (so req will be from current instr)
     .req_addr_i(curr_instr_i.op1.as_addr),
-    .req_valid_i(curr_instr_op1_isforeign),
+    .req_valid_i(curr_instr_valid_i & curr_instr_op1_isforeign),
     .resp_data_o(fop1_data),
     .resp_success_o(fop1_success)
   );
@@ -195,7 +196,7 @@ module eu_cache import pkg_dtypes::*; #(
 
     //from ALU
     .in_addr_i(alu_tx_i.opd_addr),
-    .in_valid_i(alu_res_opd_isforeign & alu_tx_i.opd_valid),
+    .in_valid_i(alu_tx_i.opd_valid & alu_res_opd_isforeign),
     .in_data_i(alu_tx_i.opd_data),
     .in_success_o(opd_foreign_success),
 
