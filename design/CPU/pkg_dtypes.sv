@@ -52,15 +52,41 @@ package pkg_dtypes;
   } type_icon_rx_channel;
 
   typedef struct packed {
-    logic                  opx;
-    type_icon_tx_channel   tx;
-    type_icon_rx_channel   rx;
+    logic                  req_valid;
+    type_exec_unit_data    data_tx;
+    logic                  data_valid_tx;
+    type_exec_unit_addr    src_addr;
+  } type_icon_tx_channel_chside;
+
+  typedef struct packed {
+    type_exec_unit_data    data_rx;
+    logic                  data_valid_rx;
+    logic                  success;
+  } type_icon_rx_channel_chside;
+
+  localparam TOT_NUM_ICON_INTERFACES = (2**LOG2_NUM_EXEC_UNITS) * 2;
+  typedef struct packed {
+    //execution unit receivers (op0 and op1)
+    logic [TOT_NUM_ICON_INTERFACES-1:0] eus;
+    //extra receivers (str buffer, mx reg bank)
+    logic receiver_str;
+    logic receiver_mxreg;
+  } type_icon_receivers_list;
+
+  //*2 for op0 and op1 in each eu
+  typedef struct packed {
+    type_exec_unit_addr      src_addr;
+
+    type_exec_unit_data      data;
+    logic                    data_valid;
+
+    type_icon_receivers_list receiver_list;
+    type_icon_receivers_list success_list;
   } type_icon_channel;
 
   typedef struct packed {
-    type_exec_unit_addr    src_addr;
-    type_exec_unit_addr    dest_addr;
-    logic                  dest_opx;
+    type_exec_unit_addr      src_addr;
+    type_icon_receivers_list receiver_list;
   } type_icon_instr;
 
   // ------------------------------------------
