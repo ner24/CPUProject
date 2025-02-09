@@ -8,7 +8,8 @@ import uvm_pkg::*;
 //typedef class eu_cache_monitor;
 
 module `SIM_TB_MODULE(execution_unit) import uvm_pkg::*; import pkg_dtypes::*; #(
-  parameter EU_IDX = 0
+  parameter NUM_PARALLEL_INSTR_DISPATCHES = 4,
+  parameter logic [LOG2_NUM_EXEC_UNITS-1:0] EU_IDX = 'b0
 ) (
   input  wire                   clk,
   input  wire                   reset_n,
@@ -27,9 +28,10 @@ module `SIM_TB_MODULE(execution_unit) import uvm_pkg::*; import pkg_dtypes::*; #
   output wire                      icon_tx_success_o,
 
   //iqueue
-  input  wire type_iqueue_entry    dispatched_instr_i,
-  input  wire                      dispatched_instr_valid_i,
-  output wire                      ready_for_next_instr_o
+  input  wire type_iqueue_entry    dispatched_instr_i       [NUM_PARALLEL_INSTR_DISPATCHES-1:0],
+  input  wire                      dispatched_instr_valid_i [NUM_PARALLEL_INSTR_DISPATCHES-1:0],
+  input  wire [LOG2_NUM_EXEC_UNITS-1:0] dispatched_instr_alloc_euidx_i [NUM_PARALLEL_INSTR_DISPATCHES-1:0],
+  output wire                      ready_for_next_instrs_o //if not, stall dispatch
 );
   
   intf_eu intf (
@@ -46,14 +48,16 @@ module `SIM_TB_MODULE(execution_unit) import uvm_pkg::*; import pkg_dtypes::*; #
   assign intf.icon_tx_success_o = icon_tx_success_o;
   assign intf.dispatched_instr_i = dispatched_instr_i;
   assign intf.dispatched_instr_valid_i = dispatched_instr_valid_i;
-  assign intf.ready_for_next_instr_o = ready_for_next_instr_o;
+  assign intf.dispatched_instr_alloc_euidx_i = dispatched_instr_alloc_euidx_i;
+  assign intf.ready_for_next_instrs_o = ready_for_next_instrs_o;
 
   initial begin
     uvm_config_db #( virtual intf_eu )::set(null, "*", "intf_eu", intf);
   end
 
   execution_unit #(
-    .EU_IDX(EU_IDX)
+    .EU_IDX(EU_IDX),
+    .NUM_PARALLEL_INSTR_DISPATCHES(NUM_PARALLEL_INSTR_DISPATCHES)
   ) dut (
     .clk      (clk),
     .reset_n  (reset_n),
@@ -70,7 +74,8 @@ module `SIM_TB_MODULE(execution_unit) import uvm_pkg::*; import pkg_dtypes::*; #
 
     .dispatched_instr_i(dispatched_instr_i),
     .dispatched_instr_valid_i(dispatched_instr_valid_i),
-    .ready_for_next_instr_o(ready_for_next_instr_o)
+    .dispatched_instr_alloc_euidx_i(dispatched_instr_alloc_euidx_i),
+    .ready_for_next_instrs_o(ready_for_next_instrs_o)
   );
 
   // --------------------

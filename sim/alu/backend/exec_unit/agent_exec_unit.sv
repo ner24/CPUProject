@@ -57,7 +57,8 @@ class execution_unit_driver extends uvm_driver #(execution_unit_sequence_item);
 
     vintf.dispatched_instr_i       <= seq_item.dispatched_instr_i;
     vintf.dispatched_instr_valid_i <= seq_item.dispatched_instr_valid_i;
-    vintf.ready_for_next_instr_o   <= seq_item.ready_for_next_instr_o;
+    vintf.dispatched_instr_alloc_euidx_i <= seq_item.dispatched_instr_alloc_euidx_i;
+    vintf.ready_for_next_instrs_o   <= seq_item.ready_for_next_instrs_o;
   endtask
 endclass
 

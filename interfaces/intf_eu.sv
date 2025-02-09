@@ -1,7 +1,12 @@
+`include "design_parameters.sv"
+
 interface intf_eu import pkg_dtypes::*; #(
 ) (
   input wire clk
 );
+
+  localparam NUM_PARALLEL_INSTR_DISPATCHES = `NUM_PARALLEL_INSTR_DISPATCHES;
+  localparam LOG2_NUM_EXEC_UNITS = `LOG2_NUM_EXEC_UNITS;
 
   logic               reset_n;
 
@@ -19,8 +24,9 @@ interface intf_eu import pkg_dtypes::*; #(
   logic                icon_tx_success_o;
 
   //iqueue
-  type_iqueue_entry    dispatched_instr_i;
-  logic                dispatched_instr_valid_i;
-  logic                ready_for_next_instr_o;
+  type_iqueue_entry    dispatched_instr_i [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
+  logic                dispatched_instr_valid_i [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
+  logic [LOG2_NUM_EXEC_UNITS-1:0] dispatched_instr_alloc_euidx_i [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
+  logic                ready_for_next_instrs_o;
     
 endinterface

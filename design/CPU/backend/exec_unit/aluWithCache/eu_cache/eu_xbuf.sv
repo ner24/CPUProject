@@ -88,14 +88,14 @@ module eu_xbuf import pkg_dtypes::*; #(
   logic addr_to_update_n_hbr_q_valid;
   always_ff @(posedge clk) begin
     if(~reset_n) begin
-      addr_to_update_n_hbr_q <= 'b0;
-      addr_to_update_n_hbr_q_valid <= 'b0;
+      addr_to_update_n_hbr_q = 'b0;
+      addr_to_update_n_hbr_q_valid = 'b0;
     end else begin
       if(out_dff_we) begin
-        addr_to_update_n_hbr_q <= req_addr_i;
-        addr_to_update_n_hbr_q_valid <= 1'b1;
+        addr_to_update_n_hbr_q = req_addr_i;
+        addr_to_update_n_hbr_q_valid = 1'b1;
       end else if (addr_to_update_n_hbr_q_valid) begin
-        addr_to_update_n_hbr_q_valid <= 1'b0;
+        addr_to_update_n_hbr_q_valid = 1'b0;
       end
     end
   end
@@ -131,7 +131,7 @@ module eu_xbuf import pkg_dtypes::*; #(
     if (in_valid_q) begin
       wentry.n_hbr = 1'b1;
       wentry.data = in_data_q;
-    end else if (addr_to_update_n_hbr_q_valid) begin
+    end else /*if (addr_to_update_n_hbr_q_valid)*/ begin
       wentry.n_hbr = 1'b0;
       wentry.data = 'b0;
     end

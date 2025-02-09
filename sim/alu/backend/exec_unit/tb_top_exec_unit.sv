@@ -30,7 +30,8 @@ module execution_unit_tb_top import uvm_pkg::*; (
   end
 
   `SIM_TB_MODULE(execution_unit) #(
-    .EU_IDX(0)
+    .EU_IDX(0),
+    .NUM_PARALLEL_INSTR_DISPATCHES(`NUM_PARALLEL_INSTR_DISPATCHES)
   ) tb (
     .clk      (clk),
     .reset_n  (intf.reset_n),
@@ -47,7 +48,8 @@ module execution_unit_tb_top import uvm_pkg::*; (
 
     .dispatched_instr_i(intf.dispatched_instr_i),
     .dispatched_instr_valid_i(intf.dispatched_instr_valid_i),
-    .ready_for_next_instr_o(intf.ready_for_next_instr_o)
+    .dispatched_instr_alloc_euidx_i(intf.dispatched_instr_alloc_euidx_i),
+    .ready_for_next_instrs_o(intf.ready_for_next_instrs_o)
   );
 
   initial begin

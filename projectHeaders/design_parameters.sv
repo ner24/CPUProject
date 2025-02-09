@@ -22,11 +22,13 @@
 `define EU_CACHE_XBUF_NUM_IDX_BITS 4 //number of address bits used for the actual address of the entry
 `define EU_CACHE_YBUF_NUM_IDX_BITS 4 //number of address bits used for the actual address of the entry
 `define EU_LOG2_IQUEUE_LENGTH 3
+`define EU_LOG2_IQUEUE_NUM_QUEUES 2
 
 // --------------------------------
 // Back end top level params
 // --------------------------------
 `define LOG2_NUM_EXEC_UNITS 2
 `define LOG2_NUM_ICON_CHANNELS 2
+`define NUM_PARALLEL_INSTR_DISPATCHES 8
 
 `endif

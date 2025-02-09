@@ -3,10 +3,15 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 
+`include "design_parameters.sv"
+
 import pkg_dtypes::*;
 class execution_unit_sequence_item extends uvm_sequence_item;
 
   `uvm_object_utils(execution_unit_sequence_item)
+
+  localparam NUM_PARALLEL_INSTR_DISPATCHES = `NUM_PARALLEL_INSTR_DISPATCHES;
+  localparam LOG2_NUM_EXEC_UNITS = `LOG2_NUM_EXEC_UNITS;
 
   logic               reset_n;
 
@@ -24,9 +29,10 @@ class execution_unit_sequence_item extends uvm_sequence_item;
         logic                icon_tx_success_o;
 
   //iqueue
-  rand  type_iqueue_entry    dispatched_instr_i;
-  rand  logic                dispatched_instr_valid_i;
-        logic                ready_for_next_instr_o;
+  rand  type_iqueue_entry    dispatched_instr_i [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
+  rand  logic                dispatched_instr_valid_i [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
+  rand  logic [LOG2_NUM_EXEC_UNITS-1:0] dispatched_instr_alloc_euidx_i [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
+        logic                ready_for_next_instrs_o;
 
   /*`define INC_CONSTRAINTS
   `include "simTests/execution_unit/tests.svh"

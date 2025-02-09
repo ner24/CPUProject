@@ -2,7 +2,8 @@
 `include "design_parameters.sv"
 
 module execution_unit import pkg_dtypes::*; #( //WIP. THis module without the IQueue only exists for verif purposes
-  parameter EU_IDX = 0
+  parameter NUM_PARALLEL_INSTR_DISPATCHES = 4,
+  parameter logic [LOG2_NUM_EXEC_UNITS-1:0] EU_IDX = 'b0
 ) (
   input  wire                   clk,
   input  wire                   reset_n,
@@ -21,9 +22,10 @@ module execution_unit import pkg_dtypes::*; #( //WIP. THis module without the IQ
   output wire                      icon_tx_success_o,
 
   //iqueue
-  input  wire type_iqueue_entry    dispatched_instr_i,
-  input  wire                      dispatched_instr_valid_i,
-  output wire                      ready_for_next_instr_o //if not, stall dispatch
+  input  wire type_iqueue_entry    dispatched_instr_i       [NUM_PARALLEL_INSTR_DISPATCHES-1:0],
+  input  wire                      dispatched_instr_valid_i [NUM_PARALLEL_INSTR_DISPATCHES-1:0],
+  input  wire [LOG2_NUM_EXEC_UNITS-1:0] dispatched_instr_alloc_euidx_i [NUM_PARALLEL_INSTR_DISPATCHES-1:0],
+  output wire                      ready_for_next_instrs_o //if not, stall dispatch
 );
 
   wire type_iqueue_entry curr_instr;
@@ -51,19 +53,23 @@ module execution_unit import pkg_dtypes::*; #( //WIP. THis module without the IQ
   );
 
   eu_IQueue #(
-    .LOG2_QUEUE_LENGTH(`EU_LOG2_IQUEUE_LENGTH)
+    .LOG2_QUEUE_LENGTH(`EU_LOG2_IQUEUE_LENGTH),
+    .NUM_PARALLEL_INSTR_DISPATCHES(NUM_PARALLEL_INSTR_DISPATCHES),
+    .EU_LOG2_IQUEUE_NUM_QUEUES(`EU_LOG2_IQUEUE_NUM_QUEUES),
+    .EU_IDX(EU_IDX)
   ) iqueue (
     .clk(clk),
     .reset_n(reset_n),
     .dispatched_instr_i(dispatched_instr_i),
     .dispatched_instr_valid_i(dispatched_instr_valid_i),
     
-    .is_full_o(ready_for_next_instr_o), //cannot accept entries when full
+    .is_full_o(ready_for_next_instrs_o), //cannot accept entries when full
     .curr_instr_to_exec_o(curr_instr),
     //tell queue to stall if not ready due to:
     //opd not being stored yet (stall on receiver)
     .ready_for_next_instr_i(ready_for_next_instr),
-    .curr_instr_to_exec_valid_o(curr_instr_to_exec_valid)
+    .curr_instr_to_exec_valid_o(curr_instr_to_exec_valid),
+    .dispatched_instr_alloc_euidx_i(dispatched_instr_alloc_euidx_i)
   );
 
   `SIM_TB_MODULE(eu_cache) #(

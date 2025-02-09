@@ -1,15 +1,19 @@
 module u_backend import pkg_dtypes::*; #(
   parameter NUM_ICON_CHANNELS = 4,
-  parameter NUM_EXEC_UNITS = 4
+  parameter NUM_EXEC_UNITS = 4,
+
+  //this should equal the width of the rename ILN in the front end
+  parameter NUM_PARALLEL_INSTR_DISPATCHES = 4
 ) (
   input  wire                   clk,
   input  wire                   reset_n,
 
   //Dispatch bus
   //connects front end dispatch to all execution unit IQueues
-  input  wire type_iqueue_entry instr_dispatch_i       [NUM_EXEC_UNITS-1:0],
-  input  wire                   instr_dispatch_valid_i [NUM_EXEC_UNITS-1:0],
-  output wire                   instr_dispatch_ready_o [NUM_EXEC_UNITS-1:0],
+  input  wire type_iqueue_entry instr_dispatch_i       [NUM_PARALLEL_INSTR_DISPATCHES-1:0],
+  input  wire                   instr_dispatch_valid_i [NUM_PARALLEL_INSTR_DISPATCHES-1:0],
+  input  wire [LOG2_NUM_EXEC_UNITS-1:0] dispatched_instr_alloc_euidx_i [NUM_PARALLEL_INSTR_DISPATCHES-1:0],
+  output wire                   instr_dispatch_ready_o,
 
   input  wire type_icon_instr   icon_instr_dispatch_i       [NUM_ICON_CHANNELS-1:0],
   input  wire                   icon_instr_dispatch_valid_i [NUM_ICON_CHANNELS-1:0],
@@ -20,8 +24,6 @@ module u_backend import pkg_dtypes::*; #(
 
   //mx register write
   //interconnect channel for writing values to mx registers in the MMU
-
-  
 
 );
   // ---------------------------
@@ -70,12 +72,14 @@ module u_backend import pkg_dtypes::*; #(
     end
   end
 
+  wire [NUM_EXEC_UNITS-1:0] instr_dispatch_readys;
+  assign instr_dispatch_ready_o = |instr_dispatch_readys;
   generate for (genvar eu_idx = 0; eu_idx < NUM_EXEC_UNITS; eu_idx++) begin: g_eu
     type_icon_tx_channel_chside icon_txs [1:0];
     
     always_comb begin
       for (int opx = 0; opx < 2; opx++) begin
-        icon_txs[opx].req_valid     = 1'b0;
+        icon_txs[opx].req_valid     = 'b0;
         icon_txs[opx].data_tx       = 'b0;
         icon_txs[opx].data_valid_tx = 'b0;
         icon_txs[opx].src_addr      = 'b0;
@@ -139,9 +143,10 @@ module u_backend import pkg_dtypes::*; #(
       .icon_tx_success_o(eu_tx_resp_data_valid),
 
       //instruction dispatch and ready
-      .dispatched_instr_i(instr_dispatch_i[eu_idx]),
-      .dispatched_instr_valid_i(instr_dispatch_valid_i[eu_idx]),
-      .ready_for_next_instr_o(instr_dispatch_ready_o[eu_idx]) //if not, stall dispatch
+      .dispatched_instr_i(instr_dispatch_i),
+      .dispatched_instr_valid_i(instr_dispatch_valid_i),
+      .ready_for_next_instrs_o(instr_dispatch_readys[eu_idx]), //if not, stall dispatch
+      .dispatched_instr_alloc_euidx_i(dispatched_instr_alloc_euidx_i)
     );
 
   end endgenerate

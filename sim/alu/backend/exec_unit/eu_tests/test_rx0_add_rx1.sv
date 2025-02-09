@@ -5,6 +5,7 @@ import uvm_pkg::*;
 `include "uvm_macros.svh"
 
 `include "../agent_exec_unit.sv"
+`include "design_parameters.sv"
 
 class execution_unit_env_test_rx0_add_rx1 extends uvm_env;
   `uvm_component_utils(execution_unit_env_test_rx0_add_rx1)
@@ -62,24 +63,29 @@ class test_rx0_add_rx1_sequence extends uvm_sequence#(execution_unit_sequence_it
           //instruction will be passed in step 0
           //exec unit should hold it until next cycle
           //since rxx dont have 0 cycle shortcuts atm
-          seq_item.dispatched_instr_valid_i = 'b1;
-          seq_item.dispatched_instr_i.op0m = REG;
-          seq_item.dispatched_instr_i.op1m = REG;
+          seq_item.dispatched_instr_valid_i[0] = 1'b1;
+          for(int i = 1; i < `NUM_PARALLEL_INSTR_DISPATCHES; i++) begin
+            seq_item.dispatched_instr_valid_i[i] = 1'b0;
+          end
+          seq_item.dispatched_instr_i[0].op0m = REG;
+          seq_item.dispatched_instr_i[0].op1m = REG;
 
-          seq_item.dispatched_instr_i.opcode.exec_type = EXEC_UNIT;
-          seq_item.dispatched_instr_i.opcode.specific_instr = enum_instr_exec_unit'(ADD);
+          seq_item.dispatched_instr_i[0].opcode.exec_type = EXEC_UNIT;
+          seq_item.dispatched_instr_i[0].opcode.specific_instr = enum_instr_exec_unit'(ADD);
 
-          seq_item.dispatched_instr_i.op0.as_addr.euidx = 'd1;
-          seq_item.dispatched_instr_i.op0.as_addr.uid = 'd0;
-          seq_item.dispatched_instr_i.op0.as_addr.spec = 'd2;
+          seq_item.dispatched_instr_i[0].op0.as_addr.euidx = 'd1;
+          seq_item.dispatched_instr_i[0].op0.as_addr.uid = 'd0;
+          seq_item.dispatched_instr_i[0].op0.as_addr.spec = 'd2;
 
-          seq_item.dispatched_instr_i.op1.as_addr.euidx = 'd2;
-          seq_item.dispatched_instr_i.op1.as_addr.uid = 'd0;
-          seq_item.dispatched_instr_i.op1.as_addr.spec = 'd1;
+          seq_item.dispatched_instr_i[0].op1.as_addr.euidx = 'd2;
+          seq_item.dispatched_instr_i[0].op1.as_addr.uid = 'd0;
+          seq_item.dispatched_instr_i[0].op1.as_addr.spec = 'd1;
 
-          seq_item.dispatched_instr_i.opd.euidx = 'd0; //means result should be in ybuffer
-          seq_item.dispatched_instr_i.opd.uid = 'd0;
-          seq_item.dispatched_instr_i.opd.spec = 'd3;
+          seq_item.dispatched_instr_i[0].opd.euidx = 'd0; //means result should be in ybuffer
+          seq_item.dispatched_instr_i[0].opd.uid = 'd0;
+          seq_item.dispatched_instr_i[0].opd.spec = 'd3;
+
+          seq_item.dispatched_instr_alloc_euidx_i[0] = 'b0;
 
           //no tx req in this test
           seq_item.icon_tx_req_valid_i = 'b0;
@@ -99,7 +105,9 @@ class test_rx0_add_rx1_sequence extends uvm_sequence#(execution_unit_sequence_it
       start_item(seq_item);
       seq_item.icon_rx0_i.valid = 'b0;
       seq_item.icon_rx1_i.valid = 'b0;
-      seq_item.dispatched_instr_valid_i = 'b0;
+      for(int i = 1; i < `NUM_PARALLEL_INSTR_DISPATCHES; i++) begin
+        seq_item.dispatched_instr_valid_i[i] = 'b0;
+      end
       seq_item.icon_tx_req_valid_i = 'b0;
       finish_item(seq_item);
     end
