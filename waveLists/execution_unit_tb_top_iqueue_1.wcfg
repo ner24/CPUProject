@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="execution_unit_tb_top_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_simulation_parameters_sv_4136123323 " />
+            <top_module name="execution_unit_tb_top" />
+            <top_module name="glbl" />
+            <top_module name="pkg_dtypes" />
+            <top_module name="std" />
+            <top_module name="uvm_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="21.001 ns"></ZoomEndTime>
+      <Cursor1Time time="21.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="169"></NameColumnWidth>
+      <ValueColumnWidth column_width="72"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="14" />
+   <wvobject fp_name="/execution_unit_tb_top/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/reset_n" type="logic">
+      <obj_property name="ElementShortName">reset_n</obj_property>
+      <obj_property name="ObjectShortName">reset_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/dispatched_instr_i" type="array">
+      <obj_property name="ElementShortName">dispatched_instr_i[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dispatched_instr_i[7:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/ready_for_next_instr_i" type="logic">
+      <obj_property name="ElementShortName">ready_for_next_instr_i</obj_property>
+      <obj_property name="ObjectShortName">ready_for_next_instr_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/curr_instr_rr_ctr" type="array">
+      <obj_property name="ElementShortName">curr_instr_rr_ctr[1:0]</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_rr_ctr[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/dispatched_instr_valid_i" type="array">
+      <obj_property name="ElementShortName">dispatched_instr_valid_i[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dispatched_instr_valid_i[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/curr_instr_to_exec_o" type="array">
+      <obj_property name="ElementShortName">curr_instr_to_exec_o</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_to_exec_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/alu/dut/ready_for_next_instr_o" type="logic">
+      <obj_property name="ElementShortName">ready_for_next_instr_o</obj_property>
+      <obj_property name="ObjectShortName">ready_for_next_instr_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/alu/dut/curr_instr_valid_i" type="logic">
+      <obj_property name="ElementShortName">curr_instr_valid_i</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_valid_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/dispatched_instr" type="array">
+      <obj_property name="ElementShortName">dispatched_instr[3:0]</obj_property>
+      <obj_property name="ObjectShortName">dispatched_instr[3:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/dispatched_instr_intermediate" type="array">
+      <obj_property name="ElementShortName">dispatched_instr_intermediate[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dispatched_instr_intermediate[7:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/iqueue/dispatched_instr_valid_intermediate" type="array">
+      <obj_property name="ElementShortName">dispatched_instr_valid_intermediate[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dispatched_instr_valid_intermediate[7:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/curr_instr" type="array">
+      <obj_property name="ElementShortName">curr_instr</obj_property>
+      <obj_property name="ObjectShortName">curr_instr</obj_property>
+   </wvobject>
+   <wvobject fp_name="/execution_unit_tb_top/tb/dut/curr_instr_to_exec_valid" type="logic">
+      <obj_property name="ElementShortName">curr_instr_to_exec_valid</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_to_exec_valid</obj_property>
+   </wvobject>
+</wave_config>

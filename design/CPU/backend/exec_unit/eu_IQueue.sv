@@ -103,7 +103,7 @@ module eu_IQueue import pkg_dtypes::*; #(
       logic [EU_LOG2_IQUEUE_NUM_QUEUES-1:0] i;
       logic [EU_LOG2_IQUEUE_NUM_QUEUES-1:0] idx;
       i = i32[EU_LOG2_IQUEUE_NUM_QUEUES-1:0];
-      idx = curr_instr_rr_ctr+i;
+      idx = curr_instr_rr_ctr + (i + 'd1);
       dispatched_instr[idx] = dispatched_instr_intermediate[i];
       dispatched_instr_valid[idx] = dispatched_instr_valid_intermediate[i];
       is_full_o |= is_full[idx] & dispatched_instr_valid[idx];

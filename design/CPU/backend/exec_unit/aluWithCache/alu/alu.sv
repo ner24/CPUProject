@@ -22,7 +22,7 @@ module alu import pkg_dtypes::*; #(
   assign alu_tx_o.opd_valid = curr_instr_valid_i & alu_rx_i.op0_valid & alu_rx_i.op1_valid;
   assign alu_tx_o.opd_addr  = alu_rx_i.opd_addr;
   
-  assign ready_for_next_instr_o = alu_rx_i.opd_store_success & alu_rx_i.op0_valid & alu_rx_i.op1_valid;
+  assign ready_for_next_instr_o = (alu_rx_i.opd_store_success & alu_rx_i.op0_valid & alu_rx_i.op1_valid) | ~curr_instr_valid_i;
 
   // ----------------------
   // Instruction decoding

@@ -105,7 +105,7 @@ class test_rx0_add_rx1_sequence extends uvm_sequence#(execution_unit_sequence_it
       start_item(seq_item);
       seq_item.icon_rx0_i.valid = 'b0;
       seq_item.icon_rx1_i.valid = 'b0;
-      for(int i = 1; i < `NUM_PARALLEL_INSTR_DISPATCHES; i++) begin
+      for(int i = 0; i < `NUM_PARALLEL_INSTR_DISPATCHES; i++) begin
         seq_item.dispatched_instr_valid_i[i] = 'b0;
       end
       seq_item.icon_tx_req_valid_i = 'b0;
