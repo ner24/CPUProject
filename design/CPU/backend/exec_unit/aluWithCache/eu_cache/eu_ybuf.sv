@@ -135,22 +135,6 @@ module eu_ybuf import pkg_dtypes::*; #(
   assign r_fetch_success = y_sw ? combined_fetch_success[1] : combined_fetch_success[0];
   assign w_fetch_success = y_sw ? combined_fetch_success[0] : combined_fetch_success[1];
 
-  /*always_comb begin //when sw is 0, y0 is r and y1 is w
-    combined_addra[y_sw[0]] = r_addra;
-    combined_addrb[y_sw[0]] = r_addrb;
-    combined_addra[y_sw[1]] = w_addra;
-    combined_addrb[y_sw[1]] = w_addrb;
-
-    r_rdataa = combined_rdataa[y_sw[0]];
-    r_rdatab = combined_rdatab[y_sw[0]];
-    w_rdatab = combined_rdatab[y_sw[1]];
-
-    r_fetch_success = combined_fetch_success[y_sw[0]];
-    w_fetch_success = combined_fetch_success[y_sw[1]];
-
-    //r_hita = combined_rhita[y_sw_0];
-  end*/
-
   // -----------------------
   // y buffers
   // -----------------------

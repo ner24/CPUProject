@@ -46,6 +46,9 @@ module u_backend import pkg_dtypes::*; #(
   back_icon_controller #(
     .NUM_ICON_CHANNELS(NUM_ICON_CHANNELS)
   ) icon_ctrl (
+    .clk(clk),
+    .reset_n(reset_n),
+
     .icon_instr_dispatch_i(icon_instr_dispatch_i),
     .icon_instr_dispatch_valid_i(icon_instr_dispatch_valid_i),
     .icon_instr_dispatch_ready_o(icon_instr_dispatch_ready_o),
@@ -58,7 +61,7 @@ module u_backend import pkg_dtypes::*; #(
   // ---------------------------
   // Instantiate exec units
   // ---------------------------
-  type_icon_tx_channel_chside icon_rx [NUM_EXEC_UNITS-1:0];
+  type_icon_rx_channel_chside icon_rx [NUM_EXEC_UNITS-1:0];
   always_comb begin
     for(int i = 0; i < NUM_ICON_CHANNELS; i++) begin
       channels[i].data       = 'b0;
@@ -71,6 +74,15 @@ module u_backend import pkg_dtypes::*; #(
       end
     end
   end
+
+  generate for(genvar i = 0; i < NUM_ICON_CHANNELS; i++) begin
+      for (genvar eu_idx = 0; eu_idx < NUM_EXEC_UNITS; eu_idx++) begin
+        assign channels[i].success_list.eus[eu_idx] = icon_rx[eu_idx].success;
+      end
+      //MMU not implemented so just tie to 0
+      assign channels[i].success_list.receiver_str = 'b0;
+      assign channels[i].success_list.receiver_mxreg = 'b0;
+  end endgenerate
 
   wire [NUM_EXEC_UNITS-1:0] instr_dispatch_readys;
   assign instr_dispatch_ready_o = |instr_dispatch_readys;
@@ -91,14 +103,22 @@ module u_backend import pkg_dtypes::*; #(
         end
       end
     end
-
+    
     wire type_exec_unit_data  eu_tx_data;
     wire type_exec_unit_addr  eu_tx_addr;
+    wire type_exec_unit_addr  eu_tx_addr_opx [1:0];
     wire                      eu_tx_valid;
+    wire                      eu_tx_valid_opx [1:0];
     wire                      eu_tx_resp_data_valid;
+    
+    assign eu_tx_addr = eu_tx_addr_opx[0] | eu_tx_addr_opx[1];
+    assign eu_tx_valid = eu_tx_valid_opx[0] | eu_tx_valid_opx[1];
 
     wire type_icon_tx_channel eu_rxx      [1:0];
     wire                      eu_rxx_resp [1:0];
+
+    type_icon_rx_channel_chside icon_rxx [1:0];
+    assign icon_rx[eu_idx] = icon_rxx[0] | icon_rxx[1];
 
     //two icon interfaces (for op0 and op1) for each eu
     for (genvar opx = 0; opx < 2; opx++) begin
@@ -107,7 +127,7 @@ module u_backend import pkg_dtypes::*; #(
       ) icon_if_0 (
         //icon side
         .icon_tx_i(icon_txs[opx]),
-        .icon_rx_o(icon_rx[eu_idx]),
+        .icon_rx_o(icon_rxx[opx]),
 
         //eu rx side
         .eu_rx_o(eu_rxx[opx]),
@@ -115,8 +135,8 @@ module u_backend import pkg_dtypes::*; #(
         
         //eu tx side
         .eu_tx_resp_data_i(eu_tx_data),
-        .eu_tx_addr_o(eu_tx_addr),
-        .eu_tx_valid_o(eu_tx_valid),
+        .eu_tx_addr_o(eu_tx_addr_opx[opx]),
+        .eu_tx_valid_o(eu_tx_valid_opx[opx]),
         .eu_tx_resp_data_valid_i(eu_tx_resp_data_valid),
 
         //extra control

@@ -24,11 +24,11 @@ module back_icon_controller import pkg_dtypes::*; #(
   // ---------------------------
   type_icon_receivers_list success_lists_latched [NUM_ICON_CHANNELS-1:0];
   generate for(genvar ch_idx = 0; ch_idx < NUM_ICON_CHANNELS; ch_idx++) begin
-    always_latch begin
+    always_ff @(posedge clk) begin
       if(~reset_n) begin
         success_lists_latched[ch_idx] = 'b0;
       end else begin
-        success_lists_latched[ch_idx] = success_lists_latched[ch_idx] | success_lists_i[ch_idx];
+        success_lists_latched[ch_idx] |= success_lists_i[ch_idx];
       end
     end
   end endgenerate

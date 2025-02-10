@@ -30,7 +30,20 @@ open:
 open_gui: #macro for opening vivado gui
 	$(CMD_GENERIC_BASE) module_top tri_state_test open_gui 1 job_type nothing
 
-#eu CACHE
+#back end top
+CMD_BACKEND_BASE:= cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/prj.tcl -tclargs module_top u_backend $(TCL_ARGS_EXTRA)
+open_back: env_setup
+	$(CMD_BACKEND_BASE) job_type nothing
+lint_back: env_setup
+	$(CMD_BACKEND_BASE) job_type lint
+elab_back: env_setup
+	$(CMD_BACKEND_BASE) job_type elab
+sim_back: env_setup
+	$(CMD_BACKEND_BASE) job_type sim
+simlint_back: env_setup
+	$(CMD_BACKEND_BASE) job_type simlint
+
+#exec unit
 CMD_EU_BASE:= cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/prj.tcl -tclargs module_top execution_unit $(TCL_ARGS_EXTRA)
 open_eu: env_setup
 	$(CMD_EU_BASE) job_type nothing
@@ -39,18 +52,18 @@ lint_eu: env_setup
 elab_eu: env_setup
 	$(CMD_EU_BASE) job_type elab
 sim_eu: env_setup
-	$(CMD_ALU_BASE) job_type sim sim_module_top execution_unit_tb_top
+	$(CMD_EU_BASE) job_type sim sim_module_top execution_unit_tb_top
 simlint_eu: env_setup
-	$(CMD_ALU_BASE) job_type simlint sim_module_top execution_unit_tb_top
+	$(CMD_EU_BASE) job_type simlint sim_module_top execution_unit_tb_top
 
 #alu
-CMD_ALU_BASE:= cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/prj.tcl -tclargs module_top alu sim_module_top alu_tb_top $(TCL_ARGS_EXTRA)
+CMD_ALU_BASE:= cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/prj.tcl -tclargs module_top alu $(TCL_ARGS_EXTRA)
 open_alu:
 	$(CMD_ALU_BASE) job_type nothing
 sim_alu: env_setup
-	$(CMD_ALU_BASE) job_type sim
+	$(CMD_ALU_BASE) job_type sim sim_module_top alu_tb_top
 simlint_alu: env_setup
-	$(CMD_ALU_BASE) job_type simlint
+	$(CMD_ALU_BASE) job_type simlint sim_module_top alu_tb_top
 elab_alu: env_setup
 	$(CMD_ALU_BASE) job_type elab
 lint_alu: env_setup

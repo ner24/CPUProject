@@ -9,7 +9,6 @@ module eu_cache import pkg_dtypes::*; #(
 
   // ALU interface
   // 2 buses: operands read, result write
-  //inout is dirty fix
   output wire type_alu_channel_rx alu_rx_o,
   input  wire type_alu_channel_tx alu_tx_i,
 
