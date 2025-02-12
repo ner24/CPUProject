@@ -1,5 +1,6 @@
 from typing import List
-from allocators.allocator16 import allocate as allocate1
+from allocators.allocator17 import allocate as allocate1
+import sys
 
 assembly = open("./allocators/customTestAsmMd5gg.txt", "r")
 
@@ -10,6 +11,7 @@ for line in assembly:
 renamedInstructions: List[dict] = allocate1(lines)
 #for i in renamedInstructions:
 #  print(i)
+sys.exit()
 
 def reg_dict_to_addr(obj) -> str:
   #print(obj)

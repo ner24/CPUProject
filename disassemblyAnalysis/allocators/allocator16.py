@@ -7,7 +7,7 @@ def get_next_alu_cache_idx(alu_cache_idx_counter: dict, alu_idx: int) -> dict:
   if alu_idx in alu_cache_idx_counter:
     alu_cache_idx_counter[alu_idx] = alu_cache_idx_counter[alu_idx] + 1
 
-    if(alu_cache_idx_counter[alu_idx] % 20) == 0: # where 20 is max val per round robin
+    if(alu_cache_idx_counter[alu_idx] % 16) == 0: # where 16 is max val per round robin
       if alu_idx not in alu_cache_uid_counter:
         alu_cache_uid_counter[alu_idx] = 0
       else:
@@ -123,8 +123,13 @@ def allocate(instructions: List[str], max_instr_batch_size: int = 10, num_alus: 
 
       #alu alloc only applies to instructions that get dispatched
       #and are not resolved internally by the front end
-      if instr["instr"] == "str" or instr["instr"] == "ldr":
+      if instr["instr"] == "str":
         alu_alloc_arr.append(-2)
+        continue
+      if instr["instr"] == "ldr":
+        alu_alloc_arr.append(-2)
+        if(destReg["value"] in register_tracker_batch):
+          del register_tracker_batch[destReg["value"]]
         continue
       
       #rules:
@@ -245,13 +250,16 @@ def allocate(instructions: List[str], max_instr_batch_size: int = 10, num_alus: 
           #if not in register_tracker_batch, generate new address in allocated eu
           #if srcs are in different alus, then send a icon instruction
           if s["value"] not in register_tracker_batch:
-            #generate a cache address in the allocated alu for the src
-            register_tracker_batch[s["value"]] = {
-              "alu_idx": alloc_alu,
-              "alu_cache_idx": alu_cache_idx_counter[alloc_alu],
-              "opx": opx[si] & 0b1,
-            }
-            alu_cache_idx_counter = get_next_alu_cache_idx(alu_cache_idx_counter, alloc_alu)
+            if s["value"] in register_tracker:
+              register_tracker_batch[s["value"]] = register_tracker[s["value"]]
+            else:
+              #generate a cache address in the allocated alu for the src
+              register_tracker_batch[s["value"]] = {
+                "alu_idx": alloc_alu,
+                "alu_cache_idx": alu_cache_idx_counter[alloc_alu],
+                "opx": opx[si] & 0b1,
+              }
+              alu_cache_idx_counter = get_next_alu_cache_idx(alu_cache_idx_counter, alloc_alu)
          
           if not (register_tracker_batch[s["value"]]["alu_idx"] == alloc_alu):
             if s["value"] in reg_icon_instr_tracker:
@@ -268,6 +276,8 @@ def allocate(instructions: List[str], max_instr_batch_size: int = 10, num_alus: 
         si += 1
       
       #Construct the renamed instruction
+      print(register_tracker)
+      print(register_tracker_batch)
       renamedInstructions_batch.append({
         "alu_idx": alloc_alu,
         "instruction": instr["instr"],
@@ -280,12 +290,13 @@ def allocate(instructions: List[str], max_instr_batch_size: int = 10, num_alus: 
     #the blocking condition is when the register is seen as a dest reg in the cell
     for key, val in register_tracker_batch.items():
       if key in register_tracker:
-        renamedInstructions_batch.append({
-          "alu_idx": -1,
-          "instruction": "iconmv",
-          "destReg": val,
-          "srcs": [ register_tracker[key] ]
-        })
+        if not (register_tracker[key] == val):
+          renamedInstructions_batch.append({
+            "alu_idx": -1,
+            "instruction": "iconmvb",
+            "destReg": val,
+            "srcs": [ register_tracker[key] ]
+          })
       
       register_tracker[key] = val
 

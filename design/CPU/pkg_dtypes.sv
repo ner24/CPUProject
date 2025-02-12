@@ -156,13 +156,14 @@ package pkg_dtypes;
   typedef struct packed {
     type_iqueue_opcode opcode;
     
+    //logic                    opxSwap; //if = 1, op0 should be found in rx1 and op1 in rx0
     union_iqueue_operand     op0;
     enum_instr_operand_type  op0m;
-
     union_iqueue_operand     op1;
     enum_instr_operand_type  op1m;
                                //NOTE: opxm assignments are based on path lengths. This gives shorter ones
     type_exec_unit_addr  opd;
+    //logic                force_foreign; //forces opd to go to tx, even if euidx matches executing unit id
   } type_iqueue_entry;
 
   // ----------------------------------------

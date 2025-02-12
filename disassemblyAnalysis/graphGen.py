@@ -74,6 +74,8 @@ def decompInstruction(line) -> tuple[bool, str, str, List[str]]:
         case "str" | "strb":
             for i in range(len(operands)):
                 operands[i]["value"] = operands[i]["value"].replace('[','').replace(',','').replace(']','')
+            #if not (operands[1]["value"].find("m") == -1):
+            #    operands[1]["loc"] = "sys"
             return True, instruction, {}, operands
         #case "stmia":
         #    memBaseIdxReg: str = operands[0].replace('!','')
@@ -84,11 +86,19 @@ def decompInstruction(line) -> tuple[bool, str, str, List[str]]:
                 operands[i]["value"] = operands[i]["value"].replace('[','').replace(',','').replace(']','')
             destReg: str = operands[0]
             operands = operands[1:]
+            #if not (operands[0]["value"].find("m") == -1):
+            #    operands[0]["loc"] = "sys"
+
             return True, instruction, destReg, operands
         #case "ldmia":
         #    memBaseIdxReg: str = operands[0].replace('!','')
 
         case "mov":
+            destReg = operands[0]
+            srcReg = operands[1]
+            return True, instruction, destReg, [ srcReg ]
+        
+        case "mvn" | "mvns":
             destReg = operands[0]
             srcReg = operands[1]
             return True, instruction, destReg, [ srcReg ]
@@ -102,6 +112,32 @@ def decompInstruction(line) -> tuple[bool, str, str, List[str]]:
                 srcReg.append(destReg)
                 srcReg.reverse()
             return True, instruction, destReg, srcReg
+
+def getNumArchReg() -> int:
+    return 16
+def getArchRegIdx(archreg: str) -> int:
+    #print(archreg)
+    match archreg:
+        case "r0": return 0
+        case "r1": return 1
+        case "r2": return 2
+        case "r3": return 3
+        case "r4": return 4
+        case "r5": return 5
+        case "r6": return 6
+        case "r7": return 7
+        case "r8": return 8
+        case "r9": return 9
+        case "r10": return 10
+        case "r11": return 11
+        case "r12": return 12
+        case "r13": return 13
+        case "r14": return 14
+        case "sp": return 15
+        case _: raise LookupError("No arch reg mapping for " + archreg)
+def convImmStrToVal(immStr: str) -> int:
+    i = immStr.replace("#","")
+    return int(i)
 
 def genGraph(lines: List[str]) -> List[pgv.AGraph]:
   GList: List[pgv.AGraph] = []

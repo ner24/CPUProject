@@ -14,11 +14,13 @@ def concat_srcs(srcs: List[dict]):
         out += i["value"] + ","
     return out[:len(out)-1]
 
-def write_instruction(instr, destReg, srcsString):
+def write_instruction(instr, destReg, srcsString, hasDestreg = True):
+    #print(destReg)
     out = "   " + str(0) + ":\t"
     out += "0000     \t"
     out += instr + "\t"
-    out += destReg["value"].strip("{").strip("}") + "\t"
+    if hasDestreg:
+        out += destReg["value"].strip("{").strip("}") + "\t"
     out += srcsString + "\n"
     custom_assembly.write(out)
 
@@ -49,7 +51,13 @@ for line in arm_assembly:
             continue
       
         case "str" | "strb":
-            write_instruction_raw(line)
+            op1 = str(srcs[2]["value"])
+            if srcs[1]["type"] == "reg":
+                op0 = srcs[1]['value'].replace("r","m")
+                write_instruction("str", srcs[0], f"[{op0}, {op1}]", hasDestreg=True)
+            else:
+                op0 = srcs[1]['value']
+                write_instruction("str", srcs[0], f"[{op0}, {op1}]", hasDestreg=True)
             continue
         case "stmia":
             destReg_val = destReg["value"]
@@ -60,13 +68,23 @@ for line in arm_assembly:
                 registers = srcs
             offset = 0
             for reg in registers:
-                write_instruction("str", reg, f"[{destReg_val}, #{str(offset)}]")
+                op0 = destReg_val.replace("r","m")
+                op1 = str(offset)
+                write_instruction("str", reg, f"[{op0}, #{op1}]")
                 offset += 1
-
+            continue
         #ld instructions will allocate to reg in new file so ignore dependencies (for now)
         #assumes each ld access a different memory address (for now)
         case "ldr" | "ldrb":
-            write_instruction_raw(line)
+            #write_instruction_raw(line)
+            op1 = str(srcs[1]["value"])
+            if srcs[0]["type"] == "reg":
+                op0 = srcs[0]['value'].replace("r","m")
+                write_instruction("ldr", destReg, f"[{op0}, {op1}]")
+            else:
+                op0 = srcs[0]['value']
+                write_instruction("ldr", destReg, f"[{op0}, {op1}]")
+            continue
         case "ldmia":
             destReg_val = destReg["value"]
             if destReg_val.find("!") == -1:
@@ -76,8 +94,11 @@ for line in arm_assembly:
                 registers = srcs
             offset = 0
             for reg in registers:
-                write_instruction("ldr", reg, f"[{destReg_val}, #{str(offset)}]")
+                op0 = destReg_val.replace("r","m")
+                op1 = str(offset)
+                write_instruction("ldr", reg, f"[{op0}, #{op1}]")
                 offset += 1
+            continue
             
         #for most instructions destination is first operand
         #source operands are after
