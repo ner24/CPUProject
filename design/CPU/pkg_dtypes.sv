@@ -189,6 +189,10 @@ package pkg_dtypes;
   } enum_instr_exec_unit;
 
   typedef enum logic [3:0] {
+    CMP //not adding any other instructions for now
+  } enum_instr_exec_unit_cmp;
+
+  typedef enum logic [3:0] {
     LDR,
     STR
   } enum_instr_ldr_str;

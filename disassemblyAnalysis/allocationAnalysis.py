@@ -2,7 +2,7 @@ from typing import List
 from allocators.allocator17 import allocate as allocate1
 import sys
 
-assembly = open("./allocators/customTestAsmMd5gg.txt", "r")
+assembly = open("./allocators/testAsm3.txt", "r")
 
 lines: List[str] = []
 for line in assembly:

@@ -7,4 +7,4 @@ c4:	fb01 f303 	mul.w	r3, #10, r3
 c8:	441a      	add	r2, r3
 cc:	009b      	lsls	r3, r3, #2
 ce:	3370      	adds	r3, #112	; 0x70
-d2:	f843 2c2c 	str.w	r2, [r3, #-44]
+d2:	f843 2c2c 	str.w	r2, [#0, #-44]
