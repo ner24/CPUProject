@@ -57,6 +57,8 @@ def allocate(instructions: List[str],
   MEM_ILN_eu_alloc_opx_locations = np.zeros((arch_reg_idx_range,), dtype=int)
   MEM_ILN_eu_alloc_opx_locations_valid = np.zeros((arch_reg_idx_range,), dtype=bool)
 
+  MEM_ILN_icongen_destreg_prop_accumulated = np.zeros((arch_reg_idx_range,num_alus,2), dtype=bool)
+
   while num_evaluated_instr < len(instructions):
     instr_batch_size = max_instr_batch_size if len(instructions) - num_evaluated_instr >= max_instr_batch_size else len(instructions) - num_evaluated_instr
 
@@ -130,14 +132,11 @@ def allocate(instructions: List[str],
         o = 0
         if "value" in destReg:
           destRegIdx = getArchRegIdx(destReg["value"])
-          ILN_ldstr_ldprop_val_valid[destRegIdx] = False
-          ILN_ldstr_out_opdIdx[i] = destRegIdx
-          ILN_ldstr_out_opdIdx_valid[i] = True
         else: #only really applies to str instructions
           destRegIdx = getArchRegIdx(srcs[0]["value"])
-          ILN_ldstr_out_opdIdx[i] = destRegIdx
-          ILN_ldstr_out_opdIdx_valid[i] = True
           o = 1
+        ILN_ldstr_out_opdIdx[i] = destRegIdx
+        ILN_ldstr_out_opdIdx_valid[i] = True
 
         op0, op0m = srcs[o+0]["value"], srcs[o+0]["type"]
         if op0m == "reg" and ILN_ldstr_ldprop_val_valid[getArchRegIdx(op0)]:
@@ -148,9 +147,11 @@ def allocate(instructions: List[str],
         else:
           ILN_ldstr_out_op0[i] = srcs[o+0]["value"]
           ILN_ldstr_out_op0m[i] = srcs[o+0]["type"]
+        
         if len(srcs) == (o+2):
           ILN_ldstr_out_op1v[i] = True
           op1, op1m = srcs[o+1]["value"], srcs[o+1]["type"]
+          #print(ILN_ldstr_ldprop_val_valid[getArchRegIdx(op1)])
           if op1m == "reg" and ILN_ldstr_ldprop_val_valid[getArchRegIdx(op1)]:
             sRegIdx = getArchRegIdx(op1)
             #if ILN_ldstr_ldprop_val_valid[sRegIdx]:
@@ -161,6 +162,9 @@ def allocate(instructions: List[str],
             ILN_ldstr_out_op1m[i] = srcs[o+1]["type"]
         else:
           ILN_ldstr_out_op1v[i] = False
+
+        if "value" in destReg:
+          ILN_ldstr_ldprop_val_valid[destRegIdx] = False
 
     for i in range(instr_batch_size-1, -1, -1): #str ILN
       t = 0
@@ -280,6 +284,8 @@ def allocate(instructions: List[str],
     ILN_rename_out_opcode = np.empty(instr_batch_size, dtype=object)
     ILN_rename_out_valid = np.zeros((instr_batch_size,), dtype=bool)
 
+    ILN_rename_out_retire_valid = np.zeros((instr_batch_size,), dtype=bool)
+
     #need to save old reg tracker values before theyre overwritten
     #needed for icon ILN
     MEM_ILN_rename_addr_euidx_q = MEM_ILN_rename_addr_euidx
@@ -357,8 +363,16 @@ def allocate(instructions: List[str],
       #for now, assign new address for each instruction dest reg
       #in future, could look at address reuse mechanisms (e.g. for instructions
       #which exec in the same eu, the op0 address can become the opd address)
+      #although it is looking that address reuse would be very difficult to do
+      #(especially if wanting to support the eus themselves going out of order)
       destRegIdx = ILN_rename_in_destRegIdx[i]
       #if not ILN_rename_addr_valid[destRegIdx]:
+      
+      mappingChanged = True #since no address reuse, mapping always changes
+      #if arch reg rename mapping changes, need to invalidate all instances of the old reg instance
+      #in any rx buffers it was sent to and the y buffer in the eu that originally assigned this reg instance
+      ILN_rename_out_retire_valid[i] = mappingChanged
+      
       ILN_rename_addr_euidx[destRegIdx] = alloc_alu
       ILN_rename_addr_uid[destRegIdx] = 0
       ILN_rename_addr_spec[destRegIdx] = alu_cache_idx_counter[alloc_alu]
@@ -370,11 +384,21 @@ def allocate(instructions: List[str],
       ILN_rename_out_opd_uid[i] = ILN_rename_addr_uid[destRegIdx]
       ILN_rename_out_opd_spec[i] = ILN_rename_addr_spec[destRegIdx]
 
+    for regidx in range(arch_reg_idx_range):
+      #if arch reg rename mapping changes, need to invalidate all instances of the old reg instance
+      #in any rx buffers it was sent to and the y buffer in the eu that originally assigned this reg instance
+
+      MEM_ILN_rename_addr_euidx[regidx] = ILN_rename_addr_euidx[regidx]
+      MEM_ILN_rename_addr_uid[regidx] = ILN_rename_addr_uid[regidx]
+      MEM_ILN_rename_addr_spec[regidx] = ILN_rename_addr_spec[regidx]
+      MEM_ILN_rename_addr_valid[regidx] = ILN_rename_addr_valid[regidx]
+
     # ----------------------------------
     # ILN icon instruction gen
     # ----------------------------------
 
     ILN_icongen_destreg_prop = np.zeros((arch_reg_idx_range,num_alus,2), dtype=bool)
+    ILN_icongen_destreg_prop_accumulated = MEM_ILN_icongen_destreg_prop_accumulated
     ILN_icongen_destreg_prop_src = []
     ILN_icongen_destreg_prop_src.append(MEM_ILN_rename_addr_euidx_q)
     ILN_icongen_destreg_prop_src.append(MEM_ILN_rename_addr_uid_q)
@@ -387,6 +411,16 @@ def allocate(instructions: List[str],
     ILN_icongen_out_icon_src_addr_spec = np.zeros((instr_batch_size+arch_reg_idx_range,), dtype=int)
     ILN_icongen_out_icon_invalidateSrc = np.zeros((instr_batch_size+arch_reg_idx_range,), dtype=bool)
     ILN_icongen_out_icon_valid = np.zeros((instr_batch_size+arch_reg_idx_range,), dtype=bool)
+
+    ILN_icongen_out_retire_rxlist = np.zeros((instr_batch_size,num_alus,2), dtype=int)
+    ILN_icongen_out_retire_euidx = np.zeros((instr_batch_size,), dtype=int)
+    ILN_icongen_out_retire_uid = np.zeros((instr_batch_size,), dtype=int)
+    ILN_icongen_out_retire_spec = np.zeros((instr_batch_size,), dtype=int)
+    ILN_icongen_out_retire_valid = np.zeros((instr_batch_size,), dtype=int)
+    
+    #add this as future improvement instead. For now, both strx and stry will be constant 1
+    #ILN_icongen_out_opd_strx = np.zeros((instr_batch_size,), dtype=bool)
+    #ILN_icongen_out_opd_stry = np.zeros((instr_batch_size,), dtype=bool)
 
     for i in range(instr_batch_size):
       alloc_alu = ILN_rename_in_eu_alloc[i]
@@ -401,26 +435,44 @@ def allocate(instructions: List[str],
         op0RegIdx = getArchRegIdx(ILN_rename_in_operands[0][i])
         if not (ILN_eu_alloc_out[i] == ILN_rename_out_op0_euidx[i]):
           ILN_icongen_destreg_prop[op0RegIdx][ILN_eu_alloc_out[i]][0] = True
-
+        
       if ILN_rename_in_op1v[i]:
         if ILN_rename_in_opm[1][i] == "reg":
           op1RegIdx = getArchRegIdx(ILN_rename_in_operands[1][i])
           if not (ILN_eu_alloc_out[i] == ILN_rename_out_op1_euidx[i]):
             ILN_icongen_destreg_prop[op1RegIdx][ILN_eu_alloc_out[i]][1] = True
 
+      #accumulate dest lists
+      for regidx in range(arch_reg_idx_range):
+        ILN_icongen_destreg_prop_accumulated[destRegIdx] = ILN_icongen_destreg_prop_accumulated[destRegIdx] | ILN_icongen_destreg_prop[destRegIdx]
+
       #dest reg handling
       #for each dest reg, dispatch icon instr corresponding to the cache address
       #of the previous instance of that reg (i.e. the addr before reassignment)
       #then reset dest list back to 0
       destRegIdx = ILN_rename_in_destRegIdx[i]
+
       ILN_icongen_out_icon_src_addr_euidx[i] = ILN_icongen_destreg_prop_src[0][destRegIdx]
       ILN_icongen_out_icon_src_addr_uid[i] = ILN_icongen_destreg_prop_src[1][destRegIdx]
       ILN_icongen_out_icon_src_addr_spec[i] = ILN_icongen_destreg_prop_src[2][destRegIdx]
+      
+      ILN_icongen_out_retire_euidx[i] = ILN_icongen_destreg_prop_src[0][destRegIdx]
+      ILN_icongen_out_retire_uid[i] = ILN_icongen_destreg_prop_src[1][destRegIdx]
+      ILN_icongen_out_retire_spec[i] = ILN_icongen_destreg_prop_src[2][destRegIdx]
+      
       hasdest = ILN_icongen_destreg_prop[destRegIdx].any()
       ILN_icongen_out_icon_valid[i] = hasdest
       ILN_icongen_out_icon_invalidateSrc[i] = True
+      ILN_icongen_out_retire_valid[i] = True
+
       ILN_icongen_out_icon_dist_destlist[i] = ILN_icongen_destreg_prop[destRegIdx]
+      ILN_icongen_out_retire_rxlist[i] = ILN_icongen_destreg_prop_accumulated[destRegIdx]
       ILN_icongen_destreg_prop[destRegIdx] = np.zeros((num_alus,2), dtype=bool)
+      ILN_icongen_destreg_prop_accumulated[destRegIdx] = np.zeros((num_alus,2), dtype=bool)
+
+      ILN_icongen_destreg_prop_src[0][destRegIdx] = ILN_rename_out_opd_euidx[i]
+      ILN_icongen_destreg_prop_src[1][destRegIdx] = ILN_rename_out_opd_uid[i]
+      ILN_icongen_destreg_prop_src[2][destRegIdx] = ILN_rename_out_opd_spec[i]
     
     #after batch, any outstanding dest lists (which appear
     #when src reg is not reassigned but is used in other eus)
@@ -434,6 +486,7 @@ def allocate(instructions: List[str],
       ILN_icongen_out_icon_src_addr_spec[i] = ILN_icongen_destreg_prop_src[2][i-instr_batch_size]
       ILN_icongen_out_icon_dist_destlist[i] = ILN_icongen_destreg_prop[destRegIdx]
 
+    MEM_ILN_icongen_destreg_prop_accumulated = ILN_icongen_destreg_prop_accumulated
 
     # ----------------------------------
     # print output
@@ -449,6 +502,20 @@ def allocate(instructions: List[str],
           print(1 if ILN_icongen_out_icon_dist_destlist[i][j][1] else 0, end=",")
         print("\t" + str(ILN_icongen_out_icon_invalidateSrc[i]), end="")
         print()
+
+      #leave retire instructions for now
+      #if ILN_icongen_out_retire_valid[i]:
+      #  print("-3\tretire", end="\t")
+      #  print(str(ILN_icongen_out_retire_euidx[i]), end=",")
+      #  print(str(ILN_icongen_out_retire_uid[i]), end=",")
+      #  print(str(ILN_icongen_out_retire_spec[i]), end="\t")
+      #  for j in range(num_alus):
+      #    print(1 if ILN_icongen_out_retire_rxlist[i][j][0] else 0, end="")
+      #    print(1 if ILN_icongen_out_retire_rxlist[i][j][1] else 0, end=",")
+      #  print()
+
+      if ILN_eu_alloc_out[i] < 0:
+        continue
       
       print(ILN_eu_alloc_out[i], end="\t")
       print(ILN_rename_out_opcode[i], end="\t")
@@ -470,3 +537,9 @@ def allocate(instructions: List[str],
         print(ILN_rename_out_op1_spec[i], end="\n")
       else:
         print(str(ILN_rename_out_op1_imm[i]), end="\n")
+
+
+#arch_destreg_new_addr_eidx = alloc_alu
+#      arch_destreg_new_addr_uid = 0
+#      arch_destreg_new_addr_spec = alu_cache_idx_counter[alloc_alu]
+#      arch_destreg_new_addr_valid = True

@@ -163,7 +163,8 @@ package pkg_dtypes;
     enum_instr_operand_type  op1m;
                                //NOTE: opxm assignments are based on path lengths. This gives shorter ones
     type_exec_unit_addr  opd;
-    //logic                force_foreign; //forces opd to go to tx, even if euidx matches executing unit id
+    //logic                opd_stry;
+    //logic                opd_strx;
   } type_iqueue_entry;
 
   // ----------------------------------------
