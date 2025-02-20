@@ -22,16 +22,34 @@ def get_next_alu_cache_idx(alu_cache_idx_counter: dict, alu_idx: int) -> dict:
 
 def allocate(instructions: List[str],
              max_instr_batch_size: int = 8,
-             num_alus: int = 4,
-             alu_alloc_lookback_size: int = 2,
+             num_alus: int = 10,
+             alu_alloc_lookback_size: int = 1,
              arch_reg_idx_range: int = getNumArchReg(),
-             str_tracker_ram_size: int = 16) -> List[dict]:
+             str_tracker_ram_size: int = 16,
+             output_filename: str = "renamedAssembly.txt") -> List[dict]:
   
   alu_cache_idx_counter: dict = {}
   for i in range(0, num_alus):
     alu_cache_idx_counter[i] = 0
 
   num_evaluated_instr: int = 0
+
+  renamed_output = open(output_filename, "w")
+  renamed_output_formats = open(output_filename + "_formats.txt", "w")
+  original_stdout = sys.stdout
+  stdouts = [renamed_output, original_stdout]
+  
+	#for the proof of concept, to keep it simple, load prefetch will be assumed to work every time
+  #to emulate this in the model, the ld register will store all the necessary data that is specified
+  #by the ldr in the input assembly
+  #for performance analysis, a stochastic evaluation of the prefetch success could be worked out by considering
+  #the hit rate and latency of l1 cache. (Note that if l1 cache latency too high, then a solution could be to make the ld
+  #reg bigger (effectively making it an l0 cache)).
+  l0_cache = np.zeros((7,), dtype=int)
+  for i in range(7): #load it with some data
+    l0_cache[i] = i+1
+
+  mx_reg_file = np.zeros((8,), dtype=int)
 
   # ----------------------------------------
   # memory units within the ILN pipeline
@@ -69,7 +87,7 @@ def allocate(instructions: List[str],
     for i in range(0, instr_batch_size):
       valid, instr, destReg, srcs = decompInstruction(instructions[num_evaluated_instr + i])
       if not valid:
-        print("Malformed instruction detected")
+        print("Malformed instruction detected at line: " + str(num_evaluated_instr+i))
         sys.exit(1)
       #in the Python model the branches wont be evaluated (for now)
       #instead, the branches which are triggered are specified externally
@@ -103,6 +121,7 @@ def allocate(instructions: List[str],
       instr = ILN_ldstr_in[i]
       srcs = instr["srcs"]
       destReg = instr["destReg"]
+      #print(instr)
 
       ILN_ldstr_out_opcode[i] = instr["instr"]
       
@@ -327,7 +346,11 @@ def allocate(instructions: List[str],
         prefetch_successful = True
         if prefetch_successful:
           ILN_rename_out_op0m[i] = "imm"
-          ILN_rename_out_op0_imm[i] = "#1234" #temp
+          #ILN_rename_out_op0_imm[i] = "#1234" #temp
+          mem_ops = ILN_rename_in_operands[0][i].split("+")
+          mx_data = mx_reg_file[int(mem_ops[0].replace("m",""))] #note this assumes mx reg is always first operand (this is fine for proof of concept)
+          mx_offset = int(mem_ops[1].replace("#",""))
+          ILN_rename_out_op0_imm[i] = "#" + str(l0_cache[mx_data+mx_offset])
         else:
           ILN_rename_out_op0m[i] = "mem"
           ILN_rename_out_op0_imm[i] = ILN_rename_in_operands[0][i]
@@ -348,7 +371,12 @@ def allocate(instructions: List[str],
           prefetch_successful = True
           if prefetch_successful:
             ILN_rename_out_op1m[i] = "imm"
-            ILN_rename_out_op1_imm[i] = "#1234" #temp
+            #ILN_rename_out_op1_imm[i] = "#1234" #temp
+            mem_ops = ILN_rename_in_operands[1][i].split("+")
+            #print(mem_ops)
+            mx_data = mx_reg_file[int(mem_ops[0].replace("m",""))] #note this assumes mx reg is always first operand (this is fine for proof of concept)
+            mx_offset = int(mem_ops[1].replace("#",""))
+            ILN_rename_out_op1_imm[i] = "#" + str(l0_cache[mx_data+mx_offset])
           else:
             ILN_rename_out_op1m[i] = "mem"
             ILN_rename_out_op1_imm[i] = ILN_rename_in_operands[1][i]
@@ -441,6 +469,7 @@ def allocate(instructions: List[str],
           op1RegIdx = getArchRegIdx(ILN_rename_in_operands[1][i])
           if not (ILN_eu_alloc_out[i] == ILN_rename_out_op1_euidx[i]):
             ILN_icongen_destreg_prop[op1RegIdx][ILN_eu_alloc_out[i]][1] = True
+            #print(ILN_icongen_destreg_prop)
 
       #accumulate dest lists
       for regidx in range(arch_reg_idx_range):
@@ -477,6 +506,7 @@ def allocate(instructions: List[str],
     #after batch, any outstanding dest lists (which appear
     #when src reg is not reassigned but is used in other eus)
     #should also be dispatched
+    #print(ILN_icongen_destreg_prop)
     for i in range(instr_batch_size, instr_batch_size+arch_reg_idx_range):
       hasdest = ILN_icongen_destreg_prop[i-instr_batch_size].any()
       ILN_icongen_out_icon_valid[i] = hasdest
@@ -484,59 +514,95 @@ def allocate(instructions: List[str],
       ILN_icongen_out_icon_src_addr_euidx[i] = ILN_icongen_destreg_prop_src[0][i-instr_batch_size]
       ILN_icongen_out_icon_src_addr_uid[i] = ILN_icongen_destreg_prop_src[1][i-instr_batch_size]
       ILN_icongen_out_icon_src_addr_spec[i] = ILN_icongen_destreg_prop_src[2][i-instr_batch_size]
-      ILN_icongen_out_icon_dist_destlist[i] = ILN_icongen_destreg_prop[destRegIdx]
+      ILN_icongen_out_icon_dist_destlist[i] = ILN_icongen_destreg_prop[i-instr_batch_size]
 
     MEM_ILN_icongen_destreg_prop_accumulated = ILN_icongen_destreg_prop_accumulated
 
     # ----------------------------------
     # print output
+    # instruction format code: 4 signals, iconmv(1) or alu(0), op0m, op1v, op1m
     # ----------------------------------
-    for i in range(instr_batch_size):
-      if ILN_icongen_out_icon_valid[i]:
-        print("-2\ticonmv", end="\t")
-        print(str(ILN_icongen_out_icon_src_addr_euidx[i]), end=",")
-        print(str(ILN_icongen_out_icon_src_addr_uid[i]), end=",")
-        print(str(ILN_icongen_out_icon_src_addr_spec[i]), end="\t")
-        for j in range(num_alus):
-          print(1 if ILN_icongen_out_icon_dist_destlist[i][j][0] else 0, end="")
-          print(1 if ILN_icongen_out_icon_dist_destlist[i][j][1] else 0, end=",")
-        print("\t" + str(ILN_icongen_out_icon_invalidateSrc[i]), end="")
-        print()
+    output_formats = True
+    for o in stdouts:
+      sys.stdout = o
+      for i in range(instr_batch_size):
+        if ILN_icongen_out_icon_valid[i]:
+          if output_formats:
+            renamed_output_formats.write("1000\n")
+          print("-2\ticonmv", end="\t")
+          print(str(ILN_icongen_out_icon_src_addr_euidx[i]), end=",")
+          print(str(ILN_icongen_out_icon_src_addr_uid[i]), end=",")
+          print(str(ILN_icongen_out_icon_src_addr_spec[i]), end="\t")
+          for j in range(num_alus):
+            print(1 if ILN_icongen_out_icon_dist_destlist[i][j][0] else 0, end="")
+            print(1 if ILN_icongen_out_icon_dist_destlist[i][j][1] else 0, end=",")
+          print("\t" + str(ILN_icongen_out_icon_invalidateSrc[i]), end="")
+          print()
 
-      #leave retire instructions for now
-      #if ILN_icongen_out_retire_valid[i]:
-      #  print("-3\tretire", end="\t")
-      #  print(str(ILN_icongen_out_retire_euidx[i]), end=",")
-      #  print(str(ILN_icongen_out_retire_uid[i]), end=",")
-      #  print(str(ILN_icongen_out_retire_spec[i]), end="\t")
-      #  for j in range(num_alus):
-      #    print(1 if ILN_icongen_out_retire_rxlist[i][j][0] else 0, end="")
-      #    print(1 if ILN_icongen_out_retire_rxlist[i][j][1] else 0, end=",")
-      #  print()
+        #leave retire instructions for now
+        #if ILN_icongen_out_retire_valid[i]:
+        #  print("-3\tretire", end="\t")
+        #  print(str(ILN_icongen_out_retire_euidx[i]), end=",")
+        #  print(str(ILN_icongen_out_retire_uid[i]), end=",")
+        #  print(str(ILN_icongen_out_retire_spec[i]), end="\t")
+        #  for j in range(num_alus):
+        #    print(1 if ILN_icongen_out_retire_rxlist[i][j][0] else 0, end="")
+        #    print(1 if ILN_icongen_out_retire_rxlist[i][j][1] else 0, end=",")
+        #  print()
 
-      if ILN_eu_alloc_out[i] < 0:
-        continue
+        if ILN_eu_alloc_out[i] < 0:
+          continue
+        
+        print(ILN_eu_alloc_out[i], end="\t")
+        print(ILN_rename_out_opcode[i], end="\t")
+
+        print(ILN_rename_out_opd_euidx[i], end=",")
+        print(ILN_rename_out_opd_uid[i], end=",")
+        print(ILN_rename_out_opd_spec[i], end="\t")
+        
+        instr_fmt = 0
+        if ILN_rename_out_op0m[i] == "reg":
+          print(ILN_rename_out_op0_euidx[i], end=",")
+          print(ILN_rename_out_op0_uid[i], end=",")
+          print(ILN_rename_out_op0_spec[i], end="\t")
+          instr_fmt |= 100
+        else:
+          print(str(ILN_rename_out_op0_imm[i]), end="\t")
+
+        if ILN_rename_out_op1v[i] and (ILN_rename_out_op1m[i] == "reg"):
+          print(ILN_rename_out_op1_euidx[i], end=",")
+          print(ILN_rename_out_op1_uid[i], end=",")
+          print(ILN_rename_out_op1_spec[i], end="\n")
+          instr_fmt |= 11
+        else:
+          print(str(ILN_rename_out_op1_imm[i]), end="\n")
+          instr_fmt |= int(ILN_rename_out_op1v[i]) * 10
+
+        if output_formats:
+            s = str(instr_fmt)
+            for c in range(len(s), 4):
+              s = "0" + s
+            renamed_output_formats.write(s + "\n")  
+
+      for i in range(instr_batch_size, instr_batch_size+arch_reg_idx_range):
+        if ILN_icongen_out_icon_valid[i]:
+          if output_formats:
+            renamed_output_formats.write("1000\n")
+          print("-2\ticonmv", end="\t")
+          print(str(ILN_icongen_out_icon_src_addr_euidx[i]), end=",")
+          print(str(ILN_icongen_out_icon_src_addr_uid[i]), end=",")
+          print(str(ILN_icongen_out_icon_src_addr_spec[i]), end="\t")
+          for j in range(num_alus):
+            print(1 if ILN_icongen_out_icon_dist_destlist[i][j][0] else 0, end="")
+            print(1 if ILN_icongen_out_icon_dist_destlist[i][j][1] else 0, end=",")
+          print("\t" + str(ILN_icongen_out_icon_invalidateSrc[i]), end="")
+          print()
       
-      print(ILN_eu_alloc_out[i], end="\t")
-      print(ILN_rename_out_opcode[i], end="\t")
+      output_formats = False
 
-      print(ILN_rename_out_opd_euidx[i], end=",")
-      print(ILN_rename_out_opd_uid[i], end=",")
-      print(ILN_rename_out_opd_spec[i], end="\t")
-      
-      if ILN_rename_out_op0m[i] == "reg":
-        print(ILN_rename_out_op0_euidx[i], end=",")
-        print(ILN_rename_out_op0_uid[i], end=",")
-        print(ILN_rename_out_op0_spec[i], end="\t")
-      else:
-        print(str(ILN_rename_out_op0_imm[i]), end="\t")
-
-      if ILN_rename_out_op1v[i] and (ILN_rename_out_op1m[i] == "reg"):
-        print(ILN_rename_out_op1_euidx[i], end=",")
-        print(ILN_rename_out_op1_uid[i], end=",")
-        print(ILN_rename_out_op1_spec[i], end="\n")
-      else:
-        print(str(ILN_rename_out_op1_imm[i]), end="\n")
+  sys.stdout = original_stdout
+  renamed_output.close()
+  renamed_output_formats.close()
 
 
 #arch_destreg_new_addr_eidx = alloc_alu

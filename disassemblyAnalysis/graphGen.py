@@ -29,6 +29,7 @@ def getTokens(line) -> List[str]:
     return tokens
 
 def getOperands(tokens) -> List[dict]:
+    #print(tokens)
     commentTokenIdx: int = 100
     for i in range(3, len(tokens)):
         if tokens[i][0] ==  ";":

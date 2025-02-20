@@ -8,3 +8,11 @@
 `endif
 
 `define SIM_TB_MODULE(m) ``m```VERIF_MODULE_SUFFIX
+
+//additional sim only defines
+
+//renamed assembly output from emulated front end
+//this should be set a cmd line
+`ifndef BACKEND_ASSEMBLY_TXT_PATH
+`define BACKEND_ASSEMBLY_TXT_PATH
+`endif

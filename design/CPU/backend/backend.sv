@@ -145,6 +145,7 @@ module u_backend import pkg_dtypes::*; #(
     end
 
     execution_unit #( //WIP. THis module without the IQueue only exists for verif purposes
+      .NUM_PARALLEL_INSTR_DISPATCHES(NUM_PARALLEL_INSTR_DISPATCHES),
       .EU_IDX(eu_idx)
     ) eu (
       .clk(clk),

@@ -5,8 +5,11 @@ dict with argv {
   #get script path. Assumes batch command passes absolute path to script in -source arg
   set script_path [ file dirname [ file normalize [ info script ] ] ]
   set root_dir [file dirname $script_path]
+  set disassemblyAnalysis_dir "$root_dir/disassemblyAnalysis"
+  set backend_test_renamed_instr "$disassemblyAnalysis_dir/renamedAssembly.txt"
   puts "Script path: $script_path"
   puts "Root directory: $root_dir"
+  puts "Disassembly directory: $disassemblyAnalysis_dir"
 
   #set part name to digilent zybo Z7-10 (assumes board files have been manually installed for vivado)
   set part_name xc7z010clg400-1
@@ -57,8 +60,8 @@ dict with argv {
     add_files -fileset $simset_name $mode_sim_def_file -verbose
 
     #set properties
-    set_property -name {xsim.compile.xvlog.more_options} -value "-L uvm -d MODE_SIMULATION -i $root_dir/projectHeaders -i $root_dir/sim/seqItems" -objects [get_fileset $simset_name] -verbose
-    set_property -name {xsim.elaborate.xelab.more_options} -value "-L uvm -d MODE_SIMULATION -i $root_dir/projectHeaders -i $root_dir/sim/seqItems" -objects [get_fileset $simset_name] -verbose
+    set_property -name {xsim.compile.xvlog.more_options} -value "-L uvm -d MODE_SIMULATION -d BACKEND_ASSEMBLY_TXT_PATH=$backend_test_renamed_instr -i $root_dir/projectHeaders -i $root_dir/sim/seqItems" -objects [get_fileset $simset_name] -verbose
+    set_property -name {xsim.elaborate.xelab.more_options} -value "-L uvm -d MODE_SIMULATION -d BACKEND_ASSEMBLY_TXT_PATH=$backend_test_renamed_instr -i $root_dir/projectHeaders -i $root_dir/sim/seqItems" -objects [get_fileset $simset_name] -verbose
     set_property -name {xsim.simulate.custom_tcl} -value "$script_path/runSim.tcl" -objects [get_fileset $simset_name] -verbose
     set_property -name {xsim.simulate.runtime} -value "10000ns" -objects [get_fileset $simset_name] -verbose
     set_property -name {xsim.compile.xsc.mt_level} -value "8" -objects [get_fileset $simset_name] -verbose

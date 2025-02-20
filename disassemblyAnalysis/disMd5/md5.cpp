@@ -132,7 +132,8 @@ private:
     static uint32_t ff(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t s, uint32_t t) {
         return (a + ((b & c) | (~b & d)) + x + t) << s | (a + ((b & c) | (~b & d)) + x + t) >> (32 - s);
     }
-
+		
+		//in proof of concept, the l0 cache has a in addr 0, b in addr 1, c in addr 2, etc..
     static uint32_t gg(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t s, uint32_t t) {
         return (a + ((b & d) | (c & ~d)) + x + t) << s | (a + ((b & d) | (c & ~d)) + x + t) >> (32 - s);
     }

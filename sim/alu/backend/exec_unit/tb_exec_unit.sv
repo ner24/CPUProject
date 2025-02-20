@@ -3,7 +3,6 @@ import uvm_pkg::*;
 
 `include "design_parameters.sv"
 `include "simulation_parameters.sv"
-`include "seqItem_exec_unit.sv"
 
 //typedef class eu_cache_monitor;
 
