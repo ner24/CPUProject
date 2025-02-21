@@ -26,7 +26,7 @@ def allocate(instructions: List[str],
              alu_alloc_lookback_size: int = 1,
              arch_reg_idx_range: int = getNumArchReg(),
              str_tracker_ram_size: int = 16,
-             output_filename: str = "renamedAssembly.txt") -> List[dict]:
+             output_filename: str = "forSim/renamedAssembly.txt") -> List[dict]:
   
   alu_cache_idx_counter: dict = {}
   for i in range(0, num_alus):

@@ -1,6 +1,6 @@
 `include "design_parameters.sv"
 
-interface intf_alu import pkg_dtypes::*; #(
+interface intf_backend import pkg_dtypes::*; #(
 ) (
   input wire clk
 );

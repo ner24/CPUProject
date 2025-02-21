@@ -4,4 +4,6 @@
 //this does mean that vivado has to restart when switching
 //between synth and sim (or this file can be removed/added from hierarchy
 //manually in the IDE)
+`ifndef MODE_SIMULATION
 `define MODE_SIMULATION
+`endif

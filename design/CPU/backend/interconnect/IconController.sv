@@ -44,7 +44,7 @@ module back_icon_controller import pkg_dtypes::*; #(
     assign icon_instr_dispatch_ready_o[ch_idx] = ~is_queue_full;
     back_icon_IQueue #(
       .LOG2_QUEUE_LENGTH(LOG2_QUEUE_LENGTH)
-    ) (
+    ) channel_iqueue (
       .clk(clk),
       .reset_n(reset_n),
 

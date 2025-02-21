@@ -39,9 +39,9 @@ lint_back: env_setup
 elab_back: env_setup
 	$(CMD_BACKEND_BASE) job_type elab
 sim_back: env_setup
-	$(CMD_BACKEND_BASE) job_type sim
+	$(CMD_BACKEND_BASE) job_type sim sim_module_top backend_tb_top
 simlint_back: env_setup
-	$(CMD_BACKEND_BASE) job_type simlint
+	$(CMD_BACKEND_BASE) job_type simlint sim_module_top backend_tb_top
 
 #exec unit
 CMD_EU_BASE:= cd $(VIVADO_DIR); vivado -mode tcl -source $(ROOT_DIR_ABS)/prj.tcl -tclargs module_top execution_unit $(TCL_ARGS_EXTRA)

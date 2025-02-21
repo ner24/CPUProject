@@ -2,6 +2,7 @@ import uvm_pkg::*;
 `include "uvm_macros.svh"
 
 `include "seqItem_backend.sv"
+`include "design_parameters.sv"
 
 class backend_sequencer extends uvm_sequencer #(backend_sequence_item);
   `uvm_component_utils(backend_sequencer)
@@ -15,7 +16,7 @@ class backend_driver extends uvm_driver #(backend_sequence_item);
 
   `uvm_component_utils(backend_driver)
 
-  virtual intf_eu vintf;
+  virtual intf_backend vintf;
   
   function new(string name = "test_design_driver", uvm_component parent = null);
     super.new(name, parent);
@@ -24,7 +25,7 @@ class backend_driver extends uvm_driver #(backend_sequence_item);
   virtual function void build_phase(uvm_phase phase);
     `uvm_info(get_full_name(), "Building...", UVM_LOW)
     super.build_phase(phase);
-    if(!uvm_config_db#( virtual intf_eu )::get(this, "", "intf_backend_top", vintf)) begin
+    if(!uvm_config_db#( virtual intf_backend )::get(this, "", "intf_backend_top", vintf)) begin
       `uvm_fatal(get_type_name(), "Could not find specified backend interface. Check interface in uvm config")
     end
   endfunction
@@ -37,22 +38,41 @@ class backend_driver extends uvm_driver #(backend_sequence_item);
 
   virtual task run_phase(uvm_phase phase);
     forever begin
-      @(posedge vintf.clk);
+      //all packets should have at least 1 valid eu instr, but may not have valid icon instr
+      //logic has_valid_icon;
+      logic icon_ready_all;
+      logic drive_trigger;
+      
       seq_item_port.get_next_item(req);
+      icon_ready_all = 1'b1;
+      //has_valid_icon = 1'b0;
+      for(int i = 0; i < 2**`LOG2_NUM_ICON_CHANNELS; i++) begin
+        /*if(req.icon_instr_dispatch_valid_i[i]) begin
+          has_valid_icon = 1'b1;
+        end*/
+        if(~vintf.icon_instr_dispatch_ready_o[i]) begin
+          icon_ready_all = 1'b0;
+        end
+      end
+
+      drive_trigger = vintf.clk & vintf.instr_dispatch_ready_o & icon_ready_all;
+
+      //only switch to next item when backend is ready
+      @(posedge drive_trigger);
       drive(req);
       seq_item_port.item_done();
     end
   endtask
 
   virtual task drive(backend_sequence_item seq_item);
-    vintf.reset_n      = seq_item.reset_n;
-    vintf.instr_dispatch_i     = seq_item.instr_dispatch_i;
-    vintf.instr_dispatch_valid_i    = seq_item.instr_dispatch_valid_i;
+    vintf.reset_n                     = seq_item.reset_n;
+    vintf.instr_dispatch_i            = seq_item.instr_dispatch_i;
+    vintf.instr_dispatch_valid_i      = seq_item.instr_dispatch_valid_i;
     vintf.dispatched_instr_alloc_euidx_i = seq_item.dispatched_instr_alloc_euidx_i;
-    vintf.instr_dispatch_ready_o    = seq_item.instr_dispatch_ready_o;
-    vintf.icon_instr_dispatch_i = seq_item.icon_instr_dispatch_i;
+    //vintf.instr_dispatch_ready_o      = seq_item.instr_dispatch_ready_o;
+    vintf.icon_instr_dispatch_i       = seq_item.icon_instr_dispatch_i;
     vintf.icon_instr_dispatch_valid_i = seq_item.icon_instr_dispatch_valid_i;
-    vintf.icon_instr_dispatch_ready_o = seq_item.icon_instr_dispatch_ready_o;
+    //vintf.icon_instr_dispatch_ready_o = seq_item.icon_instr_dispatch_ready_o;
   endtask
 endclass
 

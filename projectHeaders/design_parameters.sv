@@ -27,7 +27,7 @@
 // --------------------------------
 // Back end top level params
 // --------------------------------
-`define LOG2_NUM_EXEC_UNITS 2
+`define LOG2_NUM_EXEC_UNITS 3
 `define LOG2_NUM_ICON_CHANNELS 2
 `define NUM_PARALLEL_INSTR_DISPATCHES 8
 

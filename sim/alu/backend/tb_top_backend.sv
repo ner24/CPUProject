@@ -4,7 +4,7 @@
 
 //tests have to be included to trigger compile
 //so uvm can find them
-//`include "eu_tests/test_general.sv"
+`include "test_backend_0.sv"
 
 //`timescale 100ps/1ps
 
@@ -23,7 +23,7 @@ module backend_tb_top import uvm_pkg::*; (
   );
 
   initial begin
-    uvm_config_db #( virtual intf_eu )::set(null, "*", "intf_backend_top", intf);
+    uvm_config_db #( virtual intf_backend )::set(null, "*", "intf_backend_top", intf);
   end
 
   `SIM_TB_MODULE(u_backend) #(
@@ -47,7 +47,6 @@ module backend_tb_top import uvm_pkg::*; (
   );
 
   initial begin
-    //run_test("execution_unit_test_general");
-    run_test("execution_unit_test_rx0_add_rx1");
+    run_test("backend_test_0");
   end
 endmodule

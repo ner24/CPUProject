@@ -13,6 +13,8 @@
 
 //renamed assembly output from emulated front end
 //this should be set a cmd line
-`ifndef BACKEND_ASSEMBLY_TXT_PATH
-`define BACKEND_ASSEMBLY_TXT_PATH
+`ifndef BACKEND_ASSEMBLY_TXT_PATH_WITHOUT_QUOTES
+`define BACKEND_ASSEMBLY_TXT_PATH_WITHOUT_QUOTES
 `endif
+`define QUOTE_WRAP(w) `"w`"
+`define BACKEND_ASSEMBLY_TXT_PATH `QUOTE_WRAP(`BACKEND_ASSEMBLY_TXT_PATH_WITHOUT_QUOTES)

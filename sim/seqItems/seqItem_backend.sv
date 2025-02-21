@@ -1,5 +1,5 @@
-`ifndef EU_SEQITEM_INCLUDE
-`define EU_SEQITEM_INCLUDE
+`ifndef BACKEND_SEQITEM_INCLUDE
+`define BACKEND_SEQITEM_INCLUDE
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 
