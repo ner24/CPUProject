@@ -12,7 +12,8 @@
     
     "files.eol": "\r\n",
     "files.associations": {
-        "vector": "cpp",
-        "complex": "cpp"
+      "vector": "cpp",
+      "complex": "cpp",
+      "ostream": "cpp"
     }
 }

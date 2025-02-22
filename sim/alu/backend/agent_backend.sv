@@ -38,27 +38,11 @@ class backend_driver extends uvm_driver #(backend_sequence_item);
 
   virtual task run_phase(uvm_phase phase);
     forever begin
-      //all packets should have at least 1 valid eu instr, but may not have valid icon instr
-      //logic has_valid_icon;
-      logic icon_ready_all;
-      logic drive_trigger;
-      
       seq_item_port.get_next_item(req);
-      icon_ready_all = 1'b1;
-      //has_valid_icon = 1'b0;
-      for(int i = 0; i < 2**`LOG2_NUM_ICON_CHANNELS; i++) begin
-        /*if(req.icon_instr_dispatch_valid_i[i]) begin
-          has_valid_icon = 1'b1;
-        end*/
-        if(~vintf.icon_instr_dispatch_ready_o[i]) begin
-          icon_ready_all = 1'b0;
-        end
-      end
-
-      drive_trigger = vintf.clk & vintf.instr_dispatch_ready_o & icon_ready_all;
 
       //only switch to next item when backend is ready
-      @(posedge drive_trigger);
+      //@(posedge vintf.clk);
+      @(posedge vintf.clk & vintf.instr_dispatch_ready_o & vintf.icon_instr_dispatch_ready_all_o);
       drive(req);
       seq_item_port.item_done();
     end

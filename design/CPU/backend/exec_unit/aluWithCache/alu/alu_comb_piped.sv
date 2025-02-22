@@ -8,6 +8,7 @@ module alu_comb_piped #(
   input  wire  [DATA_WIDTH-1:0] a,
   input  wire  [DATA_WIDTH-1:0] b,
   output wire  [DATA_WIDTH-1:0] out,
+  input  wire                  out_en,
   output wire                  cout, //17th bit. Carry out for addition
   input  wire            [7:0] ctrl,
   input  wire                  cin,
@@ -146,7 +147,7 @@ module alu_comb_piped #(
   // ----------------------------------------
   // Outputs
   // ----------------------------------------
-  assign out  = out_s2;
-  assign cout = cout_s2;
+  assign out  = out_en ? out_s2 : 'b0;
+  assign cout = out_en ? cout_s2 : 'b0;
 
 endmodule

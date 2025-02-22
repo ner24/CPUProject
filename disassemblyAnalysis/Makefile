@@ -2,7 +2,8 @@ CC=arm-linux-gnueabihf-gcc
 CXX=arm-linux-gnueabihf-g++
 OBJDUMP=arm-linux-gnueabihf-objdump
 
-FILENAME=fft
+#FILENAME=fft
+FILENAME=disMd5/md5ggOnly
 
 obj:
 	$(CXX) -c srcs/$(FILENAME).cpp -o $(FILENAME).o
@@ -16,7 +17,7 @@ dmp_sig: $(FILENAME).o
 
 #sanity check that source code can run without error
 test:
-	$(CXX) $(FILENAME).cpp -o test
+	g++ $(FILENAME).cpp -o test
 	./test
 	rm test
 

@@ -15,11 +15,12 @@ module sva_alu_op import pkg_dtypes::*; #(
 );
 
   wire [DATA_WIDTH-1:0] in_a, in_b, out;
-  wire [$bits(curr_instr_i.specific_instr)-1:0] alu_cir;
+  //wire [$bits(curr_instr_i.specific_instr)-1:0] alu_cir;
+  wire enum_instr_exec_unit alu_cir;
   assign in_a = alu_rx_i.op0_data;
   assign in_b = alu_rx_i.op1_data;
   assign out  = alu_tx_o.opd_data;
-  assign alu_cir = curr_instr_i.specific_instr;
+  assign alu_cir = enum_instr_exec_unit'(curr_instr_i.specific_instr);
 
   //check CIR value is valid (i.e. betwene h0 and hc)
   /*logic sva_prop_alu_cir;
@@ -41,7 +42,7 @@ module sva_alu_op import pkg_dtypes::*; #(
                         in_b_q,
                         in_b_q2,
                         in_b_sync;
-  logic           [3:0] alu_cir_q,
+  enum_instr_exec_unit  alu_cir_q,
                         alu_cir_q2,
                         alu_cir_sync;
   generate if (USE_PIPELINED_ALU) begin
@@ -89,27 +90,27 @@ module sva_alu_op import pkg_dtypes::*; #(
   end endgenerate
 
   //check ALU logic is valid (i.e. check operations are working correctly)
-  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == 4'h0) & curr_instr_valid_i |-> out == ~in_a_sync)
+  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == MVN) & curr_instr_valid_i |-> out == ~in_a_sync)
   else `uvm_error("SVA_ALU_OP", $sformatf("%0d -> NOT operation incorrect: %b -> %b", $time(), in_a_sync, out));
 
-  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == 4'h1) & curr_instr_valid_i |-> out == (in_b_sync & in_a_sync))
+  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == AND) & curr_instr_valid_i |-> out == (in_b_sync & in_a_sync))
   else `uvm_error("SVA_ALU_OP", $sformatf("%0d -> AND operation incorrect: %b %b -> %b", $time(), in_a_sync, in_b_sync, out));
 
-  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == 4'h2) & curr_instr_valid_i |-> out == (in_b_sync | in_a_sync))
+  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == ORR) & curr_instr_valid_i |-> out == (in_b_sync | in_a_sync))
   else `uvm_error("SVA_ALU_OP", $sformatf("%0d -> OR operation incorrect: %b %b -> %b", $time(), in_a_sync, in_b_sync, out));
 
-  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == 4'h3) & curr_instr_valid_i |-> out == (in_b_sync ^ in_a_sync))
+  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == XOR) & curr_instr_valid_i |-> out == (in_b_sync ^ in_a_sync))
   else `uvm_error("SVA_ALU_OP", $sformatf("%0d -> XOR operation incorrect: %b %b -> %b", $time(), in_a_sync, in_b_sync, out));
 
-  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == 4'h6) & curr_instr_valid_i |-> out == ~(in_b_sync & in_a_sync))
+  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == NAND) & curr_instr_valid_i |-> out == ~(in_b_sync & in_a_sync))
   else `uvm_error("SVA_ALU_OP", $sformatf("%0d -> NAND operation incorrect: %b %b -> %b", $time(), in_a_sync, in_b_sync, out));
 
   //TODO: add NOR and XNOR checks. Also MUL, DIV when they get added to design
 
-  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == 4'h4) & curr_instr_valid_i |-> out == (in_b_sync + in_a_sync))
+  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == ADD) & curr_instr_valid_i |-> out == (in_b_sync + in_a_sync))
   else `uvm_error("SVA_ALU_OP", $sformatf("%0d -> ADD operation incorrect: %b %b -> %b", $time(), in_a_sync, in_b_sync, out));
   
-  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == 4'h5) & curr_instr_valid_i |-> out == (in_b_sync - in_a_sync))
+  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == SUB) & curr_instr_valid_i |-> out == (in_b_sync - in_a_sync))
   else `uvm_error("SVA_ALU_OP", $sformatf("%0d -> SUB operation incorrect: %b %b -> %b", $time(), in_a_sync, in_b_sync, out));
 
 endmodule

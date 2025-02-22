@@ -5,6 +5,7 @@ module alu_comb #(
     input  wire  [DATA_WIDTH-1:0] a,
     input  wire  [DATA_WIDTH-1:0] b,
     output wire  [DATA_WIDTH-1:0] out,
+    input  wire                   out_en,
     output wire                   cout, //17th bit. Carry out for addition
     input  wire             [7:0] ctrl,
     input  wire                   cin
@@ -48,13 +49,14 @@ module alu_comb #(
     
     //top half
     wire[DATA_WIDTH - 1:0] cla_s;
+    wire cout_internal;
     alu_add_cla_uh #(
         .DATA_WIDTH(DATA_WIDTH)
     ) cla_uh_0 (
         .oX(cla_lh_oX),
         .cgen(cla_lh_cgen),
         .cin(cin),
-        .cout(cout),
+        .cout(cout_internal),
         .s(cla_s),
         .carry_en(ctrl[3])
     );
@@ -66,8 +68,12 @@ module alu_comb #(
     end endgenerate
 
     //xor invert array
+    wire [DATA_WIDTH-1:0] out_internal;
     generate for(genvar i = 0; i < DATA_WIDTH; i = i + 1) begin
-        assign out[i] = out_nI[i] ^ ctrl[0];
+        assign out_internal[i] = out_nI[i] ^ ctrl[0];
     end endgenerate
+
+    assign out = out_en ? out_internal : 'b0;
+    assign cout = out_en ? cout_internal : 'b0;
 
 endmodule: alu_comb

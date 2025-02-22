@@ -80,5 +80,12 @@ module `SIM_TB_MODULE(execution_unit) import uvm_pkg::*; import pkg_dtypes::*; #
   // --------------------
   // VERIF
   // --------------------
+  initial begin
+    forever begin
+      @(edge dut.curr_instr);
+      `uvm_info($sformatf("EXEC_UNIT_%0d", EU_IDX), $sformatf("Current instruction: %3s dest: %d,%d,%d",
+        dut.curr_instr.opcode.name, dut.curr_instr.euidx, dut.curr_instr.uid, dut.curr_instr.spec), UVM_MEDIUM)
+    end
+  end
 
 endmodule

@@ -33,9 +33,9 @@ module alu import pkg_dtypes::*; #(
   always_comb begin: decode_instruction
     case(casted_specific_instr)
       //arithmetic and logic
-      NOT : cir_decoded = 9'b 010001000 ;
+      MVN : cir_decoded = 9'b 010001000 ;
       AND : cir_decoded = 9'b 001000100 ;
-      OR  : cir_decoded = 9'b 001100100 ;
+      ORR : cir_decoded = 9'b 001100100 ;
       XOR : cir_decoded = 9'b 000001000 ;
       ADD : cir_decoded = 9'b 001011000 ;
       SUB : cir_decoded = 9'b 101011000 ;
@@ -44,10 +44,10 @@ module alu import pkg_dtypes::*; #(
       XNOR: cir_decoded = 9'b 000001010 ;
 
       //barrel shift (WIP)
-      RSH : cir_decoded = 9'b 000000001 ;
-      LSH : cir_decoded = 9'b 000000001 ;
-      RRO : cir_decoded = 9'b 000000001 ;
-      LRO : cir_decoded = 9'b 000000001 ;
+      LSR : cir_decoded = 9'b 000000001 ;
+      LSL : cir_decoded = 9'b 000000011 ;
+      //RRO : cir_decoded = 9'b 000000001 ;
+      //LRO : cir_decoded = 9'b 000000001 ;
 
       default: cir_decoded = 9'b 000000000 ; //should never hit
     endcase
@@ -64,6 +64,7 @@ module alu import pkg_dtypes::*; #(
       .a(alu_rx_i.op0_data),
       .b(alu_rx_i.op1_data),
       .out(alu_tx_o.opd_data),
+      .out_en(~cir_decoded[0]),
       .ctrl(cir_decoded[8:1]),
       .cin(1'b0),
       .cout(cout_o)
@@ -75,10 +76,22 @@ module alu import pkg_dtypes::*; #(
       .a(alu_rx_i.op0_data),
       .b(alu_rx_i.op1_data),
       .out(alu_tx_o.opd_data),
+      .out_en(~cir_decoded[0]),
       .ctrl(cir_decoded[8:1]),
       .cin(1'b0),
       .cout(cout_o)
     );
   end endgenerate
+
+  //placeholder barrel shifter
+  logic [DATA_WIDTH-1:0] barrel_shift_out;
+  always_comb begin
+    case(cir_decoded)
+      9'b 000000001: barrel_shift_out = alu_rx_i.op0_data >> alu_rx_i.op1_data;
+      9'b 000000011: barrel_shift_out = alu_rx_i.op0_data << alu_rx_i.op1_data;
+
+      default: barrel_shift_out = 'b0;
+    endcase
+  end
 
 endmodule

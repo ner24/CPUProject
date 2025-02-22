@@ -63,8 +63,8 @@ module cache_DP # (
       .MEMORY_INIT_PARAM("0"),
       .MEMORY_OPTIMIZATION("true"),
       .MEMORY_SIZE((2**IDX_BITS)*$bits(cache_entry)),
-      //.MESSAGE_CONTROL(`MODE_SIM),
-      .MESSAGE_CONTROL(0),
+      .MESSAGE_CONTROL(`MODE_SIM),
+      //.MESSAGE_CONTROL(0), //the true dual port messages are really annoying. Nevermind this option did nothing
       .READ_DATA_WIDTH_A($bits(cache_entry)),
       .READ_DATA_WIDTH_B($bits(cache_entry)),
       .READ_LATENCY_A(0),

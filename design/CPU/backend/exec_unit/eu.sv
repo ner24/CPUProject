@@ -52,6 +52,8 @@ module execution_unit import pkg_dtypes::*; #( //WIP. THis module without the IQ
     .ready_for_next_instr_o(ready_for_next_instr)
   );
 
+  wire is_iqueue_full;
+  assign ready_for_next_instrs_o = ~is_iqueue_full;
   eu_IQueue #(
     .LOG2_QUEUE_LENGTH(`EU_LOG2_IQUEUE_LENGTH),
     .NUM_PARALLEL_INSTR_DISPATCHES(NUM_PARALLEL_INSTR_DISPATCHES),
@@ -63,7 +65,7 @@ module execution_unit import pkg_dtypes::*; #( //WIP. THis module without the IQ
     .dispatched_instr_i(dispatched_instr_i),
     .dispatched_instr_valid_i(dispatched_instr_valid_i),
     
-    .is_full_o(ready_for_next_instrs_o), //cannot accept entries when full
+    .is_full_o(is_iqueue_full), //cannot accept entries when full
     .curr_instr_to_exec_o(curr_instr),
     //tell queue to stall if not ready due to:
     //opd not being stored yet (stall on receiver)

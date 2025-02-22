@@ -8,7 +8,7 @@ def get_next_alu_cache_idx(alu_cache_idx_counter: dict, alu_idx: int) -> dict:
   if alu_idx in alu_cache_idx_counter:
     alu_cache_idx_counter[alu_idx] = alu_cache_idx_counter[alu_idx] + 1
 
-    if(alu_cache_idx_counter[alu_idx] % 16) == 0: # where 16 is max val per round robin
+    if(alu_cache_idx_counter[alu_idx] % 32) == 0: # where 16 is max val per round robin
       if alu_idx not in alu_cache_uid_counter:
         alu_cache_uid_counter[alu_idx] = 0
       else:
@@ -22,11 +22,11 @@ def get_next_alu_cache_idx(alu_cache_idx_counter: dict, alu_idx: int) -> dict:
 
 def allocate(instructions: List[str],
              max_instr_batch_size: int = 8,
-             num_alus: int = 8,
+             num_alus: int = 1,
              alu_alloc_lookback_size: int = 1,
              arch_reg_idx_range: int = getNumArchReg(),
              str_tracker_ram_size: int = 16,
-             output_filename: str = "forSim/renamedAssembly.txt") -> List[dict]:
+             output_filename: str = "forSim/renamedAssemblySingleEU.txt") -> List[dict]:
   
   alu_cache_idx_counter: dict = {}
   for i in range(0, num_alus):
@@ -554,7 +554,8 @@ def allocate(instructions: List[str],
           continue
         
         print(ILN_eu_alloc_out[i], end="\t")
-        print(ILN_rename_out_opcode[i], end="\t")
+        print(ILN_rename_out_opcode[i].upper(), end="\t")
+        #print(ILN_rename_out_opcode[i], end="\t")
 
         print(ILN_rename_out_opd_euidx[i], end=",")
         print(ILN_rename_out_opd_uid[i], end=",")

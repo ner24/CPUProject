@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="backend_tb_top_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_design_parameters_sv_2207935630 " />
+            <top_module name="backend_tb_top" />
+            <top_module name="glbl" />
+            <top_module name="pkg_dtypes" />
+            <top_module name="std" />
+            <top_module name="uvm_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0 ps"></ZoomStartTime>
+      <ZoomEndTime time="5 ps"></ZoomEndTime>
+      <Cursor1Time time="0 ps"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="212"></NameColumnWidth>
+      <ValueColumnWidth column_width="94"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="3" />
+   <wvobject fp_name="/backend_tb_top/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dispatched_instr_i" type="array">
+      <obj_property name="ElementShortName">dispatched_instr_i[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dispatched_instr_i[7:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dispatched_instr_i[7]" type="array">
+         <obj_property name="ElementShortName">[7]</obj_property>
+         <obj_property name="ObjectShortName">[7]</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dispatched_instr_i[7].opcode" type="array">
+            <obj_property name="ElementShortName">.opcode</obj_property>
+            <obj_property name="ObjectShortName">.opcode</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+         </wvobject>
+         <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dispatched_instr_i[7].op0" type="array">
+            <obj_property name="ElementShortName">.op0</obj_property>
+            <obj_property name="ObjectShortName">.op0</obj_property>
+         </wvobject>
+         <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dispatched_instr_i[7].op0m" type="other">
+            <obj_property name="ElementShortName">.op0m</obj_property>
+            <obj_property name="ObjectShortName">.op0m</obj_property>
+         </wvobject>
+         <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dispatched_instr_i[7].op1" type="array">
+            <obj_property name="ElementShortName">.op1</obj_property>
+            <obj_property name="ObjectShortName">.op1</obj_property>
+         </wvobject>
+         <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dispatched_instr_i[7].op1m" type="other">
+            <obj_property name="ElementShortName">.op1m</obj_property>
+            <obj_property name="ObjectShortName">.op1m</obj_property>
+         </wvobject>
+         <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dispatched_instr_i[7].opd" type="array">
+            <obj_property name="ElementShortName">.opd</obj_property>
+            <obj_property name="ObjectShortName">.opd</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dispatched_instr_i[6]" type="array">
+         <obj_property name="ElementShortName">[6]</obj_property>
+         <obj_property name="ObjectShortName">[6]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dispatched_instr_i[5]" type="array">
+         <obj_property name="ElementShortName">[5]</obj_property>
+         <obj_property name="ObjectShortName">[5]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dispatched_instr_i[4]" type="array">
+         <obj_property name="ElementShortName">[4]</obj_property>
+         <obj_property name="ObjectShortName">[4]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dispatched_instr_i[3]" type="array">
+         <obj_property name="ElementShortName">[3]</obj_property>
+         <obj_property name="ObjectShortName">[3]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dispatched_instr_i[2]" type="array">
+         <obj_property name="ElementShortName">[2]</obj_property>
+         <obj_property name="ObjectShortName">[2]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dispatched_instr_i[1]" type="array">
+         <obj_property name="ElementShortName">[1]</obj_property>
+         <obj_property name="ObjectShortName">[1]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dispatched_instr_i[0]" type="array">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/intf/instr_dispatch_i" type="array">
+      <obj_property name="ElementShortName">instr_dispatch_i[7:0]</obj_property>
+      <obj_property name="ObjectShortName">instr_dispatch_i[7:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/backend_tb_top/intf/instr_dispatch_i[7]" type="array">
+         <obj_property name="ElementShortName">[7]</obj_property>
+         <obj_property name="ObjectShortName">[7]</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/backend_tb_top/intf/instr_dispatch_i[7].opcode" type="array">
+            <obj_property name="ElementShortName">.opcode</obj_property>
+            <obj_property name="ObjectShortName">.opcode</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+         </wvobject>
+         <wvobject fp_name="/backend_tb_top/intf/instr_dispatch_i[7].op0" type="array">
+            <obj_property name="ElementShortName">.op0</obj_property>
+            <obj_property name="ObjectShortName">.op0</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+         </wvobject>
+         <wvobject fp_name="/backend_tb_top/intf/instr_dispatch_i[7].op0m" type="other">
+            <obj_property name="ElementShortName">.op0m</obj_property>
+            <obj_property name="ObjectShortName">.op0m</obj_property>
+         </wvobject>
+         <wvobject fp_name="/backend_tb_top/intf/instr_dispatch_i[7].op1" type="array">
+            <obj_property name="ElementShortName">.op1</obj_property>
+            <obj_property name="ObjectShortName">.op1</obj_property>
+         </wvobject>
+         <wvobject fp_name="/backend_tb_top/intf/instr_dispatch_i[7].op1m" type="other">
+            <obj_property name="ElementShortName">.op1m</obj_property>
+            <obj_property name="ObjectShortName">.op1m</obj_property>
+         </wvobject>
+         <wvobject fp_name="/backend_tb_top/intf/instr_dispatch_i[7].opd" type="array">
+            <obj_property name="ElementShortName">.opd</obj_property>
+            <obj_property name="ObjectShortName">.opd</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/intf/instr_dispatch_i[6]" type="array">
+         <obj_property name="ElementShortName">[6]</obj_property>
+         <obj_property name="ObjectShortName">[6]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/intf/instr_dispatch_i[5]" type="array">
+         <obj_property name="ElementShortName">[5]</obj_property>
+         <obj_property name="ObjectShortName">[5]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/intf/instr_dispatch_i[4]" type="array">
+         <obj_property name="ElementShortName">[4]</obj_property>
+         <obj_property name="ObjectShortName">[4]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/intf/instr_dispatch_i[3]" type="array">
+         <obj_property name="ElementShortName">[3]</obj_property>
+         <obj_property name="ObjectShortName">[3]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/intf/instr_dispatch_i[2]" type="array">
+         <obj_property name="ElementShortName">[2]</obj_property>
+         <obj_property name="ObjectShortName">[2]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/intf/instr_dispatch_i[1]" type="array">
+         <obj_property name="ElementShortName">[1]</obj_property>
+         <obj_property name="ObjectShortName">[1]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/intf/instr_dispatch_i[0]" type="array">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+      </wvobject>
+   </wvobject>
+</wave_config>

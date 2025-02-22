@@ -45,10 +45,27 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
           fmt_code_imm_reg,
           fmt_code_imm_imm;
 
-  typedef uvm_enum_wrapper#(enum_instr_exec_unit) opcode_str_enum_caster;
+  //typedef uvm_enum_wrapper#(enum_instr_exec_unit) opcode_str_enum_caster;
 
   function new(string name = "test_0_sequence");
     super.new(name);
+  endfunction
+
+  function enum_instr_exec_unit conv_opc_str_to_enum(string opcodeStr);
+    case (opcodeStr)
+      "MVN": return MVN;
+      "AND": return AND;
+      "ORR": return ORR;
+      "XOR": return XOR;
+      "ADD": return ADD;
+      "SUB": return SUB;
+      "NAND": return NAND;
+      "NOR": return NOR;
+      "XNOR": return XNOR;
+      "LSR": return LSR;
+      "LSL": return LSL;
+      default: `uvm_fatal("BACKEND_TEST0", $sformatf("No enum conversion defined for: %s", opcodeStr))
+    endcase
   endfunction
 
   function void create_instr_format_strs();
@@ -59,7 +76,7 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
       fmt_code_icon = {fmt_code_icon, "%1b%1b,"};
     end
     fmt_code_icon = {fmt_code_icon, "\t%4s\n"};
-    `uvm_info("BACKEND_TEST0", fmt_code_icon, UVM_MEDIUM)
+    //`uvm_info("BACKEND_TEST0", fmt_code_icon, UVM_MEDIUM)
 
     fmt_code_reg_none = "%d\t%3s\t%d,%d,%d\t%d,%d,%d\tNone\n";
     fmt_code_reg_reg = "%d\t%3s\t%d,%d,%d\t%d,%d,%d\t%d,%d,%d\n";
@@ -92,6 +109,10 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
     logic icon_instr_dispatch_valid     [NUM_ICON_CHANNELS-1:0];
 
     string instr_file, instr_fmt_file;
+
+    enum_instr_exec_unit enum_name_test;
+    enum_name_test = AND;
+    `uvm_info("BACKEND_TEST0", enum_name_test.name, UVM_MEDIUM)
 
     create_instr_format_strs();
 
@@ -188,8 +209,9 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
           instr_dispatch[instr_dispatch_ptr].op1.as_imm.data = 'd0;
           instr_dispatch[instr_dispatch_ptr].op1m = IMM_OR_NONE;
           instr_dispatch[instr_dispatch_ptr].op0m = REG;
-          if(opcode_str_enum_caster::from_name(opcodeStr, instr_dispatch[instr_dispatch_ptr].opcode.specific_instr))
-            `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to cast opcode (given string: %s) at line %d", opcodeStr, line_idx));
+          //if(opcode_str_enum_caster::from_name(opcodeStr, instr_dispatch[instr_dispatch_ptr].opcode.specific_instr))
+          //  `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to cast opcode (given string: %s) at line %d", opcodeStr, line_idx));
+          instr_dispatch[instr_dispatch_ptr].opcode.specific_instr = conv_opc_str_to_enum(opcodeStr);
           instr_dispatch[instr_dispatch_ptr].opcode.exec_type = EXEC_UNIT;
 
           instr_dispatch_valid[instr_dispatch_ptr] = 1'b1;
@@ -219,8 +241,9 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
 
           instr_dispatch[instr_dispatch_ptr].op0m = REG;
           instr_dispatch[instr_dispatch_ptr].op1m = REG;
-          if(opcode_str_enum_caster::from_name(opcodeStr, instr_dispatch[instr_dispatch_ptr].opcode.specific_instr))
-            `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to cast opcode (given string: %s) at line %d", opcodeStr, line_idx));
+          //if(opcode_str_enum_caster::from_name(opcodeStr, instr_dispatch[instr_dispatch_ptr].opcode.specific_instr))
+          //  `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to cast opcode (given string: %s) at line %d", opcodeStr, line_idx));
+          instr_dispatch[instr_dispatch_ptr].opcode.specific_instr = conv_opc_str_to_enum(opcodeStr);
           instr_dispatch[instr_dispatch_ptr].opcode.exec_type = EXEC_UNIT;
 
           instr_dispatch_valid[instr_dispatch_ptr] = 1'b1;
@@ -248,8 +271,9 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
 
           instr_dispatch[instr_dispatch_ptr].op0m = REG;
           instr_dispatch[instr_dispatch_ptr].op1m = IMM_OR_NONE;
-          if(opcode_str_enum_caster::from_name(opcodeStr, instr_dispatch[instr_dispatch_ptr].opcode.specific_instr))
-            `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to cast opcode (given string: %s) at line %d", opcodeStr, line_idx));
+          //if(opcode_str_enum_caster::from_name(opcodeStr, instr_dispatch[instr_dispatch_ptr].opcode.specific_instr))
+          //  `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to cast opcode (given string: %s) at line %d", opcodeStr, line_idx));
+          instr_dispatch[instr_dispatch_ptr].opcode.specific_instr = conv_opc_str_to_enum(opcodeStr);
           instr_dispatch[instr_dispatch_ptr].opcode.exec_type = EXEC_UNIT;
 
           instr_dispatch_valid[instr_dispatch_ptr] = 1'b1;
@@ -277,8 +301,9 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
           instr_dispatch[instr_dispatch_ptr].op1.as_imm.data = 'd0;
           instr_dispatch[instr_dispatch_ptr].op0m = IMM_OR_NONE;
           instr_dispatch[instr_dispatch_ptr].op1m = IMM_OR_NONE;
-          if(opcode_str_enum_caster::from_name(opcodeStr, instr_dispatch[instr_dispatch_ptr].opcode.specific_instr))
-            `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to cast opcode (given string: %s) at line %d", opcodeStr, line_idx));
+          //if(opcode_str_enum_caster::from_name(opcodeStr, instr_dispatch[instr_dispatch_ptr].opcode.specific_instr))
+          //  `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to cast opcode (given string: %s) at line %d", opcodeStr, line_idx));
+          instr_dispatch[instr_dispatch_ptr].opcode.specific_instr = conv_opc_str_to_enum(opcodeStr);
           instr_dispatch[instr_dispatch_ptr].opcode.exec_type = EXEC_UNIT;
 
           instr_dispatch_valid[instr_dispatch_ptr] = 1'b1;
@@ -306,8 +331,9 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
 
           instr_dispatch[instr_dispatch_ptr].op0m = IMM_OR_NONE;
           instr_dispatch[instr_dispatch_ptr].op1m = REG;
-          if(opcode_str_enum_caster::from_name(opcodeStr, instr_dispatch[instr_dispatch_ptr].opcode.specific_instr))
-            `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to cast opcode (given string: %s) at line %d", opcodeStr, line_idx));
+          //if(opcode_str_enum_caster::from_name(opcodeStr, instr_dispatch[instr_dispatch_ptr].opcode.specific_instr))
+          //  `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to cast opcode (given string: %s) at line %d", opcodeStr, line_idx));
+          instr_dispatch[instr_dispatch_ptr].opcode.specific_instr = conv_opc_str_to_enum(opcodeStr);
           instr_dispatch[instr_dispatch_ptr].opcode.exec_type = EXEC_UNIT;
 
           instr_dispatch_valid[instr_dispatch_ptr] = 1'b1;
@@ -317,6 +343,7 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
 
         4'b0010: begin
           string opcodeStr;
+          //enum_instr_exec_unit opcode_enum;
           `uvm_info("BACKEND_TEST0", "Reading instruction type: imm-imm", UVM_MEDIUM)
           read_result = $fscanf(file, fmt_code_imm_imm,
             instr_dispatch_alloc_euidx[instr_dispatch_ptr],
@@ -334,8 +361,10 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
           instr_dispatch[instr_dispatch_ptr].op0m = IMM_OR_NONE;
           instr_dispatch[instr_dispatch_ptr].op1m = IMM_OR_NONE;
           
-          if(opcode_str_enum_caster::from_name(opcodeStr, instr_dispatch[instr_dispatch_ptr].opcode.specific_instr))
-            `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to cast opcode (given string: %s) at line %0d", opcodeStr, line_idx));
+          //if(opcode_str_enum_caster::from_name(opcodeStr, opcode_enum))
+          //  `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to cast opcode (given string: %s) at line %0d", opcodeStr, line_idx));
+          //instr_dispatch[instr_dispatch_ptr].opcode.specific_instr = opcode_enum;
+          instr_dispatch[instr_dispatch_ptr].opcode.specific_instr = conv_opc_str_to_enum(opcodeStr);
           instr_dispatch[instr_dispatch_ptr].opcode.exec_type = EXEC_UNIT;
 
           instr_dispatch_valid[instr_dispatch_ptr] = 1'b1;
@@ -352,8 +381,13 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
       if (instr_dispatch_ptr == NUM_PARALLEL_INSTR_DISPATCHES) begin
         `uvm_info("BACKEND_TEST0", "Batch filled. Dispatching...", UVM_MEDIUM)
         seq_item = backend_sequence_item::type_id::create("seq_item");
+
+        for (int c = icon_instr_dispatch_ptr; c < NUM_ICON_CHANNELS; c++) begin
+          icon_instr_dispatch_valid[c] = 'b0;
+        end
         
         start_item(seq_item);
+        seq_item.reset_n = 1'b1;
         seq_item.instr_dispatch_i = instr_dispatch;
         seq_item.instr_dispatch_valid_i = instr_dispatch_valid;
         seq_item.dispatched_instr_alloc_euidx_i = instr_dispatch_alloc_euidx;
@@ -367,7 +401,9 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
       end else if (icon_instr_dispatch_ptr == NUM_ICON_CHANNELS) begin
         `uvm_info("BACKEND_TEST0", "icon batch filled. Dispatching icon only...", UVM_MEDIUM)
         seq_item = backend_sequence_item::type_id::create("seq_item");
+
         start_item(seq_item);
+        seq_item.reset_n = 1'b1;
 
         for(int g_parallel_dist = 0; g_parallel_dist < NUM_PARALLEL_INSTR_DISPATCHES; g_parallel_dist++) begin
           seq_item.instr_dispatch_valid_i[g_parallel_dist] = 'b0;
@@ -382,7 +418,8 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
       line_idx = line_idx + 1;
     end
     `uvm_info("BACKEND_TEST0", "Reached end of format file", UVM_MEDIUM)
-    `uvm_info("BACKEND_TEST0", $sformatf("%d", $feof(file_instr_formats)), UVM_MEDIUM)
+    //`uvm_info("BACKEND_TEST0", $sformatf("%0d", $feof(file_instr_formats)), UVM_MEDIUM)
+
     // Close the files
     $fclose(file);
     $fclose(file_instr_formats);
@@ -391,6 +428,7 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
     `uvm_info("BACKEND_TEST0", "Dispatching left over instructions", UVM_MEDIUM)
     seq_item = backend_sequence_item::type_id::create("seq_item");
     start_item(seq_item);
+    seq_item.reset_n = 1'b1;
     seq_item.instr_dispatch_i = instr_dispatch;
     seq_item.instr_dispatch_valid_i = instr_dispatch_valid;
     seq_item.dispatched_instr_alloc_euidx_i = instr_dispatch_alloc_euidx;
@@ -405,6 +443,7 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
     for (int step = 0; step < 10; step++) begin
       seq_item = backend_sequence_item::type_id::create("seq_item");
       start_item(seq_item);
+      seq_item.reset_n = 1'b1;
       for(int i = 0; i < NUM_ICON_CHANNELS; i++) begin
         seq_item.icon_instr_dispatch_valid_i[i] = 'b0;
       end

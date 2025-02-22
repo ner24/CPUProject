@@ -195,7 +195,7 @@ module eu_cache import pkg_dtypes::*; #(
 
     //from ALU
     .in_addr_i(alu_tx_i.opd_addr),
-    .in_valid_i(alu_tx_i.opd_valid & alu_res_opd_isforeign),
+    .in_valid_i(alu_tx_i.opd_valid),// & alu_res_opd_isforeign),
     .in_data_i(alu_tx_i.opd_data),
     .in_success_o(opd_foreign_success),
 

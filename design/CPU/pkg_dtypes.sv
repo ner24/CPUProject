@@ -174,19 +174,19 @@ package pkg_dtypes;
   // must be equal
 
   typedef enum logic [3:0] {
-    NOT,
+    MVN,
     AND,
-    OR,
+    ORR,
     XOR,
     ADD,
     SUB,
     NAND,
     NOR,
     XNOR,
-    RSH,
-    LSH,
-    RRO,
-    LRO
+    LSR,
+    LSL//,
+    //RRO,
+    //LRO
   } enum_instr_exec_unit;
 
   typedef enum logic [3:0] {
