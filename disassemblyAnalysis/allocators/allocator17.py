@@ -22,7 +22,7 @@ def get_next_alu_cache_idx(alu_cache_idx_counter: dict, alu_idx: int) -> dict:
 
 def allocate(instructions: List[str],
              max_instr_batch_size: int = 8,
-             num_alus: int = 10,
+             num_alus: int = 8,
              alu_alloc_lookback_size: int = 1,
              arch_reg_idx_range: int = getNumArchReg(),
              str_tracker_ram_size: int = 16,

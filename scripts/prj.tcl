@@ -67,12 +67,15 @@ dict with argv {
     }
 
     #set properties
-    set_property -name {xsim.compile.xvlog.more_options} -value "-L uvm -d MODE_SIMULATION -d BACKEND_ASSEMBLY_TXT_PATH_WITHOUT_QUOTES=$backend_test_renamed_instr -i $root_dir/projectHeaders -i $root_dir/sim/seqItems" -objects [get_fileset $simset_name] -verbose
+    set_property -name {xsim.compile.xvlog.more_options} -value "-L uvm -d MODE_SIMULATION -i $root_dir/projectHeaders -i $root_dir/sim/seqItems" -objects [get_fileset $simset_name] -verbose
     set_property -name {xsim.elaborate.xelab.more_options} -value "-L uvm -d MODE_SIMULATION -i $root_dir/projectHeaders -i $root_dir/sim/seqItems" -objects [get_fileset $simset_name] -verbose
     set_property -name {xsim.simulate.custom_tcl} -value "$script_path/runSim.tcl" -objects [get_fileset $simset_name] -verbose
     set_property -name {xsim.simulate.runtime} -value "10000ns" -objects [get_fileset $simset_name] -verbose
     set_property -name {xsim.compile.xsc.mt_level} -value "8" -objects [get_fileset $simset_name] -verbose
     set_property -name {xsim.elaborate.xsc.mt_level} -value "8" -objects [get_fileset $simset_name] -verbose
+
+    #xelab removes the = in this. This is probably a bug as it means you cannot define macros in cmd for xelab :|
+    #-d BACKEND_ASSEMBLY_TXT_PATH_WITHOUT_QUOTES=$backend_test_renamed_instr
   } else {
     #faster way but only use if sources havn't been moved around
     puts "Opening project"
