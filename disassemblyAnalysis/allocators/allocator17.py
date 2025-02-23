@@ -22,11 +22,11 @@ def get_next_alu_cache_idx(alu_cache_idx_counter: dict, alu_idx: int) -> dict:
 
 def allocate(instructions: List[str],
              max_instr_batch_size: int = 8,
-             num_alus: int = 1,
+             num_alus: int = 8,
              alu_alloc_lookback_size: int = 1,
              arch_reg_idx_range: int = getNumArchReg(),
              str_tracker_ram_size: int = 16,
-             output_filename: str = "forSim/renamedAssemblySingleEU.txt") -> List[dict]:
+             output_filename: str = "forSim/renamedAssembly.txt") -> List[dict]:
   
   alu_cache_idx_counter: dict = {}
   for i in range(0, num_alus):
@@ -36,8 +36,13 @@ def allocate(instructions: List[str],
 
   renamed_output = open(output_filename, "w")
   renamed_output_formats = open(output_filename + "_formats.txt", "w")
+  renamed_output_metadata = open(output_filename + "_meta.txt", "w")
   original_stdout = sys.stdout
   stdouts = [renamed_output, original_stdout]
+
+  renamed_output_total_num_lines = 0
+  num_icons_per_batch = []
+  num_icons_in_batch = 0
   
 	#for the proof of concept, to keep it simple, load prefetch will be assumed to work every time
   #to emulate this in the model, the ld register will store all the necessary data that is specified
@@ -538,6 +543,8 @@ def allocate(instructions: List[str],
             print(1 if ILN_icongen_out_icon_dist_destlist[i][j][1] else 0, end=",")
           print("\t" + str(ILN_icongen_out_icon_invalidateSrc[i]), end="")
           print()
+          renamed_output_total_num_lines += 1
+          num_icons_in_batch += 1
 
         #leave retire instructions for now
         #if ILN_icongen_out_retire_valid[i]:
@@ -579,6 +586,8 @@ def allocate(instructions: List[str],
           print(str(ILN_rename_out_op1_imm[i]), end="\n")
           instr_fmt |= int(ILN_rename_out_op1v[i]) * 10
 
+        renamed_output_total_num_lines += 1
+
         if output_formats:
             s = str(instr_fmt)
             for c in range(len(s), 4):
@@ -598,12 +607,27 @@ def allocate(instructions: List[str],
             print(1 if ILN_icongen_out_icon_dist_destlist[i][j][1] else 0, end=",")
           print("\t" + str(ILN_icongen_out_icon_invalidateSrc[i]), end="")
           print()
+          renamed_output_total_num_lines += 1
+          num_icons_in_batch += 1
       
       output_formats = False
+    num_icons_per_batch.append(int(num_icons_in_batch / 2))
+    num_icons_in_batch = 0
 
   sys.stdout = original_stdout
   renamed_output.close()
   renamed_output_formats.close()
+
+  print("Metadata\/")
+  #this will be double what it should be as it counts each line twice (one time for stdout and one time for file)
+  renamed_output_total_num_lines = int(renamed_output_total_num_lines / 2)
+  print("totNumLines:" + str(renamed_output_total_num_lines))
+  renamed_output_metadata.write("totNumLines:" + str(renamed_output_total_num_lines) + "\n")
+  print("numIconsPerBatch:" + str(num_icons_per_batch))
+  renamed_output_metadata.write("numIconsPerBatch:")
+  for c in range(len(num_icons_per_batch)):
+    renamed_output_metadata.write(str(num_icons_per_batch[c]) + ",")
+  renamed_output_metadata.close()
 
 
 #arch_destreg_new_addr_eidx = alloc_alu

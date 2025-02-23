@@ -124,6 +124,7 @@ package pkg_dtypes;
   //operand format
   //Note that decreasing the value of this param will increase area efficiency
   localparam IQUEUE_IMM_PADDING = $bits(type_exec_unit_addr) - $bits(type_exec_unit_data);
+  //localparam logic[31:0] IQUEUE_IMM_PADDING = ADDR_IMM_WIDTH_DIFF[31] ? ADDR_IMM_WIDTH_DIFF : 0 - ADDR_IMM_WIDTH_DIFF;
   typedef struct packed {
     logic [IQUEUE_IMM_PADDING-1:0] zero;
     type_exec_unit_data      data;

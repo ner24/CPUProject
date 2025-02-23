@@ -88,33 +88,44 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
 
   endfunction
 
-  virtual task body();
-    backend_sequence_item seq_item;
+  localparam NUM_PARALLEL_INSTR_DISPATCHES = `NUM_PARALLEL_INSTR_DISPATCHES;
+  localparam NUM_ICON_CHANNELS = 2**`LOG2_NUM_ICON_CHANNELS;
+  localparam LOG2_NUM_EXEC_UNITS = `LOG2_NUM_EXEC_UNITS;
+  localparam NUM_EXEC_UNITS = 2**LOG2_NUM_EXEC_UNITS;
+  localparam NUM_BATCHES = 3; //set to some value that is larger than actual number of batches (since cannot be found at compile time)
+  localparam NUM_ICON_BATCHES = 1;
+
+  logic [LOG2_NUM_EXEC_UNITS-1:0] instr_dispatch_alloc_euidx [NUM_BATCHES-1:0] [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
+  type_iqueue_entry instr_dispatch            [NUM_BATCHES-1:0] [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
+  logic instr_dispatch_valid                  [NUM_BATCHES-1:0] [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
+  type_icon_instr icon_instr_dispatch [NUM_BATCHES-1:0] [NUM_ICON_BATCHES-1:0] [NUM_ICON_CHANNELS-1:0];
+  logic icon_instr_dispatch_valid     [NUM_BATCHES-1:0] [NUM_ICON_BATCHES-1:0] [NUM_ICON_CHANNELS-1:0];
+  int   icon_batch_ptrs [NUM_BATCHES-1:0];
+
+  virtual task pre_body();
     int file, file_instr_formats;
     int read_result;
 
     logic [3:0] instruction_format;
 
     //points to the index within the parallel arrays where the instruction should go
-    int instr_dispatch_ptr, icon_instr_dispatch_ptr, line_idx;
-    localparam NUM_PARALLEL_INSTR_DISPATCHES = `NUM_PARALLEL_INSTR_DISPATCHES;
-    localparam NUM_ICON_CHANNELS = 2**`LOG2_NUM_ICON_CHANNELS;
-    localparam LOG2_NUM_EXEC_UNITS = `LOG2_NUM_EXEC_UNITS;
-    localparam NUM_EXEC_UNITS = 2**LOG2_NUM_EXEC_UNITS;
-
-    logic [LOG2_NUM_EXEC_UNITS-1:0] instr_dispatch_alloc_euidx  [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
-    type_iqueue_entry instr_dispatch            [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
-    logic instr_dispatch_valid                  [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
-    type_icon_instr icon_instr_dispatch [NUM_ICON_CHANNELS-1:0];
-    logic icon_instr_dispatch_valid     [NUM_ICON_CHANNELS-1:0];
-
+    int instr_dispatch_ptr, icon_instr_dispatch_ptr, line_idx, batch_idx;
+    //int total_num_lines;
     string instr_file, instr_fmt_file;
 
-    enum_instr_exec_unit enum_name_test;
-    enum_name_test = AND;
-    `uvm_info("BACKEND_TEST0", enum_name_test.name, UVM_MEDIUM)
-
     create_instr_format_strs();
+
+    //set default valids to all zeros
+    for (int i = 0; i < NUM_BATCHES; i++) begin
+      for (int j = 0; j < NUM_PARALLEL_INSTR_DISPATCHES; j++) begin
+        instr_dispatch_valid[i][j] = 'b0;
+      end
+      for (int j = 0; j < NUM_ICON_BATCHES; j++) begin
+        for (int k = 0; k < NUM_ICON_CHANNELS; k++) begin
+          icon_instr_dispatch_valid[i][j][k] = 'b0;
+        end
+      end
+    end
 
     instr_file = `BACKEND_ASSEMBLY_TXT_PATH;
     instr_fmt_file = {`BACKEND_ASSEMBLY_TXT_PATH, "_formats.txt"};
@@ -131,6 +142,10 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
 
     instr_dispatch_ptr = 'd0;
     icon_instr_dispatch_ptr = 'd0;
+    batch_idx = 'd0;
+    for (int i = 0; i < NUM_BATCHES; i++) begin
+      icon_batch_ptrs[i] = 'd0;
+    end
 
     `uvm_info("BACKEND_TEST0", "Reading in instructions", UVM_MEDIUM)
     line_idx = 'd1;
@@ -144,36 +159,36 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
       
       //instruction format codes: 4 signals, iconmv(1) or alu(0), op0m, op1v, op1m
       case (instruction_format)
-        4'b1000: begin //icon instruction
+        4'b1000: begin
           string invalSrcStr;
           `uvm_info("BACKEND_TEST0", "Reading instruction type: icon", UVM_MEDIUM)
           read_result = $fscanf(file, fmt_code_icon,
-            icon_instr_dispatch[icon_instr_dispatch_ptr].src_addr.euidx,
-            icon_instr_dispatch[icon_instr_dispatch_ptr].src_addr.uid,
-            icon_instr_dispatch[icon_instr_dispatch_ptr].src_addr.spec,
+            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].src_addr.euidx,
+            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].src_addr.uid,
+            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].src_addr.spec,
 
             //NOTE: for some stupid reason systemverilog does not have `if macros
             //LOG2_NUM_EXEC_UNITS >= 1
-            icon_instr_dispatch[icon_instr_dispatch_ptr].receiver_list.eus[0],
-            icon_instr_dispatch[icon_instr_dispatch_ptr].receiver_list.eus[1],
-            icon_instr_dispatch[icon_instr_dispatch_ptr].receiver_list.eus[2],
-            icon_instr_dispatch[icon_instr_dispatch_ptr].receiver_list.eus[3],
+            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[0],
+            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[1],
+            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[2],
+            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[3],
             
             //LOG2_NUM_EXEC_UNITS >= 2
-            icon_instr_dispatch[icon_instr_dispatch_ptr].receiver_list.eus[4],
-            icon_instr_dispatch[icon_instr_dispatch_ptr].receiver_list.eus[5],
-            icon_instr_dispatch[icon_instr_dispatch_ptr].receiver_list.eus[6],
-            icon_instr_dispatch[icon_instr_dispatch_ptr].receiver_list.eus[7],
+            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[4],
+            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[5],
+            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[6],
+            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[7],
             
             //LOG2_NUM_EXEC_UNITS == 3
-            icon_instr_dispatch[icon_instr_dispatch_ptr].receiver_list.eus[8],
-            icon_instr_dispatch[icon_instr_dispatch_ptr].receiver_list.eus[9],
-            icon_instr_dispatch[icon_instr_dispatch_ptr].receiver_list.eus[10],
-            icon_instr_dispatch[icon_instr_dispatch_ptr].receiver_list.eus[11],
-            icon_instr_dispatch[icon_instr_dispatch_ptr].receiver_list.eus[12],
-            icon_instr_dispatch[icon_instr_dispatch_ptr].receiver_list.eus[13],
-            icon_instr_dispatch[icon_instr_dispatch_ptr].receiver_list.eus[14],
-            icon_instr_dispatch[icon_instr_dispatch_ptr].receiver_list.eus[15],
+            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[8],
+            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[9],
+            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[10],
+            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[11],
+            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[12],
+            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[13],
+            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[14],
+            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[15],
 
             invalSrcStr
           );
@@ -182,7 +197,7 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
             `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to read icon instr at line %0d", line_idx))
           end
 
-          icon_instr_dispatch_valid[icon_instr_dispatch_ptr] = 1'b1;
+          icon_instr_dispatch_valid[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr] = 1'b1;
 
           icon_instr_dispatch_ptr = icon_instr_dispatch_ptr + 1;
         end
@@ -191,14 +206,14 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
           string opcodeStr;
           `uvm_info("BACKEND_TEST0", "Reading instruction type: reg-none", UVM_MEDIUM)
           read_result = $fscanf(file, fmt_code_reg_none,
-            instr_dispatch_alloc_euidx[instr_dispatch_ptr],
+            instr_dispatch_alloc_euidx[batch_idx][instr_dispatch_ptr],
             opcodeStr,
-            instr_dispatch[instr_dispatch_ptr].opd.euidx,
-            instr_dispatch[instr_dispatch_ptr].opd.uid,
-            instr_dispatch[instr_dispatch_ptr].opd.spec,
-            instr_dispatch[instr_dispatch_ptr].op0.as_addr.euidx,
-            instr_dispatch[instr_dispatch_ptr].op0.as_addr.uid,
-            instr_dispatch[instr_dispatch_ptr].op0.as_addr.spec
+            instr_dispatch[batch_idx][instr_dispatch_ptr].opd.euidx,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].opd.uid,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].opd.spec,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op0.as_addr.euidx,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op0.as_addr.uid,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op0.as_addr.spec
           );
           if (read_result != 8) begin
             `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to read reg-none instr at line %0d", line_idx))
@@ -206,15 +221,13 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
 
           //backend does not have an op1v flag (as its more or less embedded in the opcode)
           //so just add dummy immediate
-          instr_dispatch[instr_dispatch_ptr].op1.as_imm.data = 'd0;
-          instr_dispatch[instr_dispatch_ptr].op1m = IMM_OR_NONE;
-          instr_dispatch[instr_dispatch_ptr].op0m = REG;
-          //if(opcode_str_enum_caster::from_name(opcodeStr, instr_dispatch[instr_dispatch_ptr].opcode.specific_instr))
-          //  `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to cast opcode (given string: %s) at line %d", opcodeStr, line_idx));
-          instr_dispatch[instr_dispatch_ptr].opcode.specific_instr = conv_opc_str_to_enum(opcodeStr);
-          instr_dispatch[instr_dispatch_ptr].opcode.exec_type = EXEC_UNIT;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].op1.as_imm.data = 'd0;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].op1m = IMM_OR_NONE;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].op0m = REG;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].opcode.specific_instr = conv_opc_str_to_enum(opcodeStr);
+          instr_dispatch[batch_idx][instr_dispatch_ptr].opcode.exec_type = EXEC_UNIT;
 
-          instr_dispatch_valid[instr_dispatch_ptr] = 1'b1;
+          instr_dispatch_valid[batch_idx][instr_dispatch_ptr] = 1'b1;
 
           instr_dispatch_ptr = instr_dispatch_ptr + 1;
         end
@@ -223,30 +236,28 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
           string opcodeStr;
           `uvm_info("BACKEND_TEST0", "Reading instruction type: reg-reg", UVM_MEDIUM)
           read_result = $fscanf(file, fmt_code_reg_reg,
-            instr_dispatch_alloc_euidx[instr_dispatch_ptr],
+            instr_dispatch_alloc_euidx[batch_idx][instr_dispatch_ptr],
             opcodeStr,
-            instr_dispatch[instr_dispatch_ptr].opd.euidx,
-            instr_dispatch[instr_dispatch_ptr].opd.uid,
-            instr_dispatch[instr_dispatch_ptr].opd.spec,
-            instr_dispatch[instr_dispatch_ptr].op0.as_addr.euidx,
-            instr_dispatch[instr_dispatch_ptr].op0.as_addr.uid,
-            instr_dispatch[instr_dispatch_ptr].op0.as_addr.spec,
-            instr_dispatch[instr_dispatch_ptr].op1.as_addr.euidx,
-            instr_dispatch[instr_dispatch_ptr].op1.as_addr.uid,
-            instr_dispatch[instr_dispatch_ptr].op1.as_addr.spec
+            instr_dispatch[batch_idx][instr_dispatch_ptr].opd.euidx,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].opd.uid,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].opd.spec,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op0.as_addr.euidx,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op0.as_addr.uid,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op0.as_addr.spec,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op1.as_addr.euidx,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op1.as_addr.uid,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op1.as_addr.spec
           );
           if (read_result != 11) begin
             `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to read reg-reg instr at line %0d", line_idx))
           end
 
-          instr_dispatch[instr_dispatch_ptr].op0m = REG;
-          instr_dispatch[instr_dispatch_ptr].op1m = REG;
-          //if(opcode_str_enum_caster::from_name(opcodeStr, instr_dispatch[instr_dispatch_ptr].opcode.specific_instr))
-          //  `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to cast opcode (given string: %s) at line %d", opcodeStr, line_idx));
-          instr_dispatch[instr_dispatch_ptr].opcode.specific_instr = conv_opc_str_to_enum(opcodeStr);
-          instr_dispatch[instr_dispatch_ptr].opcode.exec_type = EXEC_UNIT;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].op0m = REG;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].op1m = REG;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].opcode.specific_instr = conv_opc_str_to_enum(opcodeStr);
+          instr_dispatch[batch_idx][instr_dispatch_ptr].opcode.exec_type = EXEC_UNIT;
 
-          instr_dispatch_valid[instr_dispatch_ptr] = 1'b1;
+          instr_dispatch_valid[batch_idx][instr_dispatch_ptr] = 1'b1;
 
           instr_dispatch_ptr = instr_dispatch_ptr + 1;
         end
@@ -255,28 +266,27 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
           string opcodeStr;
           `uvm_info("BACKEND_TEST0", "Reading instruction type: reg-imm", UVM_MEDIUM)
           read_result = $fscanf(file, fmt_code_reg_imm,
-            instr_dispatch_alloc_euidx[instr_dispatch_ptr],
+            instr_dispatch_alloc_euidx[batch_idx][instr_dispatch_ptr],
             opcodeStr,
-            instr_dispatch[instr_dispatch_ptr].opd.euidx,
-            instr_dispatch[instr_dispatch_ptr].opd.uid,
-            instr_dispatch[instr_dispatch_ptr].opd.spec,
-            instr_dispatch[instr_dispatch_ptr].op0.as_addr.euidx,
-            instr_dispatch[instr_dispatch_ptr].op0.as_addr.uid,
-            instr_dispatch[instr_dispatch_ptr].op0.as_addr.spec,
-            instr_dispatch[instr_dispatch_ptr].op1.as_imm
+            instr_dispatch[batch_idx][instr_dispatch_ptr].opd.euidx,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].opd.uid,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].opd.spec,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op0.as_addr.euidx,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op0.as_addr.uid,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op0.as_addr.spec,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op1.as_imm
           );
           if (read_result != 9) begin
             `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to read reg-imm instr at line %0d", line_idx))
           end
+          `uvm_info("BACKEND_TEST0", $sformatf("addr.spec: %0d", instr_dispatch[batch_idx][instr_dispatch_ptr].opd.spec), UVM_MEDIUM)
 
-          instr_dispatch[instr_dispatch_ptr].op0m = REG;
-          instr_dispatch[instr_dispatch_ptr].op1m = IMM_OR_NONE;
-          //if(opcode_str_enum_caster::from_name(opcodeStr, instr_dispatch[instr_dispatch_ptr].opcode.specific_instr))
-          //  `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to cast opcode (given string: %s) at line %d", opcodeStr, line_idx));
-          instr_dispatch[instr_dispatch_ptr].opcode.specific_instr = conv_opc_str_to_enum(opcodeStr);
-          instr_dispatch[instr_dispatch_ptr].opcode.exec_type = EXEC_UNIT;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].op0m = REG;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].op1m = IMM_OR_NONE;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].opcode.specific_instr = conv_opc_str_to_enum(opcodeStr);
+          instr_dispatch[batch_idx][instr_dispatch_ptr].opcode.exec_type = EXEC_UNIT;
 
-          instr_dispatch_valid[instr_dispatch_ptr] = 1'b1;
+          instr_dispatch_valid[batch_idx][instr_dispatch_ptr] = 1'b1;
 
           instr_dispatch_ptr = instr_dispatch_ptr + 1;
         end
@@ -285,12 +295,12 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
           string opcodeStr;
           `uvm_info("BACKEND_TEST0", "Reading instruction type: imm-none", UVM_MEDIUM)
           read_result = $fscanf(file, fmt_code_imm_none,
-            instr_dispatch_alloc_euidx[instr_dispatch_ptr],
+            instr_dispatch_alloc_euidx[batch_idx][instr_dispatch_ptr],
             opcodeStr,
-            instr_dispatch[instr_dispatch_ptr].opd.euidx,
-            instr_dispatch[instr_dispatch_ptr].opd.uid,
-            instr_dispatch[instr_dispatch_ptr].opd.spec,
-            instr_dispatch[instr_dispatch_ptr].op0.as_imm
+            instr_dispatch[batch_idx][instr_dispatch_ptr].opd.euidx,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].opd.uid,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].opd.spec,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op0.as_imm
           );
           if (read_result != 6) begin
             `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to read imm-none instr at line %0d", line_idx))
@@ -298,15 +308,13 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
 
           //backend does not have an op1v flag (as its more or less embedded in the opcode)
           //so just add dummy immediate
-          instr_dispatch[instr_dispatch_ptr].op1.as_imm.data = 'd0;
-          instr_dispatch[instr_dispatch_ptr].op0m = IMM_OR_NONE;
-          instr_dispatch[instr_dispatch_ptr].op1m = IMM_OR_NONE;
-          //if(opcode_str_enum_caster::from_name(opcodeStr, instr_dispatch[instr_dispatch_ptr].opcode.specific_instr))
-          //  `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to cast opcode (given string: %s) at line %d", opcodeStr, line_idx));
-          instr_dispatch[instr_dispatch_ptr].opcode.specific_instr = conv_opc_str_to_enum(opcodeStr);
-          instr_dispatch[instr_dispatch_ptr].opcode.exec_type = EXEC_UNIT;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].op1.as_imm.data = 'd0;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].op0m = IMM_OR_NONE;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].op1m = IMM_OR_NONE;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].opcode.specific_instr = conv_opc_str_to_enum(opcodeStr);
+          instr_dispatch[batch_idx][instr_dispatch_ptr].opcode.exec_type = EXEC_UNIT;
 
-          instr_dispatch_valid[instr_dispatch_ptr] = 1'b1;
+          instr_dispatch_valid[batch_idx][instr_dispatch_ptr] = 1'b1;
 
           instr_dispatch_ptr = instr_dispatch_ptr + 1;
         end
@@ -315,28 +323,26 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
           string opcodeStr;
           `uvm_info("BACKEND_TEST0", "Reading instruction type: imm-reg", UVM_MEDIUM)
           read_result = $fscanf(file, fmt_code_imm_reg,
-            instr_dispatch_alloc_euidx[instr_dispatch_ptr],
+            instr_dispatch_alloc_euidx[batch_idx][instr_dispatch_ptr],
             opcodeStr,
-            instr_dispatch[instr_dispatch_ptr].opd.euidx,
-            instr_dispatch[instr_dispatch_ptr].opd.uid,
-            instr_dispatch[instr_dispatch_ptr].opd.spec,
-            instr_dispatch[instr_dispatch_ptr].op0.as_imm,
-            instr_dispatch[instr_dispatch_ptr].op1.as_addr.euidx,
-            instr_dispatch[instr_dispatch_ptr].op1.as_addr.uid,
-            instr_dispatch[instr_dispatch_ptr].op1.as_addr.spec
+            instr_dispatch[batch_idx][instr_dispatch_ptr].opd.euidx,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].opd.uid,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].opd.spec,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op0.as_imm,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op1.as_addr.euidx,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op1.as_addr.uid,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op1.as_addr.spec
           );
           if (read_result != 9) begin
             `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to read imm-reg instr at line %0d", line_idx))
           end
 
-          instr_dispatch[instr_dispatch_ptr].op0m = IMM_OR_NONE;
-          instr_dispatch[instr_dispatch_ptr].op1m = REG;
-          //if(opcode_str_enum_caster::from_name(opcodeStr, instr_dispatch[instr_dispatch_ptr].opcode.specific_instr))
-          //  `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to cast opcode (given string: %s) at line %d", opcodeStr, line_idx));
-          instr_dispatch[instr_dispatch_ptr].opcode.specific_instr = conv_opc_str_to_enum(opcodeStr);
-          instr_dispatch[instr_dispatch_ptr].opcode.exec_type = EXEC_UNIT;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].op0m = IMM_OR_NONE;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].op1m = REG;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].opcode.specific_instr = conv_opc_str_to_enum(opcodeStr);
+          instr_dispatch[batch_idx][instr_dispatch_ptr].opcode.exec_type = EXEC_UNIT;
 
-          instr_dispatch_valid[instr_dispatch_ptr] = 1'b1;
+          instr_dispatch_valid[batch_idx][instr_dispatch_ptr] = 1'b1;
 
           instr_dispatch_ptr = instr_dispatch_ptr + 1;
         end
@@ -346,28 +352,26 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
           //enum_instr_exec_unit opcode_enum;
           `uvm_info("BACKEND_TEST0", "Reading instruction type: imm-imm", UVM_MEDIUM)
           read_result = $fscanf(file, fmt_code_imm_imm,
-            instr_dispatch_alloc_euidx[instr_dispatch_ptr],
+            instr_dispatch_alloc_euidx[batch_idx][instr_dispatch_ptr],
             opcodeStr,
-            instr_dispatch[instr_dispatch_ptr].opd.euidx,
-            instr_dispatch[instr_dispatch_ptr].opd.uid,
-            instr_dispatch[instr_dispatch_ptr].opd.spec,
-            instr_dispatch[instr_dispatch_ptr].op0.as_imm,
-            instr_dispatch[instr_dispatch_ptr].op1.as_imm
+            instr_dispatch[batch_idx][instr_dispatch_ptr].opd.euidx,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].opd.uid,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].opd.spec,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op0.as_imm,
+            instr_dispatch[batch_idx][instr_dispatch_ptr].op1.as_imm
           );
           if (read_result != 7) begin
             `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to read imm-imm instr at line %0d", line_idx))
           end
+          `uvm_info("BACKEND_TEST0", $sformatf("addr.spec: %0d", instr_dispatch[batch_idx][instr_dispatch_ptr].opd.spec), UVM_MEDIUM)
 
-          instr_dispatch[instr_dispatch_ptr].op0m = IMM_OR_NONE;
-          instr_dispatch[instr_dispatch_ptr].op1m = IMM_OR_NONE;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].op0m = IMM_OR_NONE;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].op1m = IMM_OR_NONE;
           
-          //if(opcode_str_enum_caster::from_name(opcodeStr, opcode_enum))
-          //  `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to cast opcode (given string: %s) at line %0d", opcodeStr, line_idx));
-          //instr_dispatch[instr_dispatch_ptr].opcode.specific_instr = opcode_enum;
-          instr_dispatch[instr_dispatch_ptr].opcode.specific_instr = conv_opc_str_to_enum(opcodeStr);
-          instr_dispatch[instr_dispatch_ptr].opcode.exec_type = EXEC_UNIT;
+          instr_dispatch[batch_idx][instr_dispatch_ptr].opcode.specific_instr = conv_opc_str_to_enum(opcodeStr);
+          instr_dispatch[batch_idx][instr_dispatch_ptr].opcode.exec_type = EXEC_UNIT;
 
-          instr_dispatch_valid[instr_dispatch_ptr] = 1'b1;
+          instr_dispatch_valid[batch_idx][instr_dispatch_ptr] = 1'b1;
 
           instr_dispatch_ptr = instr_dispatch_ptr + 1;
         end
@@ -379,39 +383,21 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
       //icon instructions and not the normal one, if the batch is filled, both normal and icon
       //instructions should be dispatched
       if (instr_dispatch_ptr == NUM_PARALLEL_INSTR_DISPATCHES) begin
-        `uvm_info("BACKEND_TEST0", "Batch filled. Dispatching...", UVM_MEDIUM)
-        seq_item = backend_sequence_item::type_id::create("seq_item");
-
-        for (int c = icon_instr_dispatch_ptr; c < NUM_ICON_CHANNELS; c++) begin
-          icon_instr_dispatch_valid[c] = 'b0;
+        `uvm_info("BACKEND_TEST0", "Batch filled. Moving to next batch idx", UVM_MEDIUM)
+        batch_idx = batch_idx + 1;
+        if(batch_idx == NUM_BATCHES) begin
+          `uvm_fatal("BACKEND_TEST0", "NUM_BATCHES is too small")
         end
-        
-        start_item(seq_item);
-        seq_item.reset_n = 1'b1;
-        seq_item.instr_dispatch_i = instr_dispatch;
-        seq_item.instr_dispatch_valid_i = instr_dispatch_valid;
-        seq_item.dispatched_instr_alloc_euidx_i = instr_dispatch_alloc_euidx;
-
-        seq_item.icon_instr_dispatch_i = icon_instr_dispatch;
-        seq_item.icon_instr_dispatch_valid_i = icon_instr_dispatch_valid;
-        finish_item(seq_item);
         
         instr_dispatch_ptr = 'd0;
         icon_instr_dispatch_ptr = 'd0;
       end else if (icon_instr_dispatch_ptr == NUM_ICON_CHANNELS) begin
-        `uvm_info("BACKEND_TEST0", "icon batch filled. Dispatching icon only...", UVM_MEDIUM)
-        seq_item = backend_sequence_item::type_id::create("seq_item");
-
-        start_item(seq_item);
-        seq_item.reset_n = 1'b1;
-
-        for(int g_parallel_dist = 0; g_parallel_dist < NUM_PARALLEL_INSTR_DISPATCHES; g_parallel_dist++) begin
-          seq_item.instr_dispatch_valid_i[g_parallel_dist] = 'b0;
+        `uvm_info("BACKEND_TEST0", "icon batch filled. Moving to next icon batch idx within same batch", UVM_MEDIUM)
+        icon_batch_ptrs[batch_idx] = icon_batch_ptrs[batch_idx] + 1;
+        if(icon_batch_ptrs[batch_idx] == NUM_ICON_BATCHES) begin
+          `uvm_fatal("BACKEND_TEST0", "NUM_ICON_BATCHES is too small")
         end
         
-        seq_item.icon_instr_dispatch_i = icon_instr_dispatch;
-        seq_item.icon_instr_dispatch_valid_i = icon_instr_dispatch_valid;
-        finish_item(seq_item);
         icon_instr_dispatch_ptr = 'd0;
       end
       
@@ -424,23 +410,42 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
     $fclose(file);
     $fclose(file_instr_formats);
 
-    //dispatch the remaining icon and normal instructions
-    `uvm_info("BACKEND_TEST0", "Dispatching left over instructions", UVM_MEDIUM)
-    seq_item = backend_sequence_item::type_id::create("seq_item");
-    start_item(seq_item);
-    seq_item.reset_n = 1'b1;
-    seq_item.instr_dispatch_i = instr_dispatch;
-    seq_item.instr_dispatch_valid_i = instr_dispatch_valid;
-    seq_item.dispatched_instr_alloc_euidx_i = instr_dispatch_alloc_euidx;
+    `uvm_info("BACKEND_TEST0", "Finished sequence construction", UVM_MEDIUM)
+  endtask
 
-    seq_item.icon_instr_dispatch_i = icon_instr_dispatch;
-    seq_item.icon_instr_dispatch_valid_i = icon_instr_dispatch_valid;
-    finish_item(seq_item);
+  virtual task body();
+    backend_sequence_item seq_item;
+    for (int i = 0; i < NUM_BATCHES; i++) begin
+      for (int j = 0; j < (icon_batch_ptrs[i]-1); j++) begin
+        //dispatch all icon batches apart from last one which is dispatched
+        //in same seq item as main batch
+        seq_item = backend_sequence_item::type_id::create("seq_item");
+        start_item(seq_item);
+        seq_item.reset_n = 1'b1;
+        for(int g_parallel_dist = 0; g_parallel_dist < NUM_PARALLEL_INSTR_DISPATCHES; g_parallel_dist++) begin
+          seq_item.instr_dispatch_valid_i[g_parallel_dist] = 'b0;
+        end
+        seq_item.icon_instr_dispatch_i = icon_instr_dispatch[i][j];
+        seq_item.icon_instr_dispatch_valid_i = icon_instr_dispatch_valid[i][j];
+        finish_item(seq_item);
+      end
+
+      seq_item = backend_sequence_item::type_id::create("seq_item");
+      start_item(seq_item);
+      seq_item.reset_n = 1'b1;
+      seq_item.instr_dispatch_i = instr_dispatch[i];
+      seq_item.instr_dispatch_valid_i = instr_dispatch_valid[i];
+      seq_item.dispatched_instr_alloc_euidx_i = instr_dispatch_alloc_euidx[i];
+
+      seq_item.icon_instr_dispatch_i = icon_instr_dispatch[i][icon_batch_ptrs[i]-1];
+      seq_item.icon_instr_dispatch_valid_i = icon_instr_dispatch_valid[i][icon_batch_ptrs[i]-1];
+      finish_item(seq_item);
+    end
 
     //next steps do nothing
     //its just to delay the $finish call
     `uvm_info("BACKEND_TEST0", "Adding empty packets", UVM_MEDIUM)
-    for (int step = 0; step < 10; step++) begin
+    for (int step = 0; step < 50; step++) begin
       seq_item = backend_sequence_item::type_id::create("seq_item");
       start_item(seq_item);
       seq_item.reset_n = 1'b1;
@@ -452,8 +457,6 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
       end
       finish_item(seq_item);
     end
-
-    `uvm_info("BACKEND_TEST0", "Finished sequence construction", UVM_MEDIUM)
   endtask
 
 endclass
@@ -484,3 +487,17 @@ class backend_test_0 extends uvm_test;
 endclass
 
 `endif //include guard
+
+/*instr_metadata_file = {`BACKEND_ASSEMBLY_TXT_PATH, "_meta.txt"};
+    `uvm_info("BACKEND_TEST0", {"Opening file: ", instr_metadata_file}, UVM_MEDIUM)
+    file_metadata = $fopen(instr_metadata_file, "r");
+    if (file_metadata == 0) begin
+      `uvm_fatal("BACKEND_TEST0", {"Failed to open ", instr_metadata_file})
+    end*/
+    /*read_result = $fscanf(file_metadata, "totNumLines:%0d", total_num_lines);
+    if (read_result != 1) begin
+      `uvm_fatal("BACKEND_TEST0", "Failed to get total number of lines from metadata file")
+    end
+    if (NUM_BATCHES < ((total_num_lines / NUM_PARALLEL_INSTR_DISPATCHES) + 1) ) begin
+      `uvm_fatal("BACKEND_TEST0", $sformatf("NUM_BATCHES is too small. Needs to be at least %0d", (total_num_lines / NUM_PARALLEL_INSTR_DISPATCHES) + 1))
+    end*/

@@ -25,12 +25,14 @@ module eu_IQueue import pkg_dtypes::*; #(
   // ----------------------------------
   // Curr instr round robin counter
   // ----------------------------------
+  wire is_empty [NUM_QUEUES-1:0]; //is buffer empty?
+
   logic [EU_LOG2_IQUEUE_NUM_QUEUES-1:0] curr_instr_rr_ctr;
   always_ff @(posedge clk) begin
     if(~reset_n) begin
       curr_instr_rr_ctr = 'b0;
     end else begin
-      if(ready_for_next_instr_i) begin
+      if(ready_for_next_instr_i & (~is_empty[curr_instr_rr_ctr])) begin
         curr_instr_rr_ctr = curr_instr_rr_ctr + 1'b1;
       end
     end
@@ -92,6 +94,24 @@ module eu_IQueue import pkg_dtypes::*; #(
   type_iqueue_entry dispatched_instr       [NUM_QUEUES-1:0];
   logic             dispatched_instr_valid [NUM_QUEUES-1:0];
   wire is_full [NUM_QUEUES-1:0]; //directly from buffers
+
+  logic [EU_LOG2_IQUEUE_NUM_QUEUES-1:0] tot_num_valid_instr_to_be_inserted;
+  logic [EU_LOG2_IQUEUE_NUM_QUEUES-1:0] iqueue_idx_alloc_ctr;
+  always_comb begin
+    tot_num_valid_instr_to_be_inserted = 'd0;
+    for(int c = 0; (c < NUM_QUEUES) & dispatched_instr_valid_intermediate[tot_num_valid_instr_to_be_inserted]; c++) begin
+      tot_num_valid_instr_to_be_inserted = tot_num_valid_instr_to_be_inserted + 'd1;
+    end
+  end
+  always_ff @(posedge clk) begin
+    if(~reset_n) begin
+      iqueue_idx_alloc_ctr = 'b0;
+    end else begin
+      if(tot_num_valid_instr_to_be_inserted != 'd0) begin
+        iqueue_idx_alloc_ctr = iqueue_idx_alloc_ctr + tot_num_valid_instr_to_be_inserted;
+      end
+    end
+  end
   always_comb begin
     is_full_o = 1'b0;
     //continuous assign 0s to stop synth creating registers where there arent meant to be any
@@ -113,7 +133,6 @@ module eu_IQueue import pkg_dtypes::*; #(
   // ----------------------------------
   // Buffers
   // ----------------------------------
-  wire is_empty [NUM_QUEUES-1:0];
   assign curr_instr_to_exec_valid_o = ~is_empty[curr_instr_rr_ctr];
 
   wire type_iqueue_entry curr_instrs [NUM_QUEUES-1:0];

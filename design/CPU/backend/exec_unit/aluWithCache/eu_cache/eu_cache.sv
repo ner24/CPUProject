@@ -130,9 +130,9 @@ module eu_cache import pkg_dtypes::*; #(
     .reset_n(reset_n),
 
     .op0_req_addr_i(op0_local_addr),
-    .op0_req_addr_valid_i(curr_instr_valid_i & ~curr_instr_op0_isforeign),
+    .op0_req_addr_valid_i(curr_instr_valid_i & ~curr_instr_op0_isforeign & curr_instr_op0_isreg),
     .op1_req_addr_i(op1_local_addr),
-    .op1_req_addr_valid_i(curr_instr_valid_i & ~curr_instr_op1_isforeign),
+    .op1_req_addr_valid_i(curr_instr_valid_i & ~curr_instr_op1_isforeign & curr_instr_op1_isreg),
 
     .op0_data_o(op0_data),
     .op0_data_success_o(op0_success),

@@ -36,6 +36,7 @@ module cache_DP # (
   localparam TAG_ADDRESS_WITDH = ADDR_WIDTH - IDX_BITS;
 
   typedef struct packed {
+    logic                         valid; //NOTE: this is added here for safety and simplifying debug traces. It may be possible to for the caches to not need a valid flag
     logic        [DATA_WIDTH-1:0] data;
     logic [TAG_ADDRESS_WITDH-1:0] stored_tag;
   } cache_entry;
@@ -44,11 +45,12 @@ module cache_DP # (
   cache_entry rdatab;
   cache_entry wdata;
 
-  assign rhita_o  = rdataa.stored_tag == addra_i[ADDR_WIDTH-1:IDX_BITS];//&(~(rdataa.stored_tag ^ addra_i[ADDR_WIDTH-1:IDX_BITS]));
-  assign rhitb_o  = rdatab.stored_tag == addrb_i[ADDR_WIDTH-1:IDX_BITS];//&(~(rdatab.stored_tag ^ addrb_i[ADDR_WIDTH-1:IDX_BITS]));
+  assign rhita_o  = rdataa.valid & (rdataa.stored_tag == addra_i[ADDR_WIDTH-1:IDX_BITS]);
+  assign rhitb_o  = rdatab.valid & (rdatab.stored_tag == addrb_i[ADDR_WIDTH-1:IDX_BITS]);
   assign rdataa_o = rdataa.data;
   assign rdatab_o = rdatab.data;
 
+  assign wdata.valid      = 1'b1;
   assign wdata.data       = wdata_i;
   assign wdata.stored_tag = addra_i[ADDR_WIDTH-1:IDX_BITS];
 

@@ -4,15 +4,15 @@
 // --------------------------------
 // Architectural/general params
 // --------------------------------
-`define WORD_WIDTH 8
+`define WORD_WIDTH 16
 `define NUM_REG 8 //number of architectural r registers
 `define LOG2_NUM_INSTRUCTIONS_PER_EXEC_TYPE 4
 
 // --------------------------------
 // Renamed address config
 // --------------------------------
-`define REN_ADDR_SPEC_IDX_NUM_BITS 3
-`define REN_ADDR_UID_NUM_BITS 4
+`define REN_ADDR_SPEC_IDX_NUM_BITS 5
+`define REN_ADDR_UID_NUM_BITS 9
 
 // --------------------------------
 // Execution unit params

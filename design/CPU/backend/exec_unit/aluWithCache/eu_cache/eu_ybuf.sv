@@ -59,6 +59,10 @@ module eu_ybuf import pkg_dtypes::*; #(
     end
   end
 
+  wire ys_hit_op0, ys_hit_op1;
+  assign ys_hit_op0 = op0_req_addr_valid_i & (op0_req_addr_i == ys_buffer.addr);
+  assign ys_hit_op1 = op1_req_addr_valid_i & (op1_req_addr_i == ys_buffer.addr);
+
   // ----------------------------------
   // y buffer r and w mode interfaces
   // ----------------------------------
@@ -83,14 +87,15 @@ module eu_ybuf import pkg_dtypes::*; #(
   
   assign w_addra = ys_buffer.addr;
   assign w_addrb = op1_req_addr_i;
-  assign w_wdataa = ys_buffer.data;
+  assign w_wdataa.data = ys_buffer.data;
+  assign w_wdataa.n_hbr = 1'b1;
 
   assign r_n_hbr = r_rdataa.n_hbr;
 
-  assign op0_data_o = r_rdatab.data;
-  assign op0_data_success_o = r_fetch_success & r_rdatab.n_hbr;
-  assign op1_data_o = w_rdatab.data;
-  assign op1_data_success_o = w_fetch_success & w_rdatab.n_hbr;
+  assign op0_data_o = ys_hit_op0 ? ys_buffer.data : r_rdatab.data;
+  assign op0_data_success_o = ys_hit_op0 | (r_fetch_success & r_rdatab.n_hbr);
+  assign op1_data_o = ys_hit_op0 ? ys_buffer.data : w_rdatab.data;
+  assign op1_data_success_o = ys_hit_op0 | (w_fetch_success & w_rdatab.n_hbr);
 
   assign result_store_slot_available = ~r_n_hbr;
   assign result_success_o = result_valid_i & result_store_slot_available;

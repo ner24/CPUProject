@@ -1,0 +1,2 @@
+totNumLines:24
+numIconsPerBatch:1,1,1,3,
