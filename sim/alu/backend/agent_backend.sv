@@ -41,7 +41,8 @@ class backend_driver extends uvm_driver #(backend_sequence_item);
       seq_item_port.get_next_item(req);
 
       //only switch to next item when backend is ready
-      //@(posedge vintf.clk);
+      //and all instructions within batch have been accepted
+      
       @(posedge vintf.clk & vintf.instr_dispatch_ready_o & vintf.icon_instr_dispatch_ready_all_o);
       drive(req);
       seq_item_port.item_done();

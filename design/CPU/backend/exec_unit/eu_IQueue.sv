@@ -119,11 +119,11 @@ module eu_IQueue import pkg_dtypes::*; #(
       dispatched_instr[i] = 'b0;
       dispatched_instr_valid[i] = 'b0;
     end
-    for (int i32 = 0; i32 < NUM_QUEUES; i32++) begin
+    for (int i32 = 0; i32 < NUM_QUEUES; i32++) begin //Note that this will fall apart if log2(NUM_QUEUES) does not equal an integer
       logic [EU_LOG2_IQUEUE_NUM_QUEUES-1:0] i;
       logic [EU_LOG2_IQUEUE_NUM_QUEUES-1:0] idx;
       i = i32[EU_LOG2_IQUEUE_NUM_QUEUES-1:0];
-      idx = curr_instr_rr_ctr + (i + 'd1);
+      idx = iqueue_idx_alloc_ctr + i;//(i + 'd1);
       dispatched_instr[idx] = dispatched_instr_intermediate[i];
       dispatched_instr_valid[idx] = dispatched_instr_valid_intermediate[i];
       is_full_o |= is_full[idx] & dispatched_instr_valid[idx];

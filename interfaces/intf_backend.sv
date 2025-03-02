@@ -30,5 +30,5 @@ interface intf_backend import pkg_dtypes::*; #(
       end
     end
   end
-    
+  
 endinterface

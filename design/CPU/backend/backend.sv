@@ -1,3 +1,5 @@
+`include "simulation_parameters.sv"
+
 module u_backend import pkg_dtypes::*; #(
   parameter NUM_ICON_CHANNELS = 4,
   parameter NUM_EXEC_UNITS = 4,
@@ -84,6 +86,12 @@ module u_backend import pkg_dtypes::*; #(
       assign channels[i].success_list.receiver_mxreg = 'b0;
   end endgenerate
 
+  //when dispatch bus is wider than eu accept bus, it is possible
+  //that some instructions in batch will get accepted as there are not enough
+  //lanes in the accept bus of a specific eu. In which case, the front end should stall
+  //and try and dispatch the left over instructions. Front end should keep retrying until
+  //entire batch gets dispatched and accepted into their designated EU IQueues
+  //NOTE: leaving this comment here, but this is now handled in EU Alloc ILN
   wire [NUM_EXEC_UNITS-1:0] instr_dispatch_readys;
   assign instr_dispatch_ready_o = |instr_dispatch_readys;
   generate for (genvar eu_idx = 0; eu_idx < NUM_EXEC_UNITS; eu_idx++) begin: g_eu
@@ -144,7 +152,7 @@ module u_backend import pkg_dtypes::*; #(
       );
     end
 
-    execution_unit #( //WIP. THis module without the IQueue only exists for verif purposes
+    `SIM_TB_MODULE(execution_unit) #( //WIP. THis module without the IQueue only exists for verif purposes
       .NUM_PARALLEL_INSTR_DISPATCHES(NUM_PARALLEL_INSTR_DISPATCHES),
       .EU_IDX(eu_idx)
     ) eu (
