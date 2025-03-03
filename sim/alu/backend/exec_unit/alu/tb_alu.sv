@@ -5,6 +5,7 @@ import uvm_pkg::*;
 `include "design_parameters.sv"
 
 module `SIM_TB_MODULE(alu) import uvm_pkg::*; import pkg_dtypes::*; #(
+  parameter DATA_WIDTH = `WORD_WIDTH,
   parameter USE_PIPELINED_ALU = `ALU_USE_PIPELINED_ALU
 ) (
   input  wire                   clk,
@@ -20,6 +21,8 @@ module `SIM_TB_MODULE(alu) import uvm_pkg::*; import pkg_dtypes::*; #(
 );
 
   alu #(
+    .DATA_WIDTH(DATA_WIDTH),
+    .USE_PIPELINED_ALU(USE_PIPELINED_ALU)
   ) dut (
     .clk(clk),
     .reset_n(reset_n),

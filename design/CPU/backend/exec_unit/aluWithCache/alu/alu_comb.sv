@@ -11,20 +11,20 @@ module alu_comb #(
     input  wire                   cin
 );
     //twos complement inverter
-    wire[DATA_WIDTH - 1:0] invA;
+    wire[DATA_WIDTH - 1:0] invB;
     alu_inverter #(
         .DATA_WIDTH(DATA_WIDTH)
     ) inv0 (
-        .a(a),
+        .a(b),
         .twos_en(ctrl[7]),
         .all_en(ctrl[6]),
-        .invA(invA)
+        .invA(invB)
     );
 
     //enable b input (for NOT functionality)
     wire[DATA_WIDTH - 1:0] b_with_en;
     generate for (genvar i = 0; i < DATA_WIDTH; i = i + 1) begin
-        assign b_with_en[i] = b[i] & ~ctrl[6];
+        assign b_with_en[i] = invB[i] & ~ctrl[6];
     end endgenerate
 
     //modified adder
@@ -35,7 +35,7 @@ module alu_comb #(
     alu_add_cla_lh #(
         .DATA_WIDTH(DATA_WIDTH)
     ) cla_lh_0 (
-        .a(invA),
+        .a(a),
         .b(b_with_en),
         .oX(cla_lh_oX),
         .cgen(cla_lh_cgen_out),

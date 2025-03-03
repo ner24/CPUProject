@@ -93,24 +93,24 @@ module sva_alu_op import pkg_dtypes::*; #(
   assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == MVN) & curr_instr_valid_i |-> out == ~in_a_sync)
   else `uvm_error("SVA_ALU_OP", $sformatf("%0d -> NOT operation incorrect: %b -> %b", $time(), in_a_sync, out));
 
-  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == AND) & curr_instr_valid_i |-> out == (in_b_sync & in_a_sync))
+  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == AND) & curr_instr_valid_i |-> out == (in_a_sync & in_b_sync))
   else `uvm_error("SVA_ALU_OP", $sformatf("%0d -> AND operation incorrect: %b %b -> %b", $time(), in_a_sync, in_b_sync, out));
 
-  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == ORR) & curr_instr_valid_i |-> out == (in_b_sync | in_a_sync))
+  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == ORR) & curr_instr_valid_i |-> out == (in_a_sync | in_b_sync))
   else `uvm_error("SVA_ALU_OP", $sformatf("%0d -> OR operation incorrect: %b %b -> %b", $time(), in_a_sync, in_b_sync, out));
 
-  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == XOR) & curr_instr_valid_i |-> out == (in_b_sync ^ in_a_sync))
+  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == XOR) & curr_instr_valid_i |-> out == (in_a_sync ^ in_b_sync))
   else `uvm_error("SVA_ALU_OP", $sformatf("%0d -> XOR operation incorrect: %b %b -> %b", $time(), in_a_sync, in_b_sync, out));
 
-  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == NAND) & curr_instr_valid_i |-> out == ~(in_b_sync & in_a_sync))
+  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == NAND) & curr_instr_valid_i |-> out == ~(in_a_sync & in_b_sync))
   else `uvm_error("SVA_ALU_OP", $sformatf("%0d -> NAND operation incorrect: %b %b -> %b", $time(), in_a_sync, in_b_sync, out));
 
   //TODO: add NOR and XNOR checks. Also MUL, DIV when they get added to design
 
-  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == ADD) & curr_instr_valid_i |-> out == (in_b_sync + in_a_sync))
+  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == ADD) & curr_instr_valid_i |-> out == (in_a_sync + in_b_sync))
   else `uvm_error("SVA_ALU_OP", $sformatf("%0d -> ADD operation incorrect: %b %b -> %b", $time(), in_a_sync, in_b_sync, out));
   
-  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == SUB) & curr_instr_valid_i |-> out == (in_b_sync - in_a_sync))
+  assert property(@(posedge alu_clk) disable iff (~alu_resetn) (alu_cir_sync == SUB) & curr_instr_valid_i |-> out == (in_a_sync - in_b_sync))
   else `uvm_error("SVA_ALU_OP", $sformatf("%0d -> SUB operation incorrect: %b %b -> %b", $time(), in_a_sync, in_b_sync, out));
 
 endmodule

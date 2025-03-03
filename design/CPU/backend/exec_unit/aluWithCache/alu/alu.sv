@@ -33,7 +33,7 @@ module alu import pkg_dtypes::*; #(
   always_comb begin: decode_instruction
     case(casted_specific_instr)
       //arithmetic and logic
-      MVN : cir_decoded = 9'b 010001000 ;
+      MVN : cir_decoded = 9'b 010001010 ;
       AND : cir_decoded = 9'b 001000100 ;
       ORR : cir_decoded = 9'b 001100100 ;
       XOR : cir_decoded = 9'b 000001000 ;
@@ -53,6 +53,7 @@ module alu import pkg_dtypes::*; #(
     endcase
   end
 
+  wire [DATA_WIDTH-1:0] opd_data;
   generate if (USE_PIPELINED_ALU) begin: g_alu_comb_piped
     alu_comb_piped #(
       .DATA_WIDTH(DATA_WIDTH)
@@ -63,7 +64,7 @@ module alu import pkg_dtypes::*; #(
 
       .a(alu_rx_i.op0_data),
       .b(alu_rx_i.op1_data),
-      .out(alu_tx_o.opd_data),
+      .out(opd_data),
       .out_en(~cir_decoded[0]),
       .ctrl(cir_decoded[8:1]),
       .cin(1'b0),
@@ -75,7 +76,7 @@ module alu import pkg_dtypes::*; #(
     ) u_alu_comb (
       .a(alu_rx_i.op0_data),
       .b(alu_rx_i.op1_data),
-      .out(alu_tx_o.opd_data),
+      .out(opd_data),
       .out_en(~cir_decoded[0]),
       .ctrl(cir_decoded[8:1]),
       .cin(1'b0),
@@ -93,5 +94,7 @@ module alu import pkg_dtypes::*; #(
       default: barrel_shift_out = 'b0;
     endcase
   end
+
+  assign alu_tx_o.opd_data.data = cir_decoded[0] ? barrel_shift_out : opd_data;
 
 endmodule

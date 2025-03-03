@@ -541,17 +541,3 @@ class backend_test_0 extends uvm_test;
 endclass
 
 `endif //include guard
-
-/*instr_metadata_file = {`BACKEND_ASSEMBLY_TXT_PATH, "_meta.txt"};
-    `uvm_info("BACKEND_TEST0", {"Opening file: ", instr_metadata_file}, UVM_MEDIUM)
-    file_metadata = $fopen(instr_metadata_file, "r");
-    if (file_metadata == 0) begin
-      `uvm_fatal("BACKEND_TEST0", {"Failed to open ", instr_metadata_file})
-    end*/
-    /*read_result = $fscanf(file_metadata, "totNumLines:%0d", total_num_lines);
-    if (read_result != 1) begin
-      `uvm_fatal("BACKEND_TEST0", "Failed to get total number of lines from metadata file")
-    end
-    if (NUM_BATCHES < ((total_num_lines / NUM_PARALLEL_INSTR_DISPATCHES) + 1) ) begin
-      `uvm_fatal("BACKEND_TEST0", $sformatf("NUM_BATCHES is too small. Needs to be at least %0d", (total_num_lines / NUM_PARALLEL_INSTR_DISPATCHES) + 1))
-    end*/

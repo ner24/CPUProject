@@ -174,7 +174,7 @@ package pkg_dtypes;
   // note that the datatypes for all opcode types
   // must be equal
 
-  typedef enum logic [3:0] {
+  typedef enum logic [LOG2_NUM_INSTRUCTIONS_PER_EXEC_TYPE:0] {
     MVN,
     AND,
     ORR,
@@ -190,16 +190,16 @@ package pkg_dtypes;
     //LRO
   } enum_instr_exec_unit;
 
-  typedef enum logic [3:0] {
+  typedef enum logic [LOG2_NUM_INSTRUCTIONS_PER_EXEC_TYPE:0] {
     CMP //not adding any other instructions for now
   } enum_instr_exec_unit_cmp;
 
-  typedef enum logic [3:0] {
+  typedef enum logic [LOG2_NUM_INSTRUCTIONS_PER_EXEC_TYPE:0] {
     LDR,
     STR
   } enum_instr_ldr_str;
 
-  typedef enum logic [3:0] {
+  typedef enum logic [LOG2_NUM_INSTRUCTIONS_PER_EXEC_TYPE:0] {
     B,    //unconditional branch
     B_GT, //branch when greater than
     B_LT, //branch when less than
