@@ -94,6 +94,8 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
   localparam NUM_EXEC_UNITS = 2**LOG2_NUM_EXEC_UNITS;
   localparam NUM_BATCHES = 3; //set to some value that is larger than actual number of batches (since cannot be found at compile time)
   localparam NUM_ICON_BATCHES = 1;
+  localparam EU_LOG2_IQUEUE_NUM_QUEUES = `EU_LOG2_IQUEUE_NUM_QUEUES;
+  localparam EU_IQUEUE_NUM_QUEUES = 2**EU_LOG2_IQUEUE_NUM_QUEUES;
 
   logic [LOG2_NUM_EXEC_UNITS-1:0] instr_dispatch_alloc_euidx [NUM_BATCHES-1:0] [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
   type_iqueue_entry instr_dispatch            [NUM_BATCHES-1:0] [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
@@ -413,8 +415,13 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
     `uvm_info("BACKEND_TEST0", "Finished sequence construction", UVM_MEDIUM)
   endtask
 
+  //Note that this algorithm also splits the batches into smaller batches
+  //that can be passed in a single cycle to the required iqueues when they are ready
+  //this is to avoid packets being dropped due to iqueues ignoring instructions when
+  //more than EU_IQUEUE_NUM_QUEUES number of instructions are dispatched to the same EU
   virtual task body();
     backend_sequence_item seq_item;
+    int v1, v2, v3;
     for (int i = 0; i < NUM_BATCHES; i++) begin
       for (int j = 0; j < (icon_batch_ptrs[i]-1); j++) begin
         //dispatch all icon batches apart from last one which is dispatched
@@ -430,7 +437,54 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
         finish_item(seq_item);
       end
 
-      seq_item = backend_sequence_item::type_id::create("seq_item");
+      v1 = instr_dispatch_alloc_euidx[i][0];
+      v2 = 1;
+      v3 = 0;
+      for (int k = 1; k < NUM_PARALLEL_INSTR_DISPATCHES; k++) begin
+        if (instr_dispatch_valid[i][k]) begin
+          if (v1 == instr_dispatch_alloc_euidx[i][k]) begin
+            v2++;
+          end else begin
+            v1 = instr_dispatch_alloc_euidx[i][k];
+            v2 = 1;
+            v3 = k;
+          end
+        end
+        if( (v2 == EU_IQUEUE_NUM_QUEUES) | (k == (NUM_PARALLEL_INSTR_DISPATCHES-1)) ) begin
+            //`uvm_info("BACKEND_TEST0", $sformatf("k=%0d", k), UVM_MEDIUM)
+            seq_item = backend_sequence_item::type_id::create("seq_item");
+            start_item(seq_item);
+            seq_item.reset_n = 1'b1;
+            seq_item.instr_dispatch_i = instr_dispatch[i];
+            seq_item.dispatched_instr_alloc_euidx_i = instr_dispatch_alloc_euidx[i];
+            
+            for(int k1 = 0; k1 < v3; k1++) begin
+              seq_item.instr_dispatch_valid_i[k1] = 'b0;
+            end
+            for(int k1 = v3; k1 < (v3+v2); k1++) begin
+              seq_item.instr_dispatch_valid_i[k1] = instr_dispatch_valid[i][k1];
+            end
+            for(int k1 = (v3+v2); k1 < NUM_PARALLEL_INSTR_DISPATCHES; k1++) begin
+              seq_item.instr_dispatch_valid_i[k1] = 'b0;
+            end
+
+            if (k == (NUM_PARALLEL_INSTR_DISPATCHES-1)) begin
+              seq_item.icon_instr_dispatch_i = icon_instr_dispatch[i][icon_batch_ptrs[i]-1];
+              seq_item.icon_instr_dispatch_valid_i = icon_instr_dispatch_valid[i][icon_batch_ptrs[i]-1];
+            end else begin
+              for (int k2 = 0; k2 < NUM_ICON_CHANNELS; k2++) begin
+                seq_item.icon_instr_dispatch_i[k2] = 'b0;
+                seq_item.icon_instr_dispatch_valid_i[k2] = 'b0;
+              end
+            end
+            finish_item(seq_item);
+
+            v2 = 0;
+            v3 = k+1;
+          end
+      end
+
+      /*seq_item = backend_sequence_item::type_id::create("seq_item");
       start_item(seq_item);
       seq_item.reset_n = 1'b1;
       seq_item.instr_dispatch_i = instr_dispatch[i];
@@ -439,7 +493,7 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
 
       seq_item.icon_instr_dispatch_i = icon_instr_dispatch[i][icon_batch_ptrs[i]-1];
       seq_item.icon_instr_dispatch_valid_i = icon_instr_dispatch_valid[i][icon_batch_ptrs[i]-1];
-      finish_item(seq_item);
+      finish_item(seq_item);*/
     end
 
     //next steps do nothing

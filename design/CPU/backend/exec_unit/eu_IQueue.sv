@@ -56,6 +56,8 @@ module eu_IQueue import pkg_dtypes::*; #(
   wire type_iqueue_entry dispatched_instr_intermediate       [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
   wire                   dispatched_instr_valid_intermediate [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
 
+  logic [$clog2(NUM_PARALLEL_INSTR_DISPATCHES)-1:0] least_significant_valid_instr;
+
   generate for (genvar i = 0; i < NUM_PARALLEL_INSTR_DISPATCHES; i++) begin
     wire type_iqueue_entry dispatched_instr_intermediate2;
     wire                   dispatched_instr_valid_intermediate2;
@@ -65,21 +67,21 @@ module eu_IQueue import pkg_dtypes::*; #(
                                                 dispatched_instr_i[i]
                                               : dispatched_instr_i[i+1];
       assign dispatched_instr_valid_intermediate2 = dispatched_instr_valid_relevant[i] ?
-                                                      dispatched_instr_valid_i[i]
-                                                    : dispatched_instr_valid_i[i+1];
+                                                      dispatched_instr_valid_relevant[i]
+                                                    : dispatched_instr_valid_relevant[i+1];
     end else begin
       assign dispatched_instr_intermediate2 = dispatched_instr_valid_relevant[i] ?
                                                 dispatched_instr_i[i]
                                               : 'b0;
       assign dispatched_instr_valid_intermediate2 = dispatched_instr_valid_relevant[i] ?
-                                                      dispatched_instr_valid_i[i]
+                                                      dispatched_instr_valid_relevant[i]
                                                     : 'b0;
     end
     if(i != 'd0) begin
-      assign dispatched_instr_intermediate[i] = dispatched_instr_valid_relevant[i-1] ?
+      assign dispatched_instr_intermediate[i] = dispatched_instr_valid_relevant[i-1] | (i == least_significant_valid_instr) ?
                                                   dispatched_instr_intermediate2
                                                 : 'b0;
-      assign dispatched_instr_valid_intermediate[i] = dispatched_instr_valid_relevant[i-1] ?
+      assign dispatched_instr_valid_intermediate[i] = dispatched_instr_valid_relevant[i-1] | (i == least_significant_valid_instr) ?
                                                         dispatched_instr_valid_intermediate2
                                                       : 'b0;
     end else begin
@@ -99,8 +101,10 @@ module eu_IQueue import pkg_dtypes::*; #(
   logic [EU_LOG2_IQUEUE_NUM_QUEUES-1:0] iqueue_idx_alloc_ctr;
   always_comb begin
     tot_num_valid_instr_to_be_inserted = 'd0;
-    for(int c = 0; (c < NUM_QUEUES) & dispatched_instr_valid_intermediate[tot_num_valid_instr_to_be_inserted]; c++) begin
-      tot_num_valid_instr_to_be_inserted = tot_num_valid_instr_to_be_inserted + 'd1;
+    for(int c = 0; c < NUM_QUEUES; c++) begin
+      if (dispatched_instr_valid_intermediate[c+least_significant_valid_instr]) begin
+        tot_num_valid_instr_to_be_inserted++;
+      end
     end
   end
   always_ff @(posedge clk) begin
@@ -112,21 +116,28 @@ module eu_IQueue import pkg_dtypes::*; #(
       end
     end
   end
+
+  //represents the lowest dispatch bus idx that is valid and relevant
+  //Note: this can also be done by converting the output to one hot by only making the most significant bit disable
+  //the outputs of the lesser significant bits and then passing into a one-hot to binary encoder. Might make a simpler circuit
+  always_comb begin
+    least_significant_valid_instr = 'd0;
+    for(int c = 0; c < NUM_PARALLEL_INSTR_DISPATCHES; c++) begin
+      if (dispatched_instr_valid_relevant[c]) begin
+        least_significant_valid_instr = c[$clog2(NUM_PARALLEL_INSTR_DISPATCHES)-1:0];
+        break;
+      end
+    end
+  end
+
+  logic [$clog2(NUM_PARALLEL_INSTR_DISPATCHES)-1:0] idx;
   always_comb begin
     is_full_o = 1'b0;
-    //continuous assign 0s to stop synth creating registers where there arent meant to be any
-    for (int i = 0; i < NUM_QUEUES; i++) begin
-      dispatched_instr[i] = 'b0;
-      dispatched_instr_valid[i] = 'b0;
-    end
-    for (int i32 = 0; i32 < NUM_QUEUES; i32++) begin //Note that this will fall apart if log2(NUM_QUEUES) does not equal an integer
-      logic [EU_LOG2_IQUEUE_NUM_QUEUES-1:0] i;
-      logic [EU_LOG2_IQUEUE_NUM_QUEUES-1:0] idx;
-      i = i32[EU_LOG2_IQUEUE_NUM_QUEUES-1:0];
-      idx = iqueue_idx_alloc_ctr + i;//(i + 'd1);
-      dispatched_instr[idx] = dispatched_instr_intermediate[i];
-      dispatched_instr_valid[idx] = dispatched_instr_valid_intermediate[i];
-      is_full_o |= is_full[idx] & dispatched_instr_valid[idx];
+    idx = least_significant_valid_instr + iqueue_idx_alloc_ctr;
+    for (int i = 0; i < NUM_QUEUES; i++, idx++) begin
+      dispatched_instr[i] = dispatched_instr_intermediate[idx];
+      dispatched_instr_valid[i] = dispatched_instr_valid_intermediate[idx];
+      is_full_o |= is_full[i] & dispatched_instr_valid[i];
     end
   end
 

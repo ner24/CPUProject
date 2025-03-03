@@ -27,7 +27,7 @@ package pkg_dtypes;
 
   typedef struct packed {
     logic [REN_ADDR_UID_NUM_BITS-1:0]  uid;
-    logic [LOG2_NUM_EXEC_UNITS-1:0]    spec;
+    logic [REN_ADDR_SPEC_IDX_NUM_BITS-1:0]    spec;
   } type_alu_local_addr;
 
   // ------------------------------------------

@@ -83,8 +83,23 @@ module `SIM_TB_MODULE(execution_unit) import uvm_pkg::*; import pkg_dtypes::*; #
   initial begin
     forever begin
       @(edge dut.curr_instr);
-      `uvm_info($sformatf("EXEC_UNIT_%0d", EU_IDX), $sformatf("Current instruction: %3s dest: %d,%d,%d",
-        dut.curr_instr.opcode.name, dut.curr_instr.euidx, dut.curr_instr.uid, dut.curr_instr.spec), UVM_MEDIUM)
+      case (dut.curr_instr.opcode.exec_type)
+      EXEC_UNIT: begin
+        if (dut.curr_instr_to_exec_valid) begin
+          enum_instr_exec_unit casted_specific_instr;
+          casted_specific_instr = enum_instr_exec_unit'(dut.curr_instr.opcode.specific_instr);
+          `uvm_info($sformatf("EXEC_UNIT_%0d", EU_IDX), $sformatf("Current instruction: %3s dest: %0d,%0d,%0d",
+            casted_specific_instr.name, dut.curr_instr.opd.euidx, dut.curr_instr.opd.uid, dut.curr_instr.opd.spec), UVM_MEDIUM)
+        end
+      end
+      default: begin
+        if (dut.curr_instr_to_exec_valid) begin
+          `uvm_info($sformatf("EXEC_UNIT_%0d", EU_IDX), $sformatf("Current instruction: %0d dest: %0d,%0d,%0d",
+            dut.curr_instr.opcode.specific_instr, dut.curr_instr.opd.euidx, dut.curr_instr.opd.uid, dut.curr_instr.opd.spec), UVM_MEDIUM)
+        end
+      end
+      endcase
+      
     end
   end
 
