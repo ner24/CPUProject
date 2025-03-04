@@ -15,15 +15,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="38.446 ns"></ZoomStartTime>
-      <ZoomEndTime time="69.362 ns"></ZoomEndTime>
-      <Cursor1Time time="109.000 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="30.916 ns"></ZoomEndTime>
+      <Cursor1Time time="9.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="212"></NameColumnWidth>
       <ValueColumnWidth column_width="74"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="19" />
+   <WVObjectSize size="22" />
    <wvobject fp_name="/backend_tb_top/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -119,12 +119,10 @@
    <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/iqueue/dispatched_instr_i" type="array">
       <obj_property name="ElementShortName">dispatched_instr_i[7:0]</obj_property>
       <obj_property name="ObjectShortName">dispatched_instr_i[7:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/iqueue/dispatched_instr" type="array">
       <obj_property name="ElementShortName">dispatched_instr[3:0]</obj_property>
       <obj_property name="ObjectShortName">dispatched_instr[3:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/iqueue/dispatched_instr[3]" type="array">
          <obj_property name="ElementShortName">[3]</obj_property>
          <obj_property name="ObjectShortName">[3]</obj_property>
@@ -215,7 +213,6 @@
    <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/iqueue/dispatched_instr_intermediate" type="array">
       <obj_property name="ElementShortName">dispatched_instr_intermediate[7:0]</obj_property>
       <obj_property name="ObjectShortName">dispatched_instr_intermediate[7:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/iqueue/dispatched_instr_valid_relevant" type="array">
       <obj_property name="ElementShortName">dispatched_instr_valid_relevant[7:0]</obj_property>
@@ -233,6 +230,88 @@
       <obj_property name="ElementShortName">dispatched_instr_valid_intermediate[7:0]</obj_property>
       <obj_property name="ObjectShortName">dispatched_instr_valid_intermediate[7:0]</obj_property>
    </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/alu/curr_instr_i" type="array">
+      <obj_property name="ElementShortName">curr_instr_i</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_i</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/alu/alu_rx_i" type="array">
+      <obj_property name="ElementShortName">alu_rx_i</obj_property>
+      <obj_property name="ObjectShortName">alu_rx_i</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/alu/alu_rx_i.op0_data" type="array">
+         <obj_property name="ElementShortName">.op0_data</obj_property>
+         <obj_property name="ObjectShortName">.op0_data</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/alu/alu_rx_i.op0_data.data" type="array">
+            <obj_property name="ElementShortName">.data[15:0]</obj_property>
+            <obj_property name="ObjectShortName">.data[15:0]</obj_property>
+            <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/alu/alu_rx_i.op0_valid" type="logic">
+         <obj_property name="ElementShortName">.op0_valid</obj_property>
+         <obj_property name="ObjectShortName">.op0_valid</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/alu/alu_rx_i.op1_data" type="array">
+         <obj_property name="ElementShortName">.op1_data</obj_property>
+         <obj_property name="ObjectShortName">.op1_data</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/alu/alu_rx_i.op1_data.data" type="array">
+            <obj_property name="ElementShortName">.data[15:0]</obj_property>
+            <obj_property name="ObjectShortName">.data[15:0]</obj_property>
+            <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/alu/alu_rx_i.op1_valid" type="logic">
+         <obj_property name="ElementShortName">.op1_valid</obj_property>
+         <obj_property name="ObjectShortName">.op1_valid</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/alu/alu_rx_i.opd_addr" type="array">
+         <obj_property name="ElementShortName">.opd_addr</obj_property>
+         <obj_property name="ObjectShortName">.opd_addr</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/alu/alu_rx_i.opd_addr.euidx" type="array">
+            <obj_property name="ElementShortName">.euidx[2:0]</obj_property>
+            <obj_property name="ObjectShortName">.euidx[2:0]</obj_property>
+            <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         </wvobject>
+         <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/alu/alu_rx_i.opd_addr.uid" type="array">
+            <obj_property name="ElementShortName">.uid[8:0]</obj_property>
+            <obj_property name="ObjectShortName">.uid[8:0]</obj_property>
+            <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         </wvobject>
+         <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/alu/alu_rx_i.opd_addr.spec" type="array">
+            <obj_property name="ElementShortName">.spec[4:0]</obj_property>
+            <obj_property name="ObjectShortName">.spec[4:0]</obj_property>
+            <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/alu/alu_rx_i.opd_store_success" type="logic">
+         <obj_property name="ElementShortName">.opd_store_success</obj_property>
+         <obj_property name="ObjectShortName">.opd_store_success</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/alu/alu_tx_o" type="array">
+      <obj_property name="ElementShortName">alu_tx_o</obj_property>
+      <obj_property name="ObjectShortName">alu_tx_o</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/alu/alu_tx_o.opd_data" type="array">
+         <obj_property name="ElementShortName">.opd_data</obj_property>
+         <obj_property name="ObjectShortName">.opd_data</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/alu/alu_tx_o.opd_addr" type="array">
+         <obj_property name="ElementShortName">.opd_addr</obj_property>
+         <obj_property name="ObjectShortName">.opd_addr</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/alu/alu_tx_o.opd_valid" type="logic">
+         <obj_property name="ElementShortName">.opd_valid</obj_property>
+         <obj_property name="ObjectShortName">.opd_valid</obj_property>
+      </wvobject>
+   </wvobject>
    <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/cache/dut/ybufs/ys_buffer" type="array">
       <obj_property name="ElementShortName">ys_buffer</obj_property>
       <obj_property name="ObjectShortName">ys_buffer</obj_property>
@@ -240,6 +319,7 @@
       <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/cache/dut/ybufs/ys_buffer.addr" type="array">
          <obj_property name="ElementShortName">.addr</obj_property>
          <obj_property name="ObjectShortName">.addr</obj_property>
+         <obj_property name="isExpanded"></obj_property>
       </wvobject>
       <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/cache/dut/ybufs/ys_buffer.data" type="array">
          <obj_property name="ElementShortName">.data</obj_property>

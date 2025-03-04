@@ -7,8 +7,13 @@ uint16_t gg(uint16_t a, uint16_t b, uint16_t c, uint16_t d, uint16_t x, uint16_t
   return (a + ((b & d) | (c & ~d)) + x + t) << s | (a + ((b & d) | (c & ~d)) + x + t) >> (16 - s);
 }
 
+uint16_t gg_no_shift(uint16_t a, uint16_t b, uint16_t c, uint16_t d, uint16_t x, uint16_t s, uint16_t t) {
+  return (a + ((b & d) | (c & ~d)) + x + t);
+}
+
 int main() {
   //NOTE: the gg arg data must match with the allocator model l0 cache
+  std::cout << (int) gg_no_shift(1, 2, 3, 4, 5, 6, 7) << std::endl;
   std::cout << (int) gg(1, 2, 3, 4, 5, 6, 7) << std::endl;
   //Outputs:
   // 8 bit word: 0
