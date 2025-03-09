@@ -16,6 +16,9 @@ module back_icon_controller import pkg_dtypes::*; #(
   //NOTE: output all 0s if instr not valid
   output wire type_exec_unit_addr      src_addrs_o      [NUM_ICON_CHANNELS-1:0],
   output wire type_icon_receivers_list receiver_lists_o [NUM_ICON_CHANNELS-1:0],
+  output wire                          channel_active_o [NUM_ICON_CHANNELS-1:0],
+  //if low, hold channel whist other channel frees the required tx buffer
+  output logic                         tx_req_valid_o   [NUM_ICON_CHANNELS-1:0],
   input  wire type_icon_receivers_list success_lists_i  [NUM_ICON_CHANNELS-1:0]
 
 );
@@ -39,6 +42,7 @@ module back_icon_controller import pkg_dtypes::*; #(
   wire                 ready_for_next_instr [NUM_ICON_CHANNELS-1:0];
   wire type_icon_instr curr_instrs          [NUM_ICON_CHANNELS-1:0];
   wire                 curr_instrs_valid    [NUM_ICON_CHANNELS-1:0];
+  assign channel_active_o = curr_instrs_valid;
   generate for(genvar ch_idx = 0; ch_idx < NUM_ICON_CHANNELS; ch_idx++) begin
     wire is_queue_full;
     assign icon_instr_dispatch_ready_o[ch_idx] = ~is_queue_full;
@@ -79,7 +83,17 @@ module back_icon_controller import pkg_dtypes::*; #(
                                    curr_instrs[ch_idx].src_addr
                                  : 'b0;
 
-    assign ready_for_next_instr[ch_idx] = &success_lists_latched[ch_idx];
+    always_comb begin
+      tx_req_valid_o[ch_idx] = 1'b1;
+      for (int i = 0; i < ch_idx; i++) begin
+        if(curr_instrs[ch_idx].src_addr.euidx == curr_instrs[i].src_addr.euidx) begin
+          tx_req_valid_o[ch_idx] = 1'b0;
+        end
+      end
+    end
+
+    //NOTE: this ignores MMU receiver signals. This should be changed when the MMU is added
+    assign ready_for_next_instr[ch_idx] = &(success_lists_latched[ch_idx].eus | ~curr_instrs[ch_idx].receiver_list.eus);
   end endgenerate
 
 endmodule

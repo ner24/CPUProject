@@ -12,12 +12,16 @@ module back_iconch_interface import pkg_dtypes::*; #(
   input  wire type_icon_rx_channel eu_rx_resp_i,
   
   //eu tx side
-  input  wire type_exec_unit_data  eu_tx_resp_data_i,
+  /*input  wire type_exec_unit_data  eu_tx_resp_data_i,
   output wire type_exec_unit_addr  eu_tx_addr_o,
   output wire                      eu_tx_valid_o,
-  input  wire                      eu_tx_resp_data_valid_i,
+  input  wire                      eu_tx_resp_data_valid_i,*/
+  output type_icon_tx_rx_channel   eu_tx_o,
+  input  type_icon_tx_tx_channel   eu_tx_resp_i,
 
   //extra control
+  //force_disable_tx primarily used to make sure the intf for opx1
+  //is not also handling the same tx request as intf for opx0
   input  wire                      force_disable_tx
 );
 
@@ -29,33 +33,34 @@ module back_iconch_interface import pkg_dtypes::*; #(
   wire eu_rx_enable;
 
   //tx = 1, rx = 0
-  wire tx_or_rx_mode;
-  assign tx_or_rx_mode = icon_tx_i.src_addr.euidx == EU_IDX;
+  wire tx_euidx_match;
+  assign tx_euidx_match = icon_tx_i.src_addr.euidx == EU_IDX;
 
-  assign eu_tx_enable =   tx_or_rx_mode  & icon_tx_i.req_valid & (~force_disable_tx);
-  assign eu_rx_enable = (~tx_or_rx_mode) & icon_tx_i.req_valid & eu_tx_resp_data_valid_i;
+  assign eu_tx_enable = icon_tx_i.req_tx_valid & tx_euidx_match & (~force_disable_tx);
+  assign eu_rx_enable = icon_tx_i.req_valid    & icon_tx_i.data_valid_tx;
 
   // ---------------
   // output eu rx
   // ---------------
 
   assign eu_rx_o.valid = eu_rx_enable;
-  assign eu_rx_o.addr  = eu_rx_enable ? icon_tx_i.data_tx  : 'b0;
-  assign eu_rx_o.data  = eu_rx_enable ? icon_tx_i.src_addr : 'b0;
+  assign eu_rx_o.data  = eu_rx_enable ? icon_tx_i.data_tx  : 'b0;
+  assign eu_rx_o.addr  = eu_rx_enable ? icon_tx_i.src_addr : 'b0;
 
   // ---------------
   // output eu tx
   // ---------------
 
-  assign eu_tx_addr_o = eu_tx_enable ? icon_tx_i.src_addr : 'b0;
-  assign eu_tx_valid_o = eu_tx_enable;
+  assign eu_tx_o.src_addr_tx  = eu_tx_enable ? icon_tx_i.src_addr : 'b0;
+  assign eu_tx_o.valid_tx     = eu_tx_enable;
 
   // ------------------------
   // output to icon channel
   // ------------------------
 
-  assign icon_rx_o.data_rx       = eu_tx_enable ? eu_tx_resp_data_i       : 'b0;
-  assign icon_rx_o.data_valid_rx = eu_tx_enable ? eu_tx_resp_data_valid_i : 'b0;
-  assign icon_rx_o.success       = eu_rx_enable & eu_rx_resp_i.success;
+  assign icon_rx_o.data_rx       = eu_tx_enable ? eu_tx_resp_i.data_tx    : 'b0;
+  assign icon_rx_o.data_valid_rx = eu_tx_enable ? eu_tx_resp_i.success_tx : 'b0;
+
+  assign icon_rx_o.success = eu_rx_enable & eu_rx_resp_i.success;
 
 endmodule

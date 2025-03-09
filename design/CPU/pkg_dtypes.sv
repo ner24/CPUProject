@@ -34,25 +34,34 @@ package pkg_dtypes;
   // Interconnect formats
   // ------------------------------------------
 
-  /*typedef struct packed {
-    logic [LOG2_NUM_ALPU-1:0] eu_idx;
-    logic  [LOG2_NUM_REG-1:0] reg_idx;
-  } type_icon_addr;*/
-
+  //eu rxx transmit
   typedef struct packed {
-    //logic                  addr_opx;
     type_exec_unit_addr    addr;
     type_exec_unit_data    data;
     logic                  valid;
   } type_icon_tx_channel;
-  //typedef type_icon_tx_channel type_icon_channel;
 
+  //eu rxx receive
   typedef struct packed {
     logic                  success;
   } type_icon_rx_channel;
 
+  //eu tx receive
+  typedef struct packed {
+    logic                  valid_tx;
+    type_exec_unit_addr    src_addr_tx;
+  } type_icon_tx_rx_channel; //receive from eu perspective
+
+  //eu tx transmit
+  typedef struct packed {
+    logic                  success_tx;
+    type_exec_unit_data    data_tx;
+  } type_icon_tx_tx_channel; //transmit from eu perspective
+
+  //icon channel side definitions
   typedef struct packed {
     logic                  req_valid;
+    logic                  req_tx_valid;
     type_exec_unit_data    data_tx;
     logic                  data_valid_tx;
     type_exec_unit_addr    src_addr;
@@ -64,6 +73,7 @@ package pkg_dtypes;
     logic                  success;
   } type_icon_rx_channel_chside;
 
+  //icon instruction definitions
   localparam TOT_NUM_ICON_INTERFACES = (2**LOG2_NUM_EXEC_UNITS) * 2;
   typedef struct packed {
     //execution unit receivers (op0 and op1)
@@ -79,6 +89,9 @@ package pkg_dtypes;
 
     type_exec_unit_data      data;
     logic                    data_valid;
+
+    logic                    tx_req_valid;
+    logic                    active;
 
     type_icon_receivers_list receiver_list;
     type_icon_receivers_list success_list;

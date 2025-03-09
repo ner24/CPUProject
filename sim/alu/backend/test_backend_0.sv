@@ -93,7 +93,7 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
   localparam LOG2_NUM_EXEC_UNITS = `LOG2_NUM_EXEC_UNITS;
   localparam NUM_EXEC_UNITS = 2**LOG2_NUM_EXEC_UNITS;
   localparam NUM_BATCHES = 3; //set to some value that is larger than actual number of batches (since cannot be found at compile time)
-  localparam NUM_ICON_BATCHES = 1;
+  localparam NUM_ICON_BATCHES = 2;
   localparam EU_LOG2_IQUEUE_NUM_QUEUES = `EU_LOG2_IQUEUE_NUM_QUEUES;
   localparam EU_IQUEUE_NUM_QUEUES = 2**EU_LOG2_IQUEUE_NUM_QUEUES;
 
@@ -194,6 +194,10 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
 
             invalSrcStr
           );
+          //this test does not use the MMU at all
+          icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.receiver_str = 1'b0;
+          icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.receiver_mxreg = 1'b0;
+
           //NOTE: successful read is when read_result = total number of passed arguments to fscanf (after the file and fmt args)
           if (read_result != (3 + (NUM_EXEC_UNITS*2) + 1)) begin
             `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to read icon instr at line %0d", line_idx))
@@ -423,7 +427,10 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
     backend_sequence_item seq_item;
     int v1, v2, v3;
     for (int i = 0; i < NUM_BATCHES; i++) begin
-      for (int j = 0; j < (icon_batch_ptrs[i]-1); j++) begin
+      `uvm_info("BACKEND_TEST0", "Dispatching icon mini batches (apart from last one)", UVM_MEDIUM)
+      `uvm_info("BACKEND_TEST0", $sformatf("num icon batches in this batch[%0d]=%0d", i, icon_batch_ptrs[i]+1), UVM_MEDIUM)
+      //note that icon_batch_ptrs[i] is one less the number of icon batches within the batch
+      for (int j = 0; j < (icon_batch_ptrs[i]); j++) begin
         //dispatch all icon batches apart from last one which is dispatched
         //in same seq item as main batch
         seq_item = backend_sequence_item::type_id::create("seq_item");
@@ -441,47 +448,52 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
       v2 = 1;
       v3 = 0;
       for (int k = 1; k < NUM_PARALLEL_INSTR_DISPATCHES; k++) begin
+        `uvm_info("BACKEND_TEST0", $sformatf("v2=%0d k=%0d", v2, k), UVM_MEDIUM)
         if (instr_dispatch_valid[i][k]) begin
+          `uvm_info("BACKEND_TEST0", $sformatf("v1=%0d, eu_alloc[k]=%0d", v1, instr_dispatch_alloc_euidx[i][k]), UVM_MEDIUM)
           if (v1 == instr_dispatch_alloc_euidx[i][k]) begin
             v2++;
           end else begin
             v1 = instr_dispatch_alloc_euidx[i][k];
-            v2 = 1;
-            v3 = k;
+            v2 = 0;
+            //v3 = k;
           end
         end
         if( (v2 == EU_IQUEUE_NUM_QUEUES) | (k == (NUM_PARALLEL_INSTR_DISPATCHES-1)) ) begin
-            //`uvm_info("BACKEND_TEST0", $sformatf("k=%0d", k), UVM_MEDIUM)
-            seq_item = backend_sequence_item::type_id::create("seq_item");
-            start_item(seq_item);
-            seq_item.reset_n = 1'b1;
-            seq_item.instr_dispatch_i = instr_dispatch[i];
-            seq_item.dispatched_instr_alloc_euidx_i = instr_dispatch_alloc_euidx[i];
-            
-            for(int k1 = 0; k1 < v3; k1++) begin
-              seq_item.instr_dispatch_valid_i[k1] = 'b0;
-            end
-            for(int k1 = v3; k1 < (v3+v2); k1++) begin
-              seq_item.instr_dispatch_valid_i[k1] = instr_dispatch_valid[i][k1];
-            end
-            for(int k1 = (v3+v2); k1 < NUM_PARALLEL_INSTR_DISPATCHES; k1++) begin
-              seq_item.instr_dispatch_valid_i[k1] = 'b0;
-            end
-
-            if (k == (NUM_PARALLEL_INSTR_DISPATCHES-1)) begin
-              seq_item.icon_instr_dispatch_i = icon_instr_dispatch[i][icon_batch_ptrs[i]-1];
-              seq_item.icon_instr_dispatch_valid_i = icon_instr_dispatch_valid[i][icon_batch_ptrs[i]-1];
-            end else begin
-              for (int k2 = 0; k2 < NUM_ICON_CHANNELS; k2++) begin
-                seq_item.icon_instr_dispatch_i[k2] = 'b0;
-                seq_item.icon_instr_dispatch_valid_i[k2] = 'b0;
-              end
-            end
-            finish_item(seq_item);
-
-            v2 = 0;
-            v3 = k+1;
+          //`uvm_info("BACKEND_TEST0", $sformatf("k=%0d", k), UVM_MEDIUM)
+          `uvm_info("BACKEND_TEST0", $sformatf("Dispatching..."), UVM_MEDIUM)
+          seq_item = backend_sequence_item::type_id::create("seq_item");
+          start_item(seq_item);
+          seq_item.reset_n = 1'b1;
+          seq_item.instr_dispatch_i = instr_dispatch[i];
+          seq_item.dispatched_instr_alloc_euidx_i = instr_dispatch_alloc_euidx[i];
+          
+          for(int k1 = 0; k1 < v3; k1++) begin
+            seq_item.instr_dispatch_valid_i[k1] = 'b0;
           end
+          for(int k1 = v3; k1 <= k; k1++) begin
+            seq_item.instr_dispatch_valid_i[k1] = instr_dispatch_valid[i][k1];
+          end
+          for(int k1 = k+1; k1 < NUM_PARALLEL_INSTR_DISPATCHES; k1++) begin
+            seq_item.instr_dispatch_valid_i[k1] = 'b0;
+          end
+
+          if (k == (NUM_PARALLEL_INSTR_DISPATCHES-1)) begin
+            `uvm_info("BACKEND_TEST0", $sformatf("Dispatching icon instructions for batch..."), UVM_MEDIUM)
+            seq_item.icon_instr_dispatch_i = icon_instr_dispatch[i][icon_batch_ptrs[i]];
+            seq_item.icon_instr_dispatch_valid_i = icon_instr_dispatch_valid[i][icon_batch_ptrs[i]];
+          end else begin
+            `uvm_info("BACKEND_TEST0", $sformatf("Icon instructions will be dispatched in final micro batch"), UVM_MEDIUM)
+            for (int k2 = 0; k2 < NUM_ICON_CHANNELS; k2++) begin
+              seq_item.icon_instr_dispatch_i[k2] = 'b0;
+              seq_item.icon_instr_dispatch_valid_i[k2] = 'b0;
+            end
+          end
+          finish_item(seq_item);
+
+          v2 = 0;
+          v3 = k+1;
+        end
       end
 
       /*seq_item = backend_sequence_item::type_id::create("seq_item");

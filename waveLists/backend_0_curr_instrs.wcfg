@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="backend_tb_top_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_design_parameters_sv_1350181021 " />
+            <top_module name="backend_tb_top" />
+            <top_module name="glbl" />
+            <top_module name="pkg_dtypes" />
+            <top_module name="std" />
+            <top_module name="uvm_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="31.463 ns"></ZoomEndTime>
+      <Cursor1Time time="105.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="204"></NameColumnWidth>
+      <ValueColumnWidth column_width="72"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="26" />
+   <wvobject fp_name="/backend_tb_top/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/icon_ctrl/icon_instr_dispatch_i" type="array">
+      <obj_property name="ElementShortName">icon_instr_dispatch_i[3:0]</obj_property>
+      <obj_property name="ObjectShortName">icon_instr_dispatch_i[3:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/icon_ctrl/icon_instr_dispatch_valid_i" type="array">
+      <obj_property name="ElementShortName">icon_instr_dispatch_valid_i[3:0]</obj_property>
+      <obj_property name="ObjectShortName">icon_instr_dispatch_valid_i[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider218">
+      <obj_property name="label">ICON curr instr</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/icon_ctrl/curr_instrs" type="array">
+      <obj_property name="ElementShortName">curr_instrs[3:0]</obj_property>
+      <obj_property name="ObjectShortName">curr_instrs[3:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider218">
+      <obj_property name="label">EU 0 curr instr</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/curr_instr_to_exec_valid" type="logic">
+      <obj_property name="ElementShortName">curr_instr_to_exec_valid</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_to_exec_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[0].eu /dut/curr_instr" type="array">
+      <obj_property name="ElementShortName">curr_instr</obj_property>
+      <obj_property name="ObjectShortName">curr_instr</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider218">
+      <obj_property name="label">EU 1 curr instr</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/curr_instr_to_exec_valid" type="logic">
+      <obj_property name="ElementShortName">curr_instr_to_exec_valid</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_to_exec_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/curr_instr" type="array">
+      <obj_property name="ElementShortName">curr_instr</obj_property>
+      <obj_property name="ObjectShortName">curr_instr</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider218">
+      <obj_property name="label">EU 2 curr instr</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[2].eu /dut/curr_instr_to_exec_valid" type="logic">
+      <obj_property name="ElementShortName">curr_instr_to_exec_valid</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_to_exec_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[2].eu /dut/curr_instr" type="array">
+      <obj_property name="ElementShortName">curr_instr</obj_property>
+      <obj_property name="ObjectShortName">curr_instr</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider218">
+      <obj_property name="label">EU 3 curr instr</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[3].eu /dut/curr_instr_to_exec_valid" type="logic">
+      <obj_property name="ElementShortName">curr_instr_to_exec_valid</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_to_exec_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[3].eu /dut/curr_instr" type="array">
+      <obj_property name="ElementShortName">curr_instr</obj_property>
+      <obj_property name="ObjectShortName">curr_instr</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider218">
+      <obj_property name="label">EU 4 curr instr</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[4].eu /dut/curr_instr_to_exec_valid" type="logic">
+      <obj_property name="ElementShortName">curr_instr_to_exec_valid</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_to_exec_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[4].eu /dut/curr_instr" type="array">
+      <obj_property name="ElementShortName">curr_instr</obj_property>
+      <obj_property name="ObjectShortName">curr_instr</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider218">
+      <obj_property name="label">EU 5 curr instr</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[5].eu /dut/curr_instr_to_exec_valid" type="logic">
+      <obj_property name="ElementShortName">curr_instr_to_exec_valid</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_to_exec_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[5].eu /dut/curr_instr" type="array">
+      <obj_property name="ElementShortName">curr_instr</obj_property>
+      <obj_property name="ObjectShortName">curr_instr</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider218">
+      <obj_property name="label">EU 6 curr instr</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[6].eu /dut/curr_instr_to_exec_valid" type="logic">
+      <obj_property name="ElementShortName">curr_instr_to_exec_valid</obj_property>
+      <obj_property name="ObjectShortName">curr_instr_to_exec_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[6].eu /dut/curr_instr" type="array">
+      <obj_property name="ElementShortName">curr_instr</obj_property>
+      <obj_property name="ObjectShortName">curr_instr</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+</wave_config>
