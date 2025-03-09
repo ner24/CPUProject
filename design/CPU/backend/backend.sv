@@ -103,6 +103,12 @@ module u_backend import pkg_dtypes::*; #(
   //NOTE: leaving this comment here, but this is now handled in EU Alloc ILN
   wire [NUM_EXEC_UNITS-1:0] instr_dispatch_readys;
   assign instr_dispatch_ready_o = |instr_dispatch_readys;
+  wire type_icon_rx_channel_chside [NUM_EXEC_UNITS-1:0] [1:0] icon_rx_glob [NUM_ICON_CHANNELS];
+
+  generate for (genvar ch_idx = 0; ch_idx < NUM_ICON_CHANNELS; ch_idx++) begin
+    assign channels[ch_idx] = |icon_rx_glob[ch_idx];
+  end endgenerate
+
   generate for (genvar eu_idx = 0; eu_idx < NUM_EXEC_UNITS; eu_idx++) begin: g_eu
     wire type_icon_tx_channel [1:0] eu_rxx_ch [NUM_ICON_CHANNELS-1:0];
     wire type_icon_tx_rx_channel [1:0] eu_tx_ch  [NUM_ICON_CHANNELS-1:0];
@@ -135,9 +141,10 @@ module u_backend import pkg_dtypes::*; #(
         assign icon_tx.src_addr      = channels[ch_idx].src_addr;
 
         wire type_icon_rx_channel_chside icon_rx;
-        assign channels[ch_idx].data                           = icon_rx.data_rx;
+        /*assign channels[ch_idx].data                           = icon_rx.data_rx;
         assign channels[ch_idx].data_valid                     = icon_rx.data_valid_rx;
-        assign channels[ch_idx].success_list[(2*eu_idx) + opx] = icon_rx.success;
+        assign channels[ch_idx].success_list[(2*eu_idx) + opx] = icon_rx.success;*/
+        assign icon_rx_glob[ch_idx][eu_idx][opx] = icon_rx;
 
         if (opx == 0) begin
           assign force_disable_op1_tx = icon_tx.req_valid;
