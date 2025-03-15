@@ -83,10 +83,12 @@ module back_icon_controller import pkg_dtypes::*; #(
                                    curr_instrs[ch_idx].src_addr
                                  : 'b0;
 
+    //resolve tx collisions (when 2 channels are trying to use the same tx buffer)
+    //by just giving it to the channel with the lower index
     always_comb begin
       tx_req_valid_o[ch_idx] = 1'b1;
       for (int i = 0; i < ch_idx; i++) begin
-        if(curr_instrs[ch_idx].src_addr.euidx == curr_instrs[i].src_addr.euidx) begin
+        if(channel_active_o[i] & (curr_instrs[ch_idx].src_addr.euidx == curr_instrs[i].src_addr.euidx)) begin
           tx_req_valid_o[ch_idx] = 1'b0;
         end
       end

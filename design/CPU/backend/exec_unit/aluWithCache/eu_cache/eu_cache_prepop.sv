@@ -108,26 +108,26 @@ module eu_prepop import pkg_dtypes::*; #(
     end else begin
 
       if (~register.valid & write_enable) begin
-        if (op0_success_i & op0_isreg_i) begin
+        if (op0_success_i & op0_isreg_i & ~op0_isforeign_i) begin
           register.valid = 1'b1;
           register.opx = 1'b0;
           //register.addr.eu_idx = EU_IDX;
           //register.addr.uid = op0_addr_i.uid;
           //register.addr.spec = op0_addr_i.spec;
           register.data = op0_data_i;
-        end else if (fop0_success_i & op0_isreg_i) begin
+        end else if (fop0_success_i & op0_isforeign_i) begin
           register.valid = 1'b1;
           register.opx = 1'b0;
           //register.addr = fop0_addr_i.addr;
           register.data = fop0_data_i;
-        end else if (op1_success_i & op1_isreg_i) begin
+        end else if (op1_success_i & op1_isreg_i & ~op1_isforeign_i) begin
           register.valid = 1'b1;
           register.opx = 1'b1;
           //register.addr.eu_idx = EU_IDX;
           //register.addr.uid = op1_addr_i.uid;
           //register.addr.spec = op1_addr_i.spec;
           register.data = op1_data_i;
-        end else if (fop1_success_i & op1_isreg_i) begin
+        end else if (fop1_success_i & op1_isreg_i & op1_isforeign_i) begin
           register.valid = 1'b1;
           register.opx = 1'b1;
           //register.addr = fop1_addr_i.addr;

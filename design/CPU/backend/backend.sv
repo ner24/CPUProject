@@ -69,7 +69,8 @@ module u_backend import pkg_dtypes::*; #(
   // ---------------------------
   // Instantiate exec units
   // ---------------------------
-  type_icon_rx_channel_chside icon_rxx [NUM_EXEC_UNITS-1:0] [1:0];
+  //type_icon_rx_channel_chside icon_rxx [NUM_EXEC_UNITS-1:0] [1:0];
+  wire type_icon_rx_channel_chside [NUM_EXEC_UNITS-1:0] [1:0] icon_rx_glob [NUM_ICON_CHANNELS];
   always_comb begin
     for(int i = 0; i < NUM_ICON_CHANNELS; i++) begin
       channels[i].data       = 'b0;
@@ -78,8 +79,8 @@ module u_backend import pkg_dtypes::*; #(
         //NOTE: the interfaces internally set these signals to all 0s when
         //eu tx is to not be used for this channel at that specific time
         for(int opx = 0; opx < 2; opx++) begin
-          channels[i].data       |= icon_rxx[eu_idx][opx].data_rx;
-          channels[i].data_valid |= icon_rxx[eu_idx][opx].data_valid_rx;
+          channels[i].data       |= channels[i].src_addr.euidx == eu_idx ? icon_rx_glob[i][eu_idx][opx].data_rx : 'b0;
+          channels[i].data_valid |= channels[i].src_addr.euidx == eu_idx & icon_rx_glob[i][eu_idx][opx].data_valid_rx;
         end
       end
     end
@@ -87,8 +88,8 @@ module u_backend import pkg_dtypes::*; #(
 
   generate for(genvar i = 0; i < NUM_ICON_CHANNELS; i++) begin
       for (genvar eu_idx = 0; eu_idx < NUM_EXEC_UNITS; eu_idx++) begin
-        assign channels[i].success_list.eus[eu_idx*2] = icon_rxx[eu_idx][0].success;
-        assign channels[i].success_list.eus[(eu_idx*2)+1] = icon_rxx[eu_idx][1].success;
+        assign channels[i].success_list.eus[eu_idx*2] = channels[i].receiver_list.eus[(2*eu_idx)] & icon_rx_glob[i][eu_idx][0].success;
+        assign channels[i].success_list.eus[(eu_idx*2)+1] = channels[i].receiver_list.eus[(2*eu_idx) + 'd1] & icon_rx_glob[i][eu_idx][1].success;
       end
       //MMU not implemented so just tie to 1
       assign channels[i].success_list.receiver_str = 'b1;
@@ -103,11 +104,6 @@ module u_backend import pkg_dtypes::*; #(
   //NOTE: leaving this comment here, but this is now handled in EU Alloc ILN
   wire [NUM_EXEC_UNITS-1:0] instr_dispatch_readys;
   assign instr_dispatch_ready_o = |instr_dispatch_readys;
-  wire type_icon_rx_channel_chside [NUM_EXEC_UNITS-1:0] [1:0] icon_rx_glob [NUM_ICON_CHANNELS];
-
-  generate for (genvar ch_idx = 0; ch_idx < NUM_ICON_CHANNELS; ch_idx++) begin
-    assign channels[ch_idx] = |icon_rx_glob[ch_idx];
-  end endgenerate
 
   generate for (genvar eu_idx = 0; eu_idx < NUM_EXEC_UNITS; eu_idx++) begin: g_eu
     wire type_icon_tx_channel [1:0] eu_rxx_ch [NUM_ICON_CHANNELS-1:0];
@@ -134,7 +130,7 @@ module u_backend import pkg_dtypes::*; #(
       wire force_disable_op1_tx;
       for (genvar opx = 0; opx < 2; opx++) begin
         wire type_icon_tx_channel_chside icon_tx;
-        assign icon_tx.req_valid     = channels[ch_idx].active & channels[ch_idx].receiver_list[(2*eu_idx) + opx];
+        assign icon_tx.req_valid     = channels[ch_idx].active & channels[ch_idx].receiver_list.eus[(2*eu_idx) + opx];
         assign icon_tx.req_tx_valid  = channels[ch_idx].tx_req_valid;
         assign icon_tx.data_tx       = channels[ch_idx].data;
         assign icon_tx.data_valid_tx = channels[ch_idx].data_valid;

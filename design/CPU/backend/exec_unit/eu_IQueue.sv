@@ -16,9 +16,9 @@ module eu_IQueue import pkg_dtypes::*; #(
   //this is fine as front end cannot move to next batch until all 
   //cells in the rename ILN are free
   output logic                  is_full_o,
-  output wire type_iqueue_entry curr_instr_to_exec_o,
+  output      type_iqueue_entry curr_instr_to_exec_o,
   input  wire                   ready_for_next_instr_i, //tell queue to stall if not ready
-  output wire                   curr_instr_to_exec_valid_o
+  output logic                  curr_instr_to_exec_valid_o
 );
   localparam NUM_QUEUES = 2**EU_LOG2_IQUEUE_NUM_QUEUES;
 
@@ -144,10 +144,11 @@ module eu_IQueue import pkg_dtypes::*; #(
   // ----------------------------------
   // Buffers
   // ----------------------------------
-  assign curr_instr_to_exec_valid_o = ~is_empty[curr_instr_rr_ctr];
-
   wire type_iqueue_entry curr_instrs [NUM_QUEUES-1:0];
-  assign curr_instr_to_exec_o = curr_instrs[curr_instr_rr_ctr];
+  always_comb begin
+    curr_instr_to_exec_valid_o = ~is_empty[curr_instr_rr_ctr];
+    curr_instr_to_exec_o = curr_instrs[curr_instr_rr_ctr];
+  end
 
   generate for(genvar i = 0; i < NUM_QUEUES; i++) begin
     fifo_buffer #(

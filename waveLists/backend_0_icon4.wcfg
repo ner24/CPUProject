@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="backend_tb_top_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_user_parameters_sv_1350181021 " />
+            <top_module name="backend_tb_top" />
+            <top_module name="glbl" />
+            <top_module name="pkg_dtypes" />
+            <top_module name="std" />
+            <top_module name="uvm_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="41.151 ns"></ZoomEndTime>
+      <Cursor1Time time="111.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="204"></NameColumnWidth>
+      <ValueColumnWidth column_width="72"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="16" />
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[2].eu /dut/cache/dut/rx0_xbuf/req_valid_i" type="logic">
+      <obj_property name="ElementShortName">req_valid_i</obj_property>
+      <obj_property name="ObjectShortName">req_valid_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[2].eu /dut/cache/dut/rx0_xbuf/req_addr_i" type="array">
+      <obj_property name="ElementShortName">req_addr_i</obj_property>
+      <obj_property name="ObjectShortName">req_addr_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[2].eu /dut/cache/dut/rx0_xbuf/in_valid_i" type="logic">
+      <obj_property name="ElementShortName">in_valid_i</obj_property>
+      <obj_property name="ObjectShortName">in_valid_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[2].eu /dut/cache/dut/rx0_xbuf/in_addr_i" type="array">
+      <obj_property name="ElementShortName">in_addr_i</obj_property>
+      <obj_property name="ObjectShortName">in_addr_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[2].eu /dut/cache/dut/rx0_xbuf/in_data_i" type="array">
+      <obj_property name="ElementShortName">in_data_i</obj_property>
+      <obj_property name="ObjectShortName">in_data_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[2].genblk1[1].genblk1[0].icon_if_0 /icon_tx_i" type="array">
+      <obj_property name="ElementShortName">icon_tx_i</obj_property>
+      <obj_property name="ObjectShortName">icon_tx_i</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/cache/dut/tx_xbuf/req_valid_i" type="logic">
+      <obj_property name="ElementShortName">req_valid_i</obj_property>
+      <obj_property name="ObjectShortName">req_valid_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/cache/dut/tx_xbuf/req_addr_i" type="array">
+      <obj_property name="ElementShortName">req_addr_i</obj_property>
+      <obj_property name="ObjectShortName">req_addr_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/cache/dut/tx_xbuf/resp_data_o" type="array">
+      <obj_property name="ElementShortName">resp_data_o</obj_property>
+      <obj_property name="ObjectShortName">resp_data_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/cache/dut/ybufs/ys_buffer" type="array">
+      <obj_property name="ElementShortName">ys_buffer</obj_property>
+      <obj_property name="ObjectShortName">ys_buffer</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/cache/dut/ybufs/ys_buffer.addr" type="array">
+         <obj_property name="ElementShortName">.addr</obj_property>
+         <obj_property name="ObjectShortName">.addr</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/cache/dut/ybufs/ys_buffer.data" type="array">
+         <obj_property name="ElementShortName">.data</obj_property>
+         <obj_property name="ObjectShortName">.data</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/cache/dut/prepop/op0_o" type="array">
+      <obj_property name="ElementShortName">op0_o</obj_property>
+      <obj_property name="ObjectShortName">op0_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/cache/dut/prepop/op1_o" type="array">
+      <obj_property name="ElementShortName">op1_o</obj_property>
+      <obj_property name="ObjectShortName">op1_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/cache/dut/prepop/current_instr_i" type="array">
+      <obj_property name="ElementShortName">current_instr_i</obj_property>
+      <obj_property name="ObjectShortName">current_instr_i</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/cache/dut/prepop/current_instr_i.opcode" type="array">
+         <obj_property name="ElementShortName">.opcode</obj_property>
+         <obj_property name="ObjectShortName">.opcode</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/cache/dut/prepop/current_instr_i.op0" type="array">
+         <obj_property name="ElementShortName">.op0</obj_property>
+         <obj_property name="ObjectShortName">.op0</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/cache/dut/prepop/current_instr_i.op0m" type="other">
+         <obj_property name="ElementShortName">.op0m</obj_property>
+         <obj_property name="ObjectShortName">.op0m</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/cache/dut/prepop/current_instr_i.op1" type="array">
+         <obj_property name="ElementShortName">.op1</obj_property>
+         <obj_property name="ObjectShortName">.op1</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/cache/dut/prepop/current_instr_i.op1m" type="other">
+         <obj_property name="ElementShortName">.op1m</obj_property>
+         <obj_property name="ObjectShortName">.op1m</obj_property>
+      </wvobject>
+      <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/cache/dut/prepop/current_instr_i.opd" type="array">
+         <obj_property name="ElementShortName">.opd</obj_property>
+         <obj_property name="ObjectShortName">.opd</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/cache/dut/rx0_xbuf/in_addr_i" type="array">
+      <obj_property name="ElementShortName">in_addr_i</obj_property>
+      <obj_property name="ObjectShortName">in_addr_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/cache/dut/rx0_xbuf/in_valid_i" type="logic">
+      <obj_property name="ElementShortName">in_valid_i</obj_property>
+      <obj_property name="ObjectShortName">in_valid_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/backend_tb_top/tb/dut/\g_eu[1].eu /dut/cache/dut/rx0_xbuf/in_data_i" type="array">
+      <obj_property name="ElementShortName">in_data_i</obj_property>
+      <obj_property name="ObjectShortName">in_data_i</obj_property>
+   </wvobject>
+</wave_config>
