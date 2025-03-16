@@ -137,7 +137,8 @@ module eu_prepop import pkg_dtypes::*; #(
 
       //valid reset should be after valid set. E.g. in operations where there is only one
       //reg operand, the code above will set valid high but it should go back low the same cycle
-      if ((op0_success_o & op1_success_i) | (op0_success_i & op1_success_o)) begin
+      //if ((op0_success_o & op1_success_i) | (op0_success_i & op1_success_o)) begin
+      if (op0_success_o & op1_success_o) begin
         register.valid = 1'b0; //set valid to 0 next cycle, i.e. reset reg for next instr
       end
 

@@ -133,10 +133,12 @@ module eu_IQueue import pkg_dtypes::*; #(
   logic [$clog2(NUM_PARALLEL_INSTR_DISPATCHES)-1:0] idx;
   always_comb begin
     is_full_o = 1'b0;
-    idx = least_significant_valid_instr + iqueue_idx_alloc_ctr;
+    //idx = least_significant_valid_instr + iqueue_idx_alloc_ctr;
     for (int i = 0; i < NUM_QUEUES; i++, idx++) begin
-      dispatched_instr[i] = dispatched_instr_intermediate[idx];
-      dispatched_instr_valid[i] = dispatched_instr_valid_intermediate[idx];
+      //dispatched_instr[i] = dispatched_instr_intermediate[idx];
+      //dispatched_instr_valid[i] = dispatched_instr_valid_intermediate[idx];
+      dispatched_instr[iqueue_idx_alloc_ctr + i[EU_LOG2_IQUEUE_NUM_QUEUES-1:0]] = dispatched_instr_intermediate[least_significant_valid_instr + i[$clog2(NUM_PARALLEL_INSTR_DISPATCHES)-1:0]];
+      dispatched_instr_valid[iqueue_idx_alloc_ctr + i[EU_LOG2_IQUEUE_NUM_QUEUES-1:0]] = dispatched_instr_valid_intermediate[least_significant_valid_instr + i[$clog2(NUM_PARALLEL_INSTR_DISPATCHES)-1:0]];
       is_full_o |= is_full[i] & dispatched_instr_valid[i];
     end
   end
