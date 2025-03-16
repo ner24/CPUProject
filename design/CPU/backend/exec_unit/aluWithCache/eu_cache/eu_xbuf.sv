@@ -93,7 +93,14 @@ module eu_xbuf import pkg_dtypes::*; #(
     end else begin
       if(out_dff_we) begin
         addr_to_update_n_hbr_q = req_addr_i;
-        addr_to_update_n_hbr_q_valid = 1'b1;
+
+        //in original design, x buf entries were made to be deleted
+        //on single access. The design has changes since then. Since the
+        //address retirement logic has not been written up, the design will
+        //just store data permanently throughout the simulation. For demo
+        //purposes, this is fine.
+        //addr_to_update_n_hbr_q_valid = 1'b1;
+        addr_to_update_n_hbr_q_valid = 1'b0;
       end else if (addr_to_update_n_hbr_q_valid) begin
         addr_to_update_n_hbr_q_valid = 1'b0;
       end
