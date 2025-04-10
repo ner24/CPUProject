@@ -4,13 +4,14 @@ import sys
 
 #assembly = open("./allocators/testAsm3.txt", "r")
 #assembly = open("./allocators/customTestAsmMd5gg.txt", "r")
-assembly = open("./allocators/manualCustomTestAsmMd5gg.txt", "r")
+#assembly = open("./allocators/manualCustomTestAsmMd5gg.txt", "r")
+assembly = open("./allocators/parallelAsm.txt", "r")
 
 lines: List[str] = []
 for line in assembly:
   lines.append(line)
 
-renamedInstructions: List[dict] = allocate1(lines)
+renamedInstructions: List[dict] = allocate1(lines, output_filename = "forSim/renamedAssemblyMtxTest.txt", num_alus = 7)
 #for i in renamedInstructions:
 #  print(i)
 sys.exit()

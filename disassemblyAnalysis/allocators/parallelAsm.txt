@@ -1,0 +1,27 @@
+   0:	0000     	ldr	r0	[m7, #0]
+   0:	0000     	ldr	r1	[m7, #1]
+   0:	0000     	add	r1, r0	;top left
+   0:	0000     	ldr	r0	[m7, #2]
+   0:	0000     	ldr	r2	[m7, #3]
+   0:	0000     	add	r2, r0	;top middle
+   0:	0000     	ldr	r0	[m7, #4]
+   0:	0000     	ldr	r3	[m7, #5]
+   0:	0000     	add	r3, r0	;top right
+   0:	0000     	ldr	r0	[m7, #6]
+   0:	0000     	ldr	r4	[m7, #7]
+   0:	0000     	add	r4, r0	;middle left
+   0:	0000     	ldr	r0	[m7, #8]
+   0:	0000     	ldr	r5	[m7, #9]
+   0:	0000     	add	r5, r0	;middle middle
+   0:	0000     	ldr	r0	[m7, #10]
+   0:	0000     	ldr	r6	[m7, #11]
+   0:	0000     	add	r6, r0	;middle right
+   0:	0000     	ldr	r0	[m7, #12]
+   0:	0000     	ldr	r7	[m7, #13]
+   0:	0000     	add	r7, r0	;bottom left
+   0:	0000     	ldr	r0	[m7, #14]
+   0:	0000     	ldr	r8	[m7, #15]
+   0:	0000     	add	r8, r0	;bottom middle
+   0:	0000     	ldr	r0	[m7, #16]
+   0:	0000     	ldr	r9	[m7, #17]
+   0:	0000     	add	r9, r0	;bottom right

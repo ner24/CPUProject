@@ -26,7 +26,7 @@ def allocate(instructions: List[str],
              alu_alloc_lookback_size: int = 1,
              arch_reg_idx_range: int = getNumArchReg(),
              str_tracker_ram_size: int = 16,
-             output_filename: str = "forSim/renamedAssembly.txt") -> List[dict]:
+             output_filename: str = "forSim/renamedAssemblyMtxTest.txt") -> List[dict]:
   
   alu_cache_idx_counter: dict = {}
   for i in range(0, num_alus):
@@ -50,8 +50,8 @@ def allocate(instructions: List[str],
   #for performance analysis, a stochastic evaluation of the prefetch success could be worked out by considering
   #the hit rate and latency of l1 cache. (Note that if l1 cache latency too high, then a solution could be to make the ld
   #reg bigger (effectively making it an l0 cache)).
-  l0_cache = np.zeros((7,), dtype=int)
-  for i in range(7): #load it with some data
+  l0_cache = np.zeros((18,), dtype=int)
+  for i in range(18): #load it with some data
     l0_cache[i] = i+1
 
   mx_reg_file = np.zeros((8,), dtype=int)

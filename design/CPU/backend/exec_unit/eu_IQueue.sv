@@ -55,38 +55,40 @@ module eu_IQueue import pkg_dtypes::*; #(
   //intermediate stores the instructions after shifting and moving all gaps to highest channel idxs
   wire type_iqueue_entry dispatched_instr_intermediate       [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
   wire                   dispatched_instr_valid_intermediate [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
+  wire type_iqueue_entry dispatched_instr_intermediate2       [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
+  wire                   dispatched_instr_valid_intermediate2 [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
 
   logic [$clog2(NUM_PARALLEL_INSTR_DISPATCHES)-1:0] least_significant_valid_instr;
 
   generate for (genvar i = 0; i < NUM_PARALLEL_INSTR_DISPATCHES; i++) begin
-    wire type_iqueue_entry dispatched_instr_intermediate2;
-    wire                   dispatched_instr_valid_intermediate2;
+    //wire type_iqueue_entry dispatched_instr_intermediate2;
+    //wire                   dispatched_instr_valid_intermediate2;
 
     if(i != (NUM_PARALLEL_INSTR_DISPATCHES-1)) begin
-      assign dispatched_instr_intermediate2 = dispatched_instr_valid_relevant[i] ?
+      assign dispatched_instr_intermediate2[i] = dispatched_instr_valid_relevant[i] ?
                                                 dispatched_instr_i[i]
-                                              : dispatched_instr_i[i+1];
-      assign dispatched_instr_valid_intermediate2 = dispatched_instr_valid_relevant[i] ?
+                                              : dispatched_instr_intermediate2[i+1];
+      assign dispatched_instr_valid_intermediate2[i] = dispatched_instr_valid_relevant[i] ?
                                                       dispatched_instr_valid_relevant[i]
-                                                    : dispatched_instr_valid_relevant[i+1];
+                                                    : dispatched_instr_valid_intermediate2[i+1];
     end else begin
-      assign dispatched_instr_intermediate2 = dispatched_instr_valid_relevant[i] ?
+      assign dispatched_instr_intermediate2[i] = dispatched_instr_valid_relevant[i] ?
                                                 dispatched_instr_i[i]
                                               : 'b0;
-      assign dispatched_instr_valid_intermediate2 = dispatched_instr_valid_relevant[i] ?
+      assign dispatched_instr_valid_intermediate2[i] = dispatched_instr_valid_relevant[i] ?
                                                       dispatched_instr_valid_relevant[i]
                                                     : 'b0;
     end
     if(i != 'd0) begin
       assign dispatched_instr_intermediate[i] = dispatched_instr_valid_relevant[i-1] | (i == least_significant_valid_instr) ?
-                                                  dispatched_instr_intermediate2
+                                                  dispatched_instr_intermediate2[i]
                                                 : 'b0;
       assign dispatched_instr_valid_intermediate[i] = dispatched_instr_valid_relevant[i-1] | (i == least_significant_valid_instr) ?
-                                                        dispatched_instr_valid_intermediate2
+                                                        dispatched_instr_valid_intermediate2[i]
                                                       : 'b0;
     end else begin
-      assign dispatched_instr_intermediate[i]       = dispatched_instr_intermediate2;
-      assign dispatched_instr_valid_intermediate[i] = dispatched_instr_valid_intermediate2;
+      assign dispatched_instr_intermediate[i]       = (least_significant_valid_instr == i) ? dispatched_instr_intermediate2[i] : 'b0;
+      assign dispatched_instr_valid_intermediate[i] = (least_significant_valid_instr == i) ? dispatched_instr_valid_intermediate2[i] : 'b0;
     end
   end endgenerate
 
@@ -133,6 +135,10 @@ module eu_IQueue import pkg_dtypes::*; #(
   logic [$clog2(NUM_PARALLEL_INSTR_DISPATCHES)-1:0] idx;
   always_comb begin
     is_full_o = 1'b0;
+    for (int i = 0; i < NUM_QUEUES; i++) begin
+      dispatched_instr[i] = 'b0;
+      dispatched_instr_valid[i] = 'b0;
+    end
     //idx = least_significant_valid_instr + iqueue_idx_alloc_ctr;
     for (int i = 0; i < NUM_QUEUES; i++, idx++) begin
       //dispatched_instr[i] = dispatched_instr_intermediate[idx];

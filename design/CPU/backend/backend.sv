@@ -1,11 +1,14 @@
 `include "simulation_parameters.sv"
 
 module u_backend import pkg_dtypes::*; #(
-  parameter NUM_ICON_CHANNELS = 4,
-  parameter NUM_EXEC_UNITS = 4,
+  //parameter NUM_ICON_CHANNELS = 4,
+  //parameter NUM_EXEC_UNITS = 4,
 
   //this should equal the width of the rename ILN in the front end
-  parameter NUM_PARALLEL_INSTR_DISPATCHES = 4
+  parameter NUM_PARALLEL_INSTR_DISPATCHES = 4,
+  
+  parameter NUM_ICON_CHANNELS = 2**LOG2_NUM_ICON_CHANNELS,
+  parameter NUM_EXEC_UNITS = 2**LOG2_NUM_EXEC_UNITS
 ) (
   input  wire                   clk,
   input  wire                   reset_n,
@@ -28,6 +31,8 @@ module u_backend import pkg_dtypes::*; #(
   //interconnect channel for writing values to mx registers in the MMU
 
 );
+  
+
   // ---------------------------
   // Interconnect channels
   // ---------------------------
