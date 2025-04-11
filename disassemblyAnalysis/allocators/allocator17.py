@@ -541,6 +541,10 @@ def allocate(instructions: List[str],
           for j in range(num_alus):
             print(1 if ILN_icongen_out_icon_dist_destlist[i][j][0] else 0, end="")
             print(1 if ILN_icongen_out_icon_dist_destlist[i][j][1] else 0, end=",")
+          #pad to the nearest next number that returns integer when put through log base 2
+          import math
+          for j in range((2 ** math.ceil(math.log2(num_alus))) - num_alus):
+            print("00", end=",")
           print("\t" + str(ILN_icongen_out_icon_invalidateSrc[i]), end="")
           print()
           renamed_output_total_num_lines += 1
@@ -605,6 +609,10 @@ def allocate(instructions: List[str],
           for j in range(num_alus):
             print(1 if ILN_icongen_out_icon_dist_destlist[i][j][0] else 0, end="")
             print(1 if ILN_icongen_out_icon_dist_destlist[i][j][1] else 0, end=",")
+          #pad to the nearest next number that returns integer when put through log base 2
+          import math
+          for j in range((2 ** math.ceil(math.log2(num_alus))) - num_alus):
+            print("00", end=",")
           print("\t" + str(ILN_icongen_out_icon_invalidateSrc[i]), end="")
           print()
           renamed_output_total_num_lines += 1

@@ -51,46 +51,40 @@ module eu_IQueue import pkg_dtypes::*; #(
   generate for (genvar i = 0; i < NUM_PARALLEL_INSTR_DISPATCHES; i++) begin
     assign dispatched_instr_valid_relevant[i] = dispatched_instr_valid_i[i] & (dispatched_instr_alloc_euidx_i[i] == EU_IDX);
   end endgenerate
-
-  //intermediate stores the instructions after shifting and moving all gaps to highest channel idxs
-  wire type_iqueue_entry dispatched_instr_intermediate       [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
-  wire                   dispatched_instr_valid_intermediate [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
-  wire type_iqueue_entry dispatched_instr_intermediate2       [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
-  wire                   dispatched_instr_valid_intermediate2 [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
-
+  
   logic [$clog2(NUM_PARALLEL_INSTR_DISPATCHES)-1:0] least_significant_valid_instr;
-
-  generate for (genvar i = 0; i < NUM_PARALLEL_INSTR_DISPATCHES; i++) begin
-    //wire type_iqueue_entry dispatched_instr_intermediate2;
-    //wire                   dispatched_instr_valid_intermediate2;
-
-    if(i != (NUM_PARALLEL_INSTR_DISPATCHES-1)) begin
-      assign dispatched_instr_intermediate2[i] = dispatched_instr_valid_relevant[i] ?
-                                                dispatched_instr_i[i]
-                                              : dispatched_instr_intermediate2[i+1];
-      assign dispatched_instr_valid_intermediate2[i] = dispatched_instr_valid_relevant[i] ?
-                                                      dispatched_instr_valid_relevant[i]
-                                                    : dispatched_instr_valid_intermediate2[i+1];
-    end else begin
-      assign dispatched_instr_intermediate2[i] = dispatched_instr_valid_relevant[i] ?
-                                                dispatched_instr_i[i]
-                                              : 'b0;
-      assign dispatched_instr_valid_intermediate2[i] = dispatched_instr_valid_relevant[i] ?
-                                                      dispatched_instr_valid_relevant[i]
-                                                    : 'b0;
+  
+  type_iqueue_entry dispatched_instr_intermediate       [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
+  logic             dispatched_instr_valid_intermediate [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
+  always_comb begin
+    logic [$clog2(NUM_PARALLEL_INSTR_DISPATCHES):0] j;
+    
+    least_significant_valid_instr = 'd0;
+    for(int c = 0; c < NUM_PARALLEL_INSTR_DISPATCHES; c++) begin
+      if (dispatched_instr_valid_relevant[c]) begin
+        least_significant_valid_instr = c[$clog2(NUM_PARALLEL_INSTR_DISPATCHES)-1:0];
+        break;
+      end
     end
-    if(i != 'd0) begin
-      assign dispatched_instr_intermediate[i] = dispatched_instr_valid_relevant[i-1] | (i == least_significant_valid_instr) ?
-                                                  dispatched_instr_intermediate2[i]
-                                                : 'b0;
-      assign dispatched_instr_valid_intermediate[i] = dispatched_instr_valid_relevant[i-1] | (i == least_significant_valid_instr) ?
-                                                        dispatched_instr_valid_intermediate2[i]
-                                                      : 'b0;
-    end else begin
-      assign dispatched_instr_intermediate[i]       = (least_significant_valid_instr == i) ? dispatched_instr_intermediate2[i] : 'b0;
-      assign dispatched_instr_valid_intermediate[i] = (least_significant_valid_instr == i) ? dispatched_instr_valid_intermediate2[i] : 'b0;
+    
+    for(int i = 0; i < NUM_PARALLEL_INSTR_DISPATCHES; i++) begin
+      dispatched_instr_intermediate[i] = 'b0;
+      dispatched_instr_valid_intermediate[i] = 'b0;
     end
-  end endgenerate
+    
+    //j = {$bits(j){1'd1}};
+    j = 'd0;
+    for(logic [$clog2(NUM_PARALLEL_INSTR_DISPATCHES):0] i = {1'b0, least_significant_valid_instr}; i < NUM_PARALLEL_INSTR_DISPATCHES && j < NUM_PARALLEL_INSTR_DISPATCHES; i++) begin
+      for(; j < NUM_PARALLEL_INSTR_DISPATCHES; j++) begin
+        if(dispatched_instr_valid_relevant[j]) begin
+          dispatched_instr_intermediate[i] = dispatched_instr_i[j];
+          dispatched_instr_valid_intermediate[i] = dispatched_instr_valid_relevant[j];
+          j++;//because the break cancels the other j++
+          break;
+        end
+      end
+    end
+  end
 
   //rotate around to align with head of round robin ctr
   //(i.e the instr in instr_intermediate[0] should go to buffer at idx 
@@ -122,7 +116,7 @@ module eu_IQueue import pkg_dtypes::*; #(
   //represents the lowest dispatch bus idx that is valid and relevant
   //Note: this can also be done by converting the output to one hot by only making the most significant bit disable
   //the outputs of the lesser significant bits and then passing into a one-hot to binary encoder. Might make a simpler circuit
-  always_comb begin
+  /*always_comb begin
     least_significant_valid_instr = 'd0;
     for(int c = 0; c < NUM_PARALLEL_INSTR_DISPATCHES; c++) begin
       if (dispatched_instr_valid_relevant[c]) begin
@@ -130,7 +124,7 @@ module eu_IQueue import pkg_dtypes::*; #(
         break;
       end
     end
-  end
+  end*/
 
   logic [$clog2(NUM_PARALLEL_INSTR_DISPATCHES)-1:0] idx;
   always_comb begin
@@ -178,3 +172,81 @@ module eu_IQueue import pkg_dtypes::*; #(
   end endgenerate
 
 endmodule
+
+//intermediate stores the instructions after shifting and moving all gaps to highest channel idxs
+  /*wire type_iqueue_entry dispatched_instr_intermediate       [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
+  wire                   dispatched_instr_valid_intermediate [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
+  wire type_iqueue_entry dispatched_instr_intermediate2       [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
+  wire                   dispatched_instr_valid_intermediate2 [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
+  logic                  dispatched_instr_out_en              [NUM_PARALLEL_INSTR_DISPATCHES-1:0];
+
+  generate for (genvar i = 0; i < NUM_PARALLEL_INSTR_DISPATCHES; i++) begin
+    //wire type_iqueue_entry dispatched_instr_intermediate2;
+    //wire                   dispatched_instr_valid_intermediate2;
+    
+    always_comb begin
+      case (i)
+        'd0: dispatched_instr_out_en[i] = (i == least_significant_valid_instr);
+        'd1: dispatched_instr_out_en[i] = dispatched_instr_valid_relevant[i-1] | (i == least_significant_valid_instr);
+        default: dispatched_instr_out_en[i] = (dispatched_instr_valid_relevant[i-1] & dispatched_instr_out_en[i-2]) | (i == least_significant_valid_instr);
+      endcase
+    end
+
+    if(i != (NUM_PARALLEL_INSTR_DISPATCHES-1)) begin
+      assign dispatched_instr_intermediate2[i] = dispatched_instr_valid_relevant[i] ?
+                                                dispatched_instr_i[i]
+                                              : dispatched_instr_intermediate2[i+1];
+      assign dispatched_instr_valid_intermediate2[i] = dispatched_instr_valid_relevant[i] ?
+                                                      dispatched_instr_valid_relevant[i]
+                                                    : dispatched_instr_valid_intermediate2[i+1];
+    end else begin
+      assign dispatched_instr_intermediate2[i] = dispatched_instr_valid_relevant[i] ?
+                                                dispatched_instr_i[i]
+                                              : 'b0;
+      assign dispatched_instr_valid_intermediate2[i] = dispatched_instr_valid_relevant[i] ?
+                                                      dispatched_instr_valid_relevant[i]
+                                                    : 'b0;
+    end
+    
+    if(i != 'd0) begin
+	    if(i == (NUM_PARALLEL_INSTR_DISPATCHES-1)) begin
+        assign dispatched_instr_intermediate[i] = dispatched_instr_out_en[i] ?
+                                                  dispatched_instr_intermediate2[i]
+                                                  : 'b0;
+        assign dispatched_instr_valid_intermediate[i] = dispatched_instr_out_en[i] ?
+                                                        dispatched_instr_valid_intermediate2[i]
+                                                        : 'b0;
+      end else begin
+        assign dispatched_instr_intermediate[i] = dispatched_instr_out_en[i] ?
+                                                  dispatched_instr_intermediate2[i]
+                                                  : dispatched_instr_intermediate2[i+1];
+        assign dispatched_instr_valid_intermediate[i] = dispatched_instr_out_en[i] ?
+                                                        dispatched_instr_valid_intermediate2[i]
+                                                        : dispatched_instr_valid_intermediate2[i+1];
+      end
+    end else begin
+      assign dispatched_instr_intermediate[i]       = dispatched_instr_out_en[i] ? dispatched_instr_intermediate2[i] : 'b0;
+      assign dispatched_instr_valid_intermediate[i] = dispatched_instr_out_en[i] ? dispatched_instr_valid_intermediate2[i] : 'b0;
+    end*/
+    /*if(i != 'd0) begin
+	    if(i == (NUM_PARALLEL_INSTR_DISPATCHES-1)) begin
+        assign dispatched_instr_intermediate[i] = dispatched_instr_valid_relevant[i-1] | (i == least_significant_valid_instr) ?
+                                                  dispatched_instr_intermediate2[i]
+                                                  : 'b0;
+        assign dispatched_instr_valid_intermediate[i] = dispatched_instr_valid_relevant[i-1] | (i == least_significant_valid_instr) ?
+                                                        dispatched_instr_valid_intermediate2[i]
+                                                        : 'b0;
+      end else begin
+        assign dispatched_instr_intermediate[i] = dispatched_instr_valid_relevant[i-1] | (i == least_significant_valid_instr) ?
+                                                  dispatched_instr_intermediate2[i]
+                                                  : dispatched_instr_intermediate2[i+1];
+        assign dispatched_instr_valid_intermediate[i] = dispatched_instr_valid_relevant[i-1] | (i == least_significant_valid_instr) ?
+                                                        dispatched_instr_valid_intermediate2[i]
+                                                        : dispatched_instr_valid_intermediate2[i+1];
+      end
+    end else begin
+      assign dispatched_instr_intermediate[i]       = (least_significant_valid_instr == i) ? dispatched_instr_intermediate2[i] : 'b0;
+      assign dispatched_instr_valid_intermediate[i] = (least_significant_valid_instr == i) ? dispatched_instr_valid_intermediate2[i] : 'b0;
+    end*/
+  //end endgenerate
+  

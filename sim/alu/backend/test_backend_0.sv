@@ -164,36 +164,83 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
         4'b1000: begin
           string invalSrcStr;
           `uvm_info("BACKEND_TEST0", "Reading instruction type: icon", UVM_MEDIUM)
-          read_result = $fscanf(file, fmt_code_icon,
-            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].src_addr.euidx,
-            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].src_addr.uid,
-            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].src_addr.spec,
+          if (LOG2_NUM_EXEC_UNITS == 3) begin
+            read_result = $fscanf(file, fmt_code_icon,
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].src_addr.euidx,
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].src_addr.uid,
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].src_addr.spec,
 
-            //NOTE: for some stupid reason systemverilog does not have `if macros
-            //LOG2_NUM_EXEC_UNITS >= 1
-            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[0],
-            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[1],
-            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[2],
-            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[3],
-            
-            //LOG2_NUM_EXEC_UNITS >= 2
-            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[4],
-            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[5],
-            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[6],
-            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[7],
-            
-            //LOG2_NUM_EXEC_UNITS == 3
-            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[8],
-            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[9],
-            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[10],
-            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[11],
-            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[12],
-            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[13],
-            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[14],
-            icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[15],
+                //NOTE: for some stupid reason systemverilog does not have `if macros
+                //LOG2_NUM_EXEC_UNITS >= 1
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[0],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[1],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[2],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[3],
+                
+                //LOG2_NUM_EXEC_UNITS >= 2
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[4],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[5],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[6],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[7],
+                
+                //LOG2_NUM_EXEC_UNITS == 3
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[8],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[9],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[10],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[11],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[12],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[13],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[14],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[15],
 
-            invalSrcStr
-          );
+                invalSrcStr
+            );
+          end else if (LOG2_NUM_EXEC_UNITS == 2) begin
+            read_result = $fscanf(file, fmt_code_icon,
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].src_addr.euidx,
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].src_addr.uid,
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].src_addr.spec,
+
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[0],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[1],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[2],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[3],
+                
+                //LOG2_NUM_EXEC_UNITS >= 2
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[4],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[5],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[6],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[7],
+
+                invalSrcStr
+            );
+          end else if (LOG2_NUM_EXEC_UNITS == 1) begin
+            read_result = $fscanf(file, fmt_code_icon,
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].src_addr.euidx,
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].src_addr.uid,
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].src_addr.spec,
+
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[0],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[1],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[2],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[3],
+
+                invalSrcStr
+            );
+          end else if (LOG2_NUM_EXEC_UNITS == 0) begin
+            read_result = $fscanf(file, fmt_code_icon,
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].src_addr.euidx,
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].src_addr.uid,
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].src_addr.spec,
+
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[0],
+                icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.eus[1],
+
+                invalSrcStr
+            );
+          end else begin
+            `uvm_fatal("BACKEND_TEST0", $sformatf("Unsupported LOG2_NUM_EXEC_UNITS: %0d", LOG2_NUM_EXEC_UNITS))
+          end
           //this test does not use the MMU at all
           icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.receiver_str = 1'b0;
           icon_instr_dispatch[batch_idx][icon_batch_ptrs[batch_idx]][icon_instr_dispatch_ptr].receiver_list.receiver_mxreg = 1'b0;

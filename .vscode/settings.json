@@ -17,6 +17,6 @@
       "ostream": "cpp",
       "random": "cpp"
     },
-    "editor.insertSpaces": false,
+    "editor.insertSpaces": true,
     "editor.detectIndentation": false
 }
