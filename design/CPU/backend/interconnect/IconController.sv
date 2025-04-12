@@ -65,18 +65,35 @@ module back_icon_controller import pkg_dtypes::*; #(
   // -------------------------------
   // Arbitration ILN and outputs
   // -------------------------------
+  localparam ch_idx_highest_priority = 'd1;
+  
   type_icon_receivers_list available_receivers_list_ics [NUM_ICON_CHANNELS-1:0];
-
-  assign available_receivers_list_ics[0] = {$bits(type_icon_receivers_list){1'b1}};
-  generate for(genvar ch_idx = 0; ch_idx < NUM_ICON_CHANNELS; ch_idx++) begin
-
+  assign available_receivers_list_ics[ch_idx_highest_priority] = {$bits(type_icon_receivers_list){1'b1}};
+  
+  /*always_comb begin
+    for(logic [$clog2(NUM_ICON_CHANNELS)-1:0] ch_idx = 1; ch_idx != 'd0; ch_idx++) begin
+        available_receivers_list_ics[ch_idx + 'd1] = ~receiver_lists_o[ch_idx];// & available_receivers_list_ics[ch_idx];
+    end
+  end*/
+  
+  //generate for(genvar ch_idx_g = 0; ch_idx_g < NUM_ICON_CHANNELS; ch_idx_g++) begin
+  generate for(genvar ch_idx_g = ch_idx_highest_priority; ch_idx_g < (NUM_ICON_CHANNELS+ch_idx_highest_priority); ch_idx_g++) begin
+    localparam logic [$clog2(NUM_ICON_CHANNELS)-1:0] ch_idx = ch_idx_g[$clog2(NUM_ICON_CHANNELS)-1:0];
+    //localparam logic [$clog2(NUM_ICON_CHANNELS)-1:0] ch_idx1 = ch_idx + 'd1;
+    
     assign receiver_lists_o[ch_idx] = curr_instrs_valid[ch_idx] ?
                                         available_receivers_list_ics[ch_idx]
                                         & (~success_lists_latched[ch_idx])
                                         & curr_instrs[ch_idx].receiver_list
                                       : 'b0;
-    if (ch_idx != (NUM_ICON_CHANNELS-1)) begin
-      assign available_receivers_list_ics[ch_idx + 1] = ~receiver_lists_o[ch_idx];
+    //if (ch_idx != (NUM_ICON_CHANNELS-1)) begin
+    if (ch_idx != (ch_idx_highest_priority - 'd1)) begin
+      always_comb begin
+        logic [$clog2(NUM_ICON_CHANNELS)-1:0] ch_idx1;
+        ch_idx1 = ch_idx + 'd1;
+        available_receivers_list_ics[ch_idx1] = ~receiver_lists_o[ch_idx];
+      end
+      //assign available_receivers_list_ics[ch_idx1] = ~receiver_lists_o[ch_idx];
     end
 
     assign src_addrs_o[ch_idx] = curr_instrs_valid[ch_idx] ?
@@ -87,7 +104,8 @@ module back_icon_controller import pkg_dtypes::*; #(
     //by just giving it to the channel with the lower index
     always_comb begin
       tx_req_valid_o[ch_idx] = 1'b1;
-      for (int i = 0; i < ch_idx; i++) begin
+      //for (int i = 0; i < ch_idx; i++) begin
+      for (logic [$clog2(NUM_ICON_CHANNELS)-1:0] i = ch_idx_highest_priority; i != ch_idx; i++) begin
         if(channel_active_o[i] & (curr_instrs[ch_idx].src_addr.euidx == curr_instrs[i].src_addr.euidx)) begin
           tx_req_valid_o[ch_idx] = 1'b0;
         end

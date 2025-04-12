@@ -12,7 +12,7 @@ lines: List[str] = []
 for line in assembly:
   lines.append(line)
 
-renamedInstructions: List[dict] = allocate1(lines, output_filename = "forSim/renamedAssemblyVarEU.txt", num_alus = 4)
+renamedInstructions: List[dict] = allocate1(lines, output_filename = "forSim/renamedAssemblyVarEU3.txt", num_alus = 4)
 #renamedInstructions: List[dict] = allocate1(lines, output_filename = "forSim/renamedAssemblyMtxTest.txt", num_alus = 9)
 #renamedInstructions: List[dict] = allocate1(lines, output_filename = "forSim/renamedAssemblySeqTest.txt", num_alus = 7)
 

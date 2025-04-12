@@ -94,8 +94,8 @@ module eu_ybuf import pkg_dtypes::*; #(
 
   assign op0_data_o = ys_hit_op0 ? ys_buffer.data : r_rdatab.data;
   assign op0_data_success_o = ys_hit_op0 | (r_fetch_success & r_rdatab.n_hbr);
-  assign op1_data_o = ys_hit_op0 ? ys_buffer.data : w_rdatab.data;
-  assign op1_data_success_o = ys_hit_op0 | (w_fetch_success & w_rdatab.n_hbr);
+  assign op1_data_o = ys_hit_op1 ? ys_buffer.data : w_rdatab.data;
+  assign op1_data_success_o = ys_hit_op1 | (w_fetch_success & w_rdatab.n_hbr);
 
   assign result_store_slot_available = ~r_n_hbr;
   assign result_success_o = result_valid_i & result_store_slot_available;

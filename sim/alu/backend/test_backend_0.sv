@@ -414,7 +414,10 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
             instr_dispatch[batch_idx][instr_dispatch_ptr].op1.as_imm
           );
           if (read_result != 7) begin
-            `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to read imm-imm instr at line %0d", line_idx))
+            string s;
+            $fscanf(file, "%[^\n]\n", s);
+            //void'($fgets(s, file)); //this just destroys vivado
+            `uvm_fatal("BACKEND_TEST0", $sformatf("Failed to read imm-imm instr at line %0d. result: %0d line after: %s", line_idx, read_result, s))
           end
           `uvm_info("BACKEND_TEST0", $sformatf("addr.spec: %0d", instr_dispatch[batch_idx][instr_dispatch_ptr].opd.spec), UVM_MEDIUM)
 
