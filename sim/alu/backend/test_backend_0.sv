@@ -75,7 +75,7 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
     for (int i = 0; i < 2**`LOG2_NUM_EXEC_UNITS; i++) begin
       fmt_code_icon = {fmt_code_icon, "%1b%1b,"};
     end
-    fmt_code_icon = {fmt_code_icon, "\t%4s\n"};
+    fmt_code_icon = {fmt_code_icon, "\t%5s\n"};
     //`uvm_info("BACKEND_TEST0", fmt_code_icon, UVM_MEDIUM)
 
     fmt_code_reg_none = "%d\t%3s\t%d,%d,%d\t%d,%d,%d\tNone\n";
@@ -93,7 +93,7 @@ class test_0_sequence extends uvm_sequence#(backend_sequence_item);
   localparam LOG2_NUM_EXEC_UNITS = `LOG2_NUM_EXEC_UNITS;
   localparam NUM_EXEC_UNITS = 2**LOG2_NUM_EXEC_UNITS;
   localparam NUM_BATCHES = 3; //set to some value that is larger than actual number of batches (since cannot be found at compile time)
-  localparam NUM_ICON_BATCHES = 2;
+  localparam NUM_ICON_BATCHES = 4;
   localparam EU_LOG2_IQUEUE_NUM_QUEUES = `EU_LOG2_IQUEUE_NUM_QUEUES;
   localparam EU_IQUEUE_NUM_QUEUES = 2**EU_LOG2_IQUEUE_NUM_QUEUES;
 

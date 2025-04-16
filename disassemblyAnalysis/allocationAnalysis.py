@@ -4,15 +4,17 @@ import sys
 
 #assembly = open("./allocators/testAsm3.txt", "r")
 #assembly = open("./allocators/customTestAsmMd5gg.txt", "r")
-assembly = open("./allocators/manualCustomTestAsmMd5gg.txt", "r")
+#assembly = open("./allocators/manualCustomTestAsmMd5gg.txt", "r")
 #assembly = open("./allocators/parallelAsm.txt", "r")
 #assembly = open("./allocators/sequentialAsm.txt", "r")
+assembly = open("./allocators/sequentialTreeAsm.txt", "r")
 
 lines: List[str] = []
 for line in assembly:
   lines.append(line)
 
-renamedInstructions: List[dict] = allocate1(lines, output_filename = "forSim/renamedAssemblyVarEU3.txt", num_alus = 4)
+renamedInstructions: List[dict] = allocate1(lines, output_filename = "forSim/renamedAssemblySeqTreeTest.txt", num_alus = 8)
+#renamedInstructions: List[dict] = allocate1(lines, output_filename = "forSim/renamedAssemblyVarEU3.txt", num_alus = 4)
 #renamedInstructions: List[dict] = allocate1(lines, output_filename = "forSim/renamedAssemblyMtxTest.txt", num_alus = 9)
 #renamedInstructions: List[dict] = allocate1(lines, output_filename = "forSim/renamedAssemblySeqTest.txt", num_alus = 7)
 

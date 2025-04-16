@@ -25,10 +25,12 @@ module back_icon_controller import pkg_dtypes::*; #(
   // ---------------------------
   // success list latches
   // ---------------------------
+  wire                 ready_for_next_instr [NUM_ICON_CHANNELS-1:0];
+  
   type_icon_receivers_list success_lists_latched [NUM_ICON_CHANNELS-1:0];
   generate for(genvar ch_idx = 0; ch_idx < NUM_ICON_CHANNELS; ch_idx++) begin
     always_ff @(posedge clk) begin
-      if(~reset_n) begin
+      if(~reset_n | ready_for_next_instr[ch_idx]) begin
         success_lists_latched[ch_idx] = 'b0;
       end else begin
         success_lists_latched[ch_idx] |= success_lists_i[ch_idx];
@@ -39,7 +41,6 @@ module back_icon_controller import pkg_dtypes::*; #(
   // -------------------------------
   // Channel instruction queues
   // -------------------------------
-  wire                 ready_for_next_instr [NUM_ICON_CHANNELS-1:0];
   wire type_icon_instr curr_instrs          [NUM_ICON_CHANNELS-1:0];
   wire                 curr_instrs_valid    [NUM_ICON_CHANNELS-1:0];
   assign channel_active_o = curr_instrs_valid;

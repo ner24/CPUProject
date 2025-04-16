@@ -167,7 +167,7 @@ module u_backend import pkg_dtypes::*; #(
           .eu_tx_resp_i(eu_tx_resp),
 
           //extra control
-          .force_disable_tx(force_disable_op1_tx)
+          .force_disable_tx(opx == 1 ? force_disable_op1_tx : 'b0)
         );
       end
     end
